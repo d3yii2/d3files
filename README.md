@@ -8,7 +8,7 @@
 
 ## Installation
 ```bash
-php composer.phar require d3yii2/d2files dev-master
+php composer.phar require d3yii2/d3files dev-master
 ```
 
  * add to config/web.php

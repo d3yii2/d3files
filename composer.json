@@ -1,0 +1,16 @@
+{
+    "name": "dbrisinajumi/d3files",
+    "description": "file uploader",
+    "keywords": ["files","uploader","widget","yii","phundament"],
+    "type": "yii-extension",
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "Ivars Jukams",
+            "email": "ivars.ju@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+    }
+}

@@ -10,7 +10,7 @@ $uploadUrl = Yii::$app->urlManager->createUrl(
 $script = <<< JS
 $(function(){
     var tbl = $('#d3files-table');
-        
+    
     $(document).on('click', '.d3files-delete', function(e) {
         
         if (!confirm('Are you sure you want to delete this item?')) {
@@ -26,8 +26,7 @@ $(function(){
             data:    {},
             success: function(data) {
                 row.remove();
-                var count = tbl.find('tr').length;
-                if (!count) {
+                if (!tbl.find('tr').length) {
                     addEmptyRow();
                 }
             }
@@ -50,7 +49,7 @@ $(function(){
         var url = '$uploadUrl';
         var xhr = new XMLHttpRequest();
         var fd  = new FormData();
-        xhr.open("POST", url, true);
+        xhr.open('POST', url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 // Every thing ok, file uploaded
@@ -58,22 +57,54 @@ $(function(){
                 tbl.append(xhr.responseText);
             }
         };
-        fd.append("model_name", "$model_name");
-        fd.append("_csrf", yii.getCsrfToken());
-        fd.append("upload_file", file);
+        fd.append('model_name', '$model_name');
+        fd.append('_csrf', yii.getCsrfToken());
+        fd.append('upload_file', file);
         xhr.send(fd);
+    }
+    
+    // Check for the File API support.
+    if (!window.File) {
+        $('#d3files-drop-zone').hide();
+    } else {
+        function handleFileSelect(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            handleDragLeave();
+            var file = e.dataTransfer.files[0];
+            uploadFile(file);
+        }
+
+        function handleDragOver(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+            $('#d3files-drop-zone').css('border-color', '#555');
+            $('#d3files-drop-zone').css('color', '#555');
+        }
+        
+        function handleDragLeave() {
+            $('#d3files-drop-zone').css('border-color', '#bbb');
+            $('#d3files-drop-zone').css('color', '#bbb');
+        }
+
+        // Setup the dnd listeners.
+        var dropZone = document.getElementById('d3files-drop-zone');
+        dropZone.addEventListener('dragover', handleDragOver, false);
+        dropZone.addEventListener('dragleave', handleDragLeave, false);
+        dropZone.addEventListener('drop', handleFileSelect, false);
     }
 });
 JS;
 
 $this->registerJs($script, View::POS_END);
 ?>
-<?php 
-if (!$hideTitle) {
-    ?>
-    <table class="table table-striped table-bordered" style="margin-bottom: 0px; border-bottom: 0px;">
-        <tr style="border-bottom: 0px;">
-            <th colspan="2" style="border-bottom: 0px;">
+<table class="table table-striped table-bordered" style="margin-bottom: 0px; border-bottom: 0;">
+    <?php
+    if (!$hideTitle) {
+        ?>
+        <tr style="border-bottom: 0;">
+            <th style="border-bottom: 0;">
                 <span class="<?php echo $icon; ?>"></span>
                 <?php echo $title; ?>
                 <label style="margin: 0; margin-left: 5px;" title="Add">
@@ -82,10 +113,18 @@ if (!$hideTitle) {
                 </label>
             </th>
         </tr>
-    </table>
-<?php
-}
-?>
+    <?php
+    }
+    ?>
+    <tr style="border-bottom: 0;">
+        <td style="padding: 0; border-bottom: 0;">
+            <div id="d3files-drop-zone" title="Drag&Drop a file here, upload will start automatically" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
+                <span class="glyphicon glyphicon-cloud-upload"></span>
+                Drag&Drop file here
+            </div>
+        </td>
+    </tr>
+</table>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'summary'      => '',
@@ -104,6 +143,7 @@ if (!$hideTitle) {
                     ['title' => 'Download']
                 );
             },
+            'contentOptions' => ['class' => 'col-xs-11'],
         ],
         [
             'format' => 'raw',
@@ -114,6 +154,7 @@ if (!$hideTitle) {
                     ['class' => 'd3files-delete', 'title' => 'Delete']
                 );
             },
+            'contentOptions' => ['class' => 'text-center col-xs-1'],
         ],
 
     ],

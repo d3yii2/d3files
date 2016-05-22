@@ -1,5 +1,5 @@
 <?php
-namespace app\vendor\dbrisinajumi\d3files;
+namespace app\vendor\d3yii2\d3files;
 
 /**
  * d3files module definition class
@@ -9,7 +9,7 @@ class D3Files extends \yii\base\Module
     /**
      * @inheritdoc
      */
-    public $controllerNamespace = 'app\vendor\dbrisinajumi\d3files\controllers';
+    public $controllerNamespace = 'app\vendor\d3yii2\d3files\controllers';
     
     public $upload_dir;
     public $file_types;

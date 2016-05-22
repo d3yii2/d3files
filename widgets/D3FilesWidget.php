@@ -1,9 +1,9 @@
 <?php
 
-namespace app\vendor\dbrisinajumi\d3files\widgets;
+namespace app\vendor\d3yii2\d3files\widgets;
 
 use yii\base\Widget;
-use app\vendor\dbrisinajumi\d3files\models\D3filesSearch;
+use app\vendor\d3yii2\d3files\models\D3filesSearch;
 
 class D3FilesWidget extends Widget
 {

@@ -1,13 +1,13 @@
 <?php
 
-namespace app\vendor\dbrisinajumi\d3files\models;
+namespace app\vendor\d3yii2\d3files\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\vendor\dbrisinajumi\d3files\models\D3files;
+use app\vendor\d3yii2\d3files\models\D3files;
 
 /**
- * D3filesSearch represents the model behind the search form about `app\vendor\dbrisinajumi\d3files\models\D3files`.
+ * D3filesSearch represents the model behind the search form about `app\vendor\d3yii2\d3files\models\D3files`.
  */
 class D3filesSearch extends D3files
 {

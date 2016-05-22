@@ -1,4 +1,4 @@
-# d2files (inspired from d2files)
+# d3files (inspired from d2files)
 
 
 ## Features

@@ -84,6 +84,34 @@ class FileHandler
         
     }
     
+    public function rename($new_id) {
+        
+        $oldName = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
+            . self::createSaveFileName(
+                $this->options['model_id'],
+                $this->options['file_name']
+            );
+        
+        $newName = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
+            . self::createSaveFileName(
+                $new_id,
+                $this->options['file_name']
+            );
+        
+        rename($oldName, $newName);
+    }
+    
+    public function remove() {
+        
+        $oldName = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
+            . self::createSaveFileName(
+                $this->options['model_id'],
+                $this->options['file_name']
+            );
+        
+        return unlink($oldName);
+    }
+    
     public function download()
     {
         $file_path = $this->options['upload_dir'] . DIRECTORY_SEPARATOR

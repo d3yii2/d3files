@@ -91,6 +91,18 @@ class D3filesController extends Controller
             throw new HttpException(422, 'mandatory POST parameter model_name is not set');
         }
         
+        $tmp_id = uniqid();
+        
+        $fileHandler = new FileHandler(
+            [
+                'model_name' => $_POST['model_name'],
+                'model_id'   => $tmp_id,
+                'file_name'  => $_FILES['upload_file']['name'],
+            ]
+        );
+
+        $fileHandler->upload();
+        
         $model = new D3files();
         
         $model->file_name    = $_FILES['upload_file']['name'];
@@ -100,18 +112,13 @@ class D3filesController extends Controller
         $model->model_id     = $id;
         
         if ($model->save()) {
-            $fileHandler = new FileHandler(
-                [
-                    'model_name' => $_POST['model_name'],
-                    'model_id'   => $model->id,
-                    'file_name'  => $model->file_name,
-                ]
-            );
-            
-            $fileHandler->upload();
-            
-            return $this->renderPartial('upload', ['model' => $model]);
+            $fileHandler->rename($model->id);
+        } else {
+            $fileHandler->remove();
+            throw new HttpException(500, 'Insert DB record failed');
         }
+        
+        return $this->renderPartial('upload', ['model' => $model]);
         
     }
 }

@@ -38,9 +38,11 @@ class D3filesController extends Controller
      */
     public function actionDelete($id)
     {
+        Yii::$app->response->format = 'json';
         $model = $this->findModel($id);
         $model->deleted = 1;
         $model->save();
+        return $this->renderPartial('delete', ['model' => $model]);
     }
 
     /**
@@ -55,7 +57,7 @@ class D3filesController extends Controller
         if (($model = D3files::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+            throw new NotFoundHttpException('The requested file does not exist.');
         }
     }
     
@@ -78,6 +80,8 @@ class D3filesController extends Controller
     public function actionUpload($id)
     {
         // $id te ir id modelim, kuram tiek pievienots pielikums
+        
+        Yii::$app->response->format = 'json';
         
         if (!isset($_FILES['upload_file'])) {
             throw new NotFoundHttpException('File not uploaded.');

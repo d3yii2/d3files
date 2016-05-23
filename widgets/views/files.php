@@ -10,8 +10,25 @@ $uploadUrl = Yii::$app->urlManager->createUrl(
 $script = <<< JS
 $(function(){
     var tbl = $('#d3files-table');
+        
+    function showError(data)
+    {
+        $('#d3files-alert').remove();
+        
+        var html = '<div id="d3files-alert" class="alert alert-danger alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
+        html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+        html += '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> ';
+        html += '<strong>' + data.status + '</strong> ';
+        html += '<span class="sr-only">' + data.name + '</span> ';
+        html += data.message;
+        html += '</div>';
+        
+        $('#d3files-widget').prepend(html);
+    }
     
     $(document).on('click', '.d3files-delete', function(e) {
+        
+        $('#d3files-alert').remove();
         
         if (!confirm('Are you sure you want to delete this item?')) {
             return false;
@@ -29,6 +46,9 @@ $(function(){
                 if (!tbl.find('tr').length) {
                     addEmptyRow();
                 }
+            },
+            error: function(xhr) {
+                showError(xhr.responseJSON);
             }
         });
         
@@ -46,15 +66,22 @@ $(function(){
     });
     
     function uploadFile(file) {
+        $('#d3files-alert').remove();
+        
         var url = '$uploadUrl';
         var xhr = new XMLHttpRequest();
         var fd  = new FormData();
         xhr.open('POST', url, true);
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                // Every thing ok, file uploaded
-                tbl.find('div.empty').closest('tr').remove();
-                tbl.append(xhr.responseText);
+            if (xhr.readyState == 4) {
+                var response = $.parseJSON(xhr.responseText);
+        
+                if (xhr.status == 200) {
+                    tbl.find('div.empty').closest('tr').remove();
+                    tbl.append(response);
+                } else {
+                    showError(response);
+                }
             }
         };
         fd.append('model_name', '$model_name');
@@ -99,6 +126,7 @@ JS;
 
 $this->registerJs($script, View::POS_END);
 ?>
+<div id="d3files-widget">
 <table class="table table-striped table-bordered" style="margin-bottom: 0px; border-bottom: 0;">
     <?php
     if (!$hideTitle) {
@@ -162,3 +190,4 @@ $this->registerJs($script, View::POS_END);
         'class' => 'd3files-row',
     ],
 ]); ?>
+</div>

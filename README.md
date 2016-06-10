@@ -15,7 +15,7 @@ php composer.phar require d3yii2/d3files dev-master
 ```php
     'modules' => [
         'd3files' => [
-            'class'      => 'app\vendor\d3yii2\d3files\D3Files',
+            'class'      => 'd3yii2\d3files\D3Files',
             'upload_dir' => dirname(__DIR__) . '\upload\d3files',
         ],
     ],
@@ -24,7 +24,7 @@ php composer.phar require d3yii2/d3files dev-master
 ## Usage
 ### VIEW
 ```php
-    <?= app\vendor\d3yii2\d3files\widgets\D3FilesWidget::widget(
+    <?= d3yii2\d3files\widgets\D3FilesWidget::widget(
         [
             'model'     => $model,
             'model_id'  => $model->id,

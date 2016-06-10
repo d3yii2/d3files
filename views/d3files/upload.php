@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\vendor\d3yii2\d3files\models\D3files */
+/* @var $model d3yii2\d3files\models\D3files */
 
 ?>
 <tr data-key="<?= $model->id; ?>" class="d3files-row">

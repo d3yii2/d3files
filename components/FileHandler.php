@@ -1,5 +1,5 @@
 <?php
-namespace app\vendor\d3yii2\d3files\components;
+namespace d3yii2\d3files\components;
 
 use yii\web\NotFoundHttpException;
 use yii\base\InvalidParamException;

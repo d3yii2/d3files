@@ -1,6 +1,6 @@
 <?php
 
-namespace app\vendor\d3yii2\d3files\models;
+namespace d3yii2\d3files\models;
 
 use yii\db\ActiveRecord;
 

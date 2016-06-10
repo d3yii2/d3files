@@ -1,10 +1,10 @@
 <?php
 
-namespace app\vendor\d3yii2\d3files\controllers;
+namespace d3yii2\d3files\controllers;
 
 use Yii;
-use app\vendor\d3yii2\d3files\models\D3files;
-use app\vendor\d3yii2\d3files\components\FileHandler;
+use d3yii2\d3files\models\D3files;
+use d3yii2\d3files\components\FileHandler;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\HttpException;

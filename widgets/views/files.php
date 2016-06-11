@@ -9,13 +9,12 @@ $uploadUrl = Yii::$app->urlManager->createUrl(
 
 $script = <<< JS
 $(function(){
-    var tbl = $('#d3files-table');
-        
-    function showError(data)
+    
+    function showError(data, el)
     {
-        $('#d3files-alert').remove();
+        $('.d3files-alert').remove();
         
-        var html = '<div id="d3files-alert" class="alert alert-danger alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
+        var html = '<div class="d3files-alert alert alert-danger alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
         html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
         html += '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> ';
         html += '<strong>' + data.status + '</strong> ';
@@ -23,19 +22,21 @@ $(function(){
         html += data.message;
         html += '</div>';
         
-        $('#d3files-widget').prepend(html);
+        el.prepend(html);
     }
     
     $(document).on('click', '.d3files-delete', function(e) {
         
-        $('#d3files-alert').remove();
+        $('.d3files-alert').remove();
         
         if (!confirm('Are you sure you want to delete this item?')) {
             return false;
         }
         
         var url = $(this).attr('href');
+        var tbl = $(this).closest('table');
         var row = $(this).closest('tr');
+        var el  = $(this).closest('.d3files-widget');
         
         $.ajax({
             url:     url,
@@ -48,7 +49,7 @@ $(function(){
                 }
             },
             error: function(xhr) {
-                showError(xhr.responseJSON);
+                showError(xhr.responseJSON, el);
             }
         });
         
@@ -60,15 +61,17 @@ $(function(){
         return false;
     });
         
-    $('#d3file-input').on('change', function() {
-        uploadFile(this.files[0]);
+    $('.d3file-input').on('change', function() {
+        uploadFile(this.files[0], $(this).closest('.d3files-widget'));
         return false;
     });
     
-    function uploadFile(file) {
-        $('#d3files-alert').remove();
+    function uploadFile(file, el) {
+        $('.d3files-alert').remove();
         
-        var url = '$uploadUrl';
+        var tbl = el.find('table.d3files-table');
+        
+        var url = el.find('.d3file-input').attr('data-url');
         var xhr = new XMLHttpRequest();
         var fd  = new FormData();
         xhr.open('POST', url, true);
@@ -80,11 +83,11 @@ $(function(){
                     tbl.find('div.empty').closest('tr').remove();
                     tbl.append(response);
                 } else {
-                    showError(response);
+                    showError(response, el);
                 }
             }
         };
-        fd.append('model_name', '$model_name');
+        fd.append('model_name', el.find('.d3file-input').attr('name'));
         fd.append('_csrf', yii.getCsrfToken());
         fd.append('upload_file', file);
         xhr.send(fd);
@@ -92,41 +95,45 @@ $(function(){
     
     // Check for the File API support.
     if (!window.File) {
-        $('#d3files-drop-zone').hide();
+        $('.d3files-drop-zone').hide();
     } else {
         function handleFileSelect(e) {
             e.stopPropagation();
             e.preventDefault();
-            handleDragLeave();
+            handleDragLeave(e);
             var file = e.dataTransfer.files[0];
-            uploadFile(file);
+            uploadFile(file, $(e.target).closest('.d3files-widget'));
         }
 
         function handleDragOver(e) {
             e.stopPropagation();
             e.preventDefault();
             e.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-            $('#d3files-drop-zone').css('border-color', '#555');
-            $('#d3files-drop-zone').css('color', '#555');
+            $(e.target).css('border-color', '#555');
+            $(e.target).css('color', '#555');
         }
         
-        function handleDragLeave() {
-            $('#d3files-drop-zone').css('border-color', '#bbb');
-            $('#d3files-drop-zone').css('color', '#bbb');
+        function handleDragLeave(e) {
+            $(e.target).css('border-color', '#bbb');
+            $(e.target).css('color', '#bbb');
         }
 
         // Setup the dnd listeners.
-        var dropZone = document.getElementById('d3files-drop-zone');
-        dropZone.addEventListener('dragover', handleDragOver, false);
-        dropZone.addEventListener('dragleave', handleDragLeave, false);
-        dropZone.addEventListener('drop', handleFileSelect, false);
+        $('.d3files-drop-zone').each(function() {
+            var dropZone = $(this)[0];
+        
+            dropZone.addEventListener('dragover', handleDragOver, false);
+            dropZone.addEventListener('dragleave', handleDragLeave, false);
+            dropZone.addEventListener('drop', handleFileSelect, false);
+        });
+        
     }
 });
 JS;
 
-$this->registerJs($script, View::POS_END);
+$this->registerJs($script, View::POS_END, 'd3files');
 ?>
-<div id="d3files-widget">
+<div class="d3files-widget">
 <table class="table table-striped table-bordered" style="margin-bottom: 0px; border-bottom: 0;">
     <?php
     if (!$hideTitle) {
@@ -136,7 +143,7 @@ $this->registerJs($script, View::POS_END);
                 <span class="<?php echo $icon; ?>"></span>
                 <?php echo $title; ?>
                 <label style="margin: 0; margin-left: 5px;" title="Add">
-                    <input type="file" id="d3file-input" style="display: none;" />
+                    <input type="file" class="d3file-input" style="display: none;" data-url="<?php echo $uploadUrl; ?>" name="<?php echo $model_name; ?>" />
                     <span class="glyphicon glyphicon-plus text-primary" style="cursor: pointer;"></span>
                 </label>
             </th>
@@ -146,7 +153,7 @@ $this->registerJs($script, View::POS_END);
     ?>
     <tr style="border-bottom: 0;">
         <td style="padding: 0; border-bottom: 0;">
-            <div id="d3files-drop-zone" title="Drag&Drop a file here, upload will start automatically" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
+            <div class="d3files-drop-zone" title="Drag&Drop a file here, upload will start automatically" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
                 <span class="glyphicon glyphicon-cloud-upload"></span>
                 Drag&Drop file here
             </div>
@@ -157,9 +164,9 @@ $this->registerJs($script, View::POS_END);
     'dataProvider' => $dataProvider,
     'summary'      => '',
     'showHeader'   => false,
+    //'emptyText'    => '',
     'tableOptions' => [
-        'id'    => 'd3files-table',
-        'class' => 'table table-striped table-bordered'
+        'class' => 'd3files-table table table-striped table-bordered'
     ],
     'columns'      => [
         [

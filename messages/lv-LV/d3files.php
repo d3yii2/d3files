@@ -42,7 +42,7 @@ return [
     'File deleted' => 'Fails dzēsts',
     'Model ID' => 'Modeļa ID',
     'Model Name' => 'Modeļa nosaukums',
-    'No results found.' => 'Ieraksti netika atrasti',
+    'No results found.' => 'Nekas nav atrasts.',
     'Notes' => 'Piezīmes',
     'Type ID' => 'Tips',
     'User ID' => 'Lietotāja ID',

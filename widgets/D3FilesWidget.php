@@ -65,4 +65,9 @@ class D3FilesWidget extends Widget
         );
         
     }
+    
+    public function getViewPath()
+    {
+        return dirname(__DIR__) . '/views/d3files/';
+    }
 }

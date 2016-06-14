@@ -2,6 +2,7 @@
 
 namespace d3yii2\d3files\models;
 
+use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -48,15 +49,15 @@ class D3files extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'type_id' => 'Type ID',
-            'file_name' => 'File Name',
-            'add_datetime' => 'Add Datetime',
-            'user_id' => 'User ID',
-            'deleted' => 'Deleted',
-            'notes' => 'Notes',
-            'model_name' => 'Model Name',
-            'model_id' => 'Model ID',
+            'id'           => Yii::t('d3files', 'ID'),
+            'type_id'      => Yii::t('d3files', 'Type ID'),
+            'file_name'    => Yii::t('d3files', 'File Name'),
+            'add_datetime' => Yii::t('d3files', 'Add Datetime'),
+            'user_id'      => Yii::t('d3files', 'User ID'),
+            'deleted'      => Yii::t('d3files', 'Deleted'),
+            'notes'        => Yii::t('d3files', 'Notes'),
+            'model_name'   => Yii::t('d3files', 'Model Name'),
+            'model_id'     => Yii::t('d3files', 'Model ID'),
         ];
     }
 }

@@ -1,1 +1,3 @@
-File deleted
+<?php
+
+echo Yii::t('d3files', 'File deleted');

@@ -57,7 +57,7 @@ class D3filesController extends Controller
         if (($model = D3files::findOne($id)) !== null) {
             return $model;
         } else {
-            throw new NotFoundHttpException('The requested file does not exist.');
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
     }
     
@@ -79,16 +79,16 @@ class D3filesController extends Controller
     
     public function actionUpload($id)
     {
-        // $id te ir id modelim, kuram tiek pievienots pielikums
+        // $id here is id for model to which will be attached attachments
         
         Yii::$app->response->format = 'json';
         
         if (!isset($_FILES['upload_file'])) {
-            throw new NotFoundHttpException('File not uploaded.');
+            throw new NotFoundHttpException(Yii::t('d3files', 'File not uploaded.'));
         }
         
         if (empty($_POST['model_name'])) {
-            throw new HttpException(422, 'mandatory POST parameter model_name is not set');
+            throw new HttpException(422, Yii::t('d3files', 'mandatory POST parameter model_name is not set'));
         }
         
         $tmp_id = uniqid();
@@ -115,7 +115,7 @@ class D3filesController extends Controller
             $fileHandler->rename($model->id);
         } else {
             $fileHandler->remove();
-            throw new HttpException(500, 'Insert DB record failed');
+            throw new HttpException(500, Yii::t('d3files', 'Insert DB record failed'));
         }
         
         return $this->renderPartial('upload', ['model' => $model]);

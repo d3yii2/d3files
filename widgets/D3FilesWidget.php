@@ -2,7 +2,9 @@
 
 namespace d3yii2\d3files\widgets;
 
+use Yii;
 use yii\base\Widget;
+use d3yii2\d3files\D3Files;
 use d3yii2\d3files\models\D3filesSearch;
 
 class D3FilesWidget extends Widget
@@ -20,6 +22,7 @@ class D3FilesWidget extends Widget
     public function init()
     {
         parent::init();
+        D3Files::registerTranslations();
         
         $reflection       = new \ReflectionClass($this->model);
         $this->model_name = $reflection->getShortName();
@@ -36,12 +39,12 @@ class D3FilesWidget extends Widget
             ]
         );
     }
-
+    
     public function run()
     {
         
         if ($this->title === null) {
-            $this->title = 'Attachments';
+            $this->title = Yii::t('d3files', 'Attachments');
         }
         
         if ($this->icon === null) {

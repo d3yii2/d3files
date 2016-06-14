@@ -1,6 +1,7 @@
 <?php
 namespace d3yii2\d3files\components;
 
+use Yii;
 use yii\web\NotFoundHttpException;
 use yii\base\InvalidParamException;
 use yii\web\ForbiddenHttpException;
@@ -15,15 +16,15 @@ class FileHandler
     public function __construct($options) {
         
         if (!isset($options['model_name'])) {
-            throw new InvalidParamException('UploadHandler mandatory option module_name is not set');
+            throw new InvalidParamException(Yii::t('d3files', 'UploadHandler mandatory option module_name is not set'));
         }
         
         if (!isset($options['model_id'])) {
-            throw new InvalidParamException('UploadHandler mandatory option model_id is not set');
+            throw new InvalidParamException(Yii::t('d3files', 'UploadHandler mandatory option model_id is not set'));
         }
         
         if (!isset($options['file_name'])) {
-            throw new InvalidParamException('UploadHandler mandatory option file_name is not set');
+            throw new InvalidParamException(Yii::t('d3files', 'UploadHandler mandatory option file_name is not set'));
         }
         
         $this->options['upload_dir'] = self::getUploadDirPath($options['model_name']); 
@@ -37,7 +38,7 @@ class FileHandler
             pathinfo($this->options['file_name'])['extension']
         )
         ) {
-            throw new ForbiddenHttpException('Forbidden file type');
+            throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type'));
         }
         
     }
@@ -65,7 +66,7 @@ class FileHandler
     {
         
         if (!isset($_FILES['upload_file'])) {
-            throw new InvalidParamException('upload_file is not set');
+            throw new InvalidParamException(Yii::t('d3files', 'upload_file is not set'));
         }
         
         if (!move_uploaded_file(
@@ -77,7 +78,7 @@ class FileHandler
                 )
         )
         ) {
-            throw new NotFoundHttpException('The uploaded file does not exist.');
+            throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
         
         return true;
@@ -121,7 +122,7 @@ class FileHandler
                 );
         
         if (!is_file($file_path)) {
-            throw new NotFoundHttpException('The requested file does not exist.');
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
         
         header('Content-Description: File Transfer');

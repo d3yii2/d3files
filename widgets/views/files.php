@@ -7,6 +7,10 @@ $uploadUrl = Yii::$app->urlManager->createUrl(
     ['d3files/d3files/upload', 'id' => $model_id]
 );
 
+$t_aria_label = Yii::t('d3files', 'Close');
+$t_confirm    = Yii::t('d3files', 'Are you sure you want to delete this item?');
+$t_no_results = Yii::t('d3files', 'No results found.');
+
 $script = <<< JS
 $(function(){
     
@@ -15,7 +19,7 @@ $(function(){
         $('.d3files-alert').remove();
         
         var html = '<div class="d3files-alert alert alert-danger alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
-        html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+        html += '<button type="button" class="close" data-dismiss="alert" aria-label="$t_aria_label"><span aria-hidden="true">&times;</span></button>';
         html += '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> ';
         html += '<strong>' + data.status + '</strong> ';
         html += '<span class="sr-only">' + data.name + '</span> ';
@@ -29,7 +33,7 @@ $(function(){
         
         $('.d3files-alert').remove();
         
-        if (!confirm('Are you sure you want to delete this item?')) {
+        if (!confirm('$t_confirm')) {
             return false;
         }
         
@@ -54,7 +58,7 @@ $(function(){
         });
         
         function addEmptyRow() {
-            var html = '<tr><td colspan="2"><div class="empty">No results found.</div></td></tr>';
+            var html = '<tr><td colspan="2"><div class="empty">$t_no_results</div></td></tr>';
             tbl.append(html);
         }
         
@@ -142,7 +146,7 @@ $this->registerJs($script, View::POS_END, 'd3files');
             <th style="border-bottom: 0;">
                 <span class="<?php echo $icon; ?>"></span>
                 <?php echo $title; ?>
-                <label style="margin: 0; margin-left: 5px;" title="Add">
+                <label style="margin: 0; margin-left: 5px;" title="<?php echo Yii::t('d3files', 'Add'); ?>">
                     <input type="file" class="d3file-input" style="display: none;" data-url="<?php echo $uploadUrl; ?>" name="<?php echo $model_name; ?>" />
                     <span class="glyphicon glyphicon-plus text-primary" style="cursor: pointer;"></span>
                 </label>
@@ -153,9 +157,9 @@ $this->registerJs($script, View::POS_END, 'd3files');
     ?>
     <tr style="border-bottom: 0;">
         <td style="padding: 0; border-bottom: 0;">
-            <div class="d3files-drop-zone" title="Drag&Drop a file here, upload will start automatically" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
+            <div class="d3files-drop-zone" title="<?php echo Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically'); ?>" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
                 <span class="glyphicon glyphicon-cloud-upload"></span>
-                Drag&Drop file here
+                <?php echo Yii::t('d3files', 'Drag&Drop file here'); ?>
             </div>
         </td>
     </tr>
@@ -175,7 +179,7 @@ $this->registerJs($script, View::POS_END, 'd3files');
                 return Html::a(
                     $data->file_name,
                     ['d3files/d3files/download', 'id' => $data->id],
-                    ['title' => 'Download']
+                    ['title' => Yii::t('d3files', 'Download')]
                 );
             },
             'contentOptions' => ['class' => 'col-xs-11'],
@@ -186,7 +190,7 @@ $this->registerJs($script, View::POS_END, 'd3files');
                 return Html::a(
                     '<span class="glyphicon glyphicon-trash"></span>',
                     ['d3files/d3files/delete', 'id' => $data->id],
-                    ['class' => 'd3files-delete', 'title' => 'Delete']
+                    ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
                 );
             },
             'contentOptions' => ['class' => 'text-center col-xs-1'],

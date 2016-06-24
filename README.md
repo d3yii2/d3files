@@ -21,6 +21,18 @@ php composer.phar require d3yii2/d3files dev-master
     ],
 ```
 
+* migration configuration. Add to console parameters migration path
+```php
+    'yii.migrations' => [
+        '@vendor/d3yii2/d3files/migrations',
+    ],
+```
+
+* do migration
+```bash
+yii migrate
+```
+
 ## Usage
 ### VIEW
 ```php

@@ -178,7 +178,7 @@ $this->registerJs($script, View::POS_END, 'd3files');
             'value'  => function ($data) {
                 return Html::a(
                     $data->file_name,
-                    ['d3files/d3files/download', 'id' => $data->id],
+                    ['/d3files/d3files/download', 'id' => $data->id],
                     ['title' => Yii::t('d3files', 'Download')]
                 );
             },

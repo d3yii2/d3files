@@ -93,9 +93,11 @@ class D3filesController extends Controller
         
         $tmp_id = uniqid();
         
+        $request = Yii::$app->request;
+
         $fileHandler = new FileHandler(
             [
-                'model_name' => $_POST['model_name'],
+                'model_name' => $request->post('model_name'),
                 'model_id'   => $tmp_id,
                 'file_name'  => $_FILES['upload_file']['name'],
             ]
@@ -104,11 +106,11 @@ class D3filesController extends Controller
         $fileHandler->upload();
         
         $model = new D3files();
-        
+
         $model->file_name    = $_FILES['upload_file']['name'];
         $model->add_datetime = date('Y-m-d H:i:s');
         $model->user_id      = Yii::$app->user->getId();
-        $model->model_name   = 'People';
+        $model->model_name   = $request->post('model_name');
         $model->model_id     = $id;
         
         if ($model->save()) {

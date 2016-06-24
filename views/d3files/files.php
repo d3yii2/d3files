@@ -189,7 +189,7 @@ $this->registerJs($script, View::POS_END, 'd3files');
             'value'  => function ($data) {
                 return Html::a(
                     '<span class="glyphicon glyphicon-trash"></span>',
-                    ['d3files/d3files/delete', 'id' => $data->id],
+                    ['/d3files/d3files/delete', 'id' => $data->id],
                     ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
                 );
             },

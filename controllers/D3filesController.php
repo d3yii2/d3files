@@ -108,7 +108,7 @@ class D3filesController extends Controller
         $model = new D3files();
 
         $model->file_name    = $_FILES['upload_file']['name'];
-        $model->add_datetime = date('Y-m-d H:i:s');
+        $model->add_datetime = new \yii\db\Expression('NOW()');
         $model->user_id      = Yii::$app->user->getId();
         $model->model_name   = $request->post('model_name');
         $model->model_id     = $id;

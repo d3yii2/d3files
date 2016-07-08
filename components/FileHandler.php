@@ -62,6 +62,12 @@ class FileHandler
             . DIRECTORY_SEPARATOR . $model_name;
     }
     
+    /**
+     * copy posted file to upload directory
+     * @return boolean
+     * @throws InvalidParamException
+     * @throws NotFoundHttpException
+     */
     public function upload()
     {
         
@@ -69,15 +75,7 @@ class FileHandler
             throw new InvalidParamException(Yii::t('d3files', 'upload_file is not set'));
         }
         
-        if (!move_uploaded_file(
-            $_FILES['upload_file']['tmp_name'],
-            $this->options['upload_dir'] . DIRECTORY_SEPARATOR
-                . self::createSaveFileName(
-                    $this->options['model_id'],
-                    $this->options['file_name']
-                )
-        )
-        ) {
+        if (!move_uploaded_file($_FILES['upload_file']['tmp_name'], $this->getFilePath())) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
         
@@ -85,13 +83,31 @@ class FileHandler
         
     }
     
-    public function rename($new_id) {
+    /**
+     * get file path for saving uploaded file
+     * @return string
+     */
+    public function getFilePath()
+    {
+        return $this->options['upload_dir'] . DIRECTORY_SEPARATOR
+                . self::createSaveFileName(
+                    $this->options['model_id'],
+                    $this->options['file_name']
+                );
+    }
+
+    /**
+     * save file. Alternative for method  upload()
+     * @param string $fileContent
+     */
+    public function save(&$fileContent)
+    {
+        file_put_contents($this->getFilePath(), $fileContent);
         
-        $oldName = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
-            . self::createSaveFileName(
-                $this->options['model_id'],
-                $this->options['file_name']
-            );
+        return true;
+    }
+
+    public function rename($new_id) {
         
         $newName = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
             . self::createSaveFileName(
@@ -99,7 +115,7 @@ class FileHandler
                 $this->options['file_name']
             );
         
-        rename($oldName, $newName);
+        rename($this->getFilePath(), $newName);
     }
     
     public function remove() {

@@ -71,13 +71,14 @@ class D3files extends ActiveRecord
      * @param int $userId
      * @throws HttpException
      */
-    public static function saveFile($fileName,$modelName,$modelId, $fileContent, $userId = 0)
+    public static function saveFile($fileName,$modelName,$modelId, $fileContent, $fileTypes, $userId = 0 )
     {
         $fileHandler = new FileHandler(
             [
                 'model_name' => $modelName,
                 'model_id'   => uniqid(),
                 'file_name'  => $fileName,
+                'file_types'  => $fileTypes,
             ]
         );
 
@@ -95,7 +96,7 @@ class D3files extends ActiveRecord
             $fileHandler->rename($model->id);
         } else {
             $fileHandler->remove();
-            throw new HttpException(500, Yii::t('d3files', 'Insert DB record failed'));
+            throw new Exception(500, Yii::t('d3files', 'Insert DB record failed'));
         }        
     }
 }

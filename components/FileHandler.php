@@ -9,7 +9,7 @@ use yii\web\ForbiddenHttpException;
 class FileHandler
 {
     
-    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm)$/i';
+    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt)$/i';
     
     protected $options;
 
@@ -33,12 +33,9 @@ class FileHandler
         $this->options['model_id']   = $options['model_id'];
         $this->options['file_name']  = $options['file_name'];
         
-        if (!preg_match(
-            $this->options['file_types'],
-            pathinfo($this->options['file_name'])['extension']
-        )
-        ) {
-            throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type'));
+        $fileExtension = pathinfo($this->options['file_name'])['extension'];
+        if (!preg_match($this->options['file_types'],$fileExtension)) {
+            throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: ' . $fileExtension));
         }
         
     }

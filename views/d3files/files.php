@@ -1,6 +1,5 @@
 <?php
 use yii\helpers\Html;
-use yii\grid\GridView;
 use yii\web\View;
 
 $uploadUrl = Yii::$app->urlManager->createUrl(

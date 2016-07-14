@@ -18,7 +18,7 @@ class m160714_080102_create_table_d3files_model extends Migration
              `model_id` BIGINT,
              `deleted` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
              PRIMARY KEY (`id`),
-             FOREIGN KEY (`d3files_id`) REFERENCES `yii2basic`.`d3files`(`id`)
+             FOREIGN KEY (`d3files_id`) REFERENCES `d3files`(`id`)
            ) ENGINE=INNODB CHARSET=utf8;
            
             ALTER TABLE `d3files`   

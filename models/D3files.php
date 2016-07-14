@@ -15,8 +15,6 @@ use d3yii2\d3files\components\FileHandler;
  * @property integer $user_id
  * @property integer $deleted
  * @property string $notes
- * @property string $model_name
- * @property string $model_id
  */
 class D3files extends ActiveRecord
 {
@@ -34,12 +32,11 @@ class D3files extends ActiveRecord
     public function rules()
     {
         return [
-            [['type_id', 'user_id', 'deleted', 'model_id'], 'integer'],
-            [['file_name', 'add_datetime', 'user_id', 'model_name', 'model_id'], 'required'],
+            [['type_id', 'user_id', 'deleted'], 'integer'],
+            [['file_name', 'add_datetime', 'user_id'], 'required'],
             [['notes'], 'string'],
             [['add_datetime'], 'safe'],
             [['file_name'], 'string', 'max' => 255],
-            [['model_name'], 'string', 'max' => 50],
         ];
     }
 
@@ -56,8 +53,6 @@ class D3files extends ActiveRecord
             'user_id'      => Yii::t('d3files', 'User ID'),
             'deleted'      => Yii::t('d3files', 'Deleted'),
             'notes'        => Yii::t('d3files', 'Notes'),
-            'model_name'   => Yii::t('d3files', 'Model Name'),
-            'model_id'     => Yii::t('d3files', 'Model ID'),
         ];
     }
     
@@ -89,14 +84,60 @@ class D3files extends ActiveRecord
         $model->file_name    = $fileName;
         $model->add_datetime = new \yii\db\Expression('NOW()');
         $model->user_id      = $userId;
-        $model->model_name   = $modelName;
-        $model->model_id     = $modelId;
         
         if ($model->save()) {
+            
+            $modelM = new D3filesModel();
+            $modelM->d3files_id = $model->id;
+            $modelM->is_file = 1;
+            $modelM->model_name = $modelName;
+            $modelM->model_id = $modelId;
+            $modelM->save();            
+            
             $fileHandler->rename($model->id);
         } else {
             $fileHandler->remove();
             throw new Exception(500, Yii::t('d3files', 'Insert DB record failed'));
         }        
     }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getD3filesModels()
+    {
+        return $this->hasMany(D3filesModel::className(), ['d3files_id' => 'id']);
+    }     
+    
+    /**
+     * get file list for widget
+     * 
+     * @param string $modelName model name
+     * @param int $modelId mder record PK value
+     * @return array
+     */
+    public static function fileListForWidget($modelName, $modelId) {
+
+        $sSql = "
+            SELECT 
+              f.id,
+              f.file_name,
+              fm.id  file_model_id
+            FROM
+              d3files f 
+              INNER JOIN d3files_model fm 
+                ON f.id = fm.d3files_id 
+            WHERE fm.model_name = :model_name 
+              AND fm.model_id = :model_id
+              AND fm.deleted = 0
+                 ";
+        $parameters = [
+            ':model_name' => $modelName,
+            ':model_id' => $modelId,
+        ];
+        
+        $connection = \Yii::$app->getDb();
+        $command = $connection->createCommand($sSql, $parameters);
+        return $command->queryAll();        
+    }    
 }

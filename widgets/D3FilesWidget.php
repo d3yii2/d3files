@@ -5,7 +5,7 @@ namespace d3yii2\d3files\widgets;
 use Yii;
 use yii\base\Widget;
 use d3yii2\d3files\D3Files;
-use d3yii2\d3files\models\D3filesSearch;
+use d3yii2\d3files\models\D3files as ModelD3Files;
 
 class D3FilesWidget extends Widget
 {
@@ -16,8 +16,8 @@ class D3FilesWidget extends Widget
     public $icon;
     public $hideTitle;
     public $readOnly;
-    
-    protected $dataProvider;
+
+    protected $fileList;
 
     public function init()
     {
@@ -26,18 +26,9 @@ class D3FilesWidget extends Widget
         
         $reflection       = new \ReflectionClass($this->model);
         $this->model_name = $reflection->getShortName();
-        $searchModel      = new D3filesSearch();
+
+        $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);        
         
-        $this->dataProvider = $searchModel->search(
-            [
-                'D3filesSearch' =>
-                    [
-                        'model_name' => $this->model_name,
-                        'model_id'   => $this->model_id,
-                        'deleted'    => 0,
-                    ]
-            ]
-        );
     }
     
     public function run()
@@ -60,7 +51,7 @@ class D3FilesWidget extends Widget
                 'icon'         => $this->icon,
                 'hideTitle'    => $this->hideTitle,
                 'readOnly'     => $this->readOnly,
-                'dataProvider' => $this->dataProvider,
+                'fileList'     => $this->fileList,
             ]
         );
         

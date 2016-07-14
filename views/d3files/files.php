@@ -164,41 +164,30 @@ $this->registerJs($script, View::POS_END, 'd3files');
         </td>
     </tr>
 </table>
-<?= GridView::widget([
-    'dataProvider' => $dataProvider,
-    'summary'      => '',
-    'showHeader'   => false,
-    //'emptyText'    => '',
-    'tableOptions' => [
-        'class' => 'd3files-table table table-striped table-bordered'
-    ],
-    'columns'      => [
-        [
-            'format' => 'raw',
-            'value'  => function ($data) {
-                return Html::a(
-                    $data->file_name,
-                    ['/d3files/d3files/download', 'id' => $data->id],
-                    ['title' => Yii::t('d3files', 'Download')]
-                );
-            },
-            'contentOptions' => ['class' => 'col-xs-11'],
-        ],
-        [
-            'format' => 'raw',
-            'value'  => function ($data) {
-                return Html::a(
-                    '<span class="glyphicon glyphicon-trash"></span>',
-                    ['/d3files/d3files/delete', 'id' => $data->id],
-                    ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
-                );
-            },
-            'contentOptions' => ['class' => 'text-center col-xs-1'],
-        ],
+<table class="d3files-table table table-striped table-bordered">
+<?php
 
-    ],
-    'rowOptions' => [
-        'class' => 'd3files-row',
-    ],
-]); ?>
+foreach ($fileList as $row){
+    ?>
+    <tr>
+        <td class="col-xs-11">
+            <?=Html::a(
+                    $row['file_name'],
+                    ['/d3files/d3files/download', 'id' => $row['id']],
+                    ['title' => Yii::t('d3files', 'Download')]
+                )?>
+        </td>
+        <td class="text-center col-xs-1">
+            <?=Html::a(
+                    '<span class="glyphicon glyphicon-trash"></span>',
+                    ['/d3files/d3files/delete', 'id' => $row['file_model_id']],
+                    ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
+                );?>
+        </td>
+    </tr>
+    <?php
+}
+?>        
+</table>    
+
 </div>

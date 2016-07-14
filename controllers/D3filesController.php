@@ -5,6 +5,7 @@ namespace d3yii2\d3files\controllers;
 use Yii;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\components\FileHandler;
+use d3yii2\d3files\models\D3filesModel;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\HttpException;
@@ -39,10 +40,10 @@ class D3filesController extends Controller
     public function actionDelete($id)
     {
         Yii::$app->response->format = 'json';
-        $model = $this->findModel($id);
+        $model = D3filesModel::findOne($id);
         $model->deleted = 1;
         $model->save();
-        return $this->renderPartial('delete', ['model' => $model]);
+        return $this->renderPartial('delete');
     }
 
     /**
@@ -64,13 +65,18 @@ class D3filesController extends Controller
     public function actionDownload($id)
     {
         
-        $model = $this->findModel($id);
+        $file = $this->findModel($id);
+        $fileModel = $file->getD3filesModels()->where(['is_file' => 1])->one();
+        
+        if(!$fileModel){
+            return false;
+        }
         
         $fileHandler = new FileHandler(
             [
-                'model_name' => $model->model_name,
-                'model_id'   => $model->id,
-                'file_name'  => $model->file_name,
+                'model_name' => $fileModel->model_name,
+                'model_id'   => $file->id,
+                'file_name'  => $file->file_name,
             ]
         );
         
@@ -110,17 +116,28 @@ class D3filesController extends Controller
         $model->file_name    = $_FILES['upload_file']['name'];
         $model->add_datetime = new \yii\db\Expression('NOW()');
         $model->user_id      = Yii::$app->user->getId();
-        $model->model_name   = $request->post('model_name');
-        $model->model_id     = $id;
         
         if ($model->save()) {
+            
+            $modelM = new D3filesModel();
+            $modelM->d3files_id = $model->id;
+            $modelM->is_file = 1;
+            $modelM->model_name = $request->post('model_name');
+            $modelM->model_id = $id;
+            $modelM->save();
+            
             $fileHandler->rename($model->id);
         } else {
             $fileHandler->remove();
             throw new HttpException(500, Yii::t('d3files', 'Insert DB record failed'));
         }
         
-        return $this->renderPartial('upload', ['model' => $model]);
+        $renderParam = [
+            'id' => $model->id,
+            'file_name' => $model->file_name,
+            'file_model_id' => $modelM->id,
+        ];
+        return $this->renderPartial('upload', $renderParam);
         
     }
 }

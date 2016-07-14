@@ -61,4 +61,28 @@ class D3filesModel extends \yii\db\ActiveRecord
     {
         return $this->hasOne(D3files::className(), ['id' => 'd3files_id']);
     }
+    
+    public static function createCopy($id, $model_name, $model_id)
+    {
+        $model = D3filesModel::findOne($id);
+        $newModel = new D3filesModel();
+        $newModel->d3files_id = $model->d3files_id;
+        $newModel->is_file = 0;
+        $newModel->model_name = $model_name;
+        $newModel->model_id = $model_id;
+        $newModel->save();
+                
+    }
+    
+    public static function findFileLinks($d3files_id)
+    {
+        return D3filesModel::find()
+                ->select('model_name,model_id')
+                ->where([
+                    'd3files_id' => $d3files_id,
+                    'deleted' => 0,
+                        ])
+                ->asArray()
+                ->all();
+    }
 }

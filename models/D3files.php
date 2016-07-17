@@ -4,6 +4,7 @@ namespace d3yii2\d3files\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\UploadedFile;
 use d3yii2\d3files\components\FileHandler;
 /**
  * This is the model class for table "d3files".
@@ -84,6 +85,50 @@ class D3files extends ActiveRecord
         $model->file_name    = $fileName;
         $model->add_datetime = new \yii\db\Expression('NOW()');
         $model->user_id      = $userId;
+        
+        if ($model->save()) {
+            
+            $modelM = new D3filesModel();
+            $modelM->d3files_id = $model->id;
+            $modelM->is_file = 1;
+            $modelM->model_name = $modelName;
+            $modelM->model_id = $modelId;
+            $modelM->save();            
+            
+            $fileHandler->rename($model->id);
+        } else {
+            $fileHandler->remove();
+            throw new Exception(500, Yii::t('d3files', 'Insert DB record failed'));
+        }        
+    }
+
+    /**
+     * Upload yii\web\UploadedFile
+     * @param UploadedFile $uploadFile
+     * @param string $modelName
+     * @param int $modelId
+     * @param type $userId
+     * @throws Exception
+     */
+    public static function saveYii2UploadFile(UploadedFile $uploadFile, $modelName,$modelId)
+    {
+        
+        $fileHandler = new FileHandler(
+            [
+                'model_name' => $modelName,
+                'model_id'   => uniqid(),
+                'file_name'  => $uploadFile->name,
+                'file_types'  => '*', //yii2 model controll file types
+            ]
+        );
+
+        $fileHandler->uploadYii2UloadFile($uploadFile);
+        
+        $model = new D3files();
+
+        $model->file_name    = $uploadFile->name;
+        $model->add_datetime = new \yii\db\Expression('NOW()');
+        $model->user_id      = \Yii::$app->person->user_id;
         
         if ($model->save()) {
             

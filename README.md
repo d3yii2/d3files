@@ -47,3 +47,56 @@ yii migrate
         ]
     ) ?>
 ```
+
+### Active Form
+
+* to Active form model add propery for uploading file
+
+```php
+
+public $uploadFile;
+```
+
+* to Active model for new attribute add rule
+
+```php
+    public function rules() {
+        return [
+            ......,
+            [
+                ['uploadFile'],
+                'file',
+                'skipOnEmpty' => true,
+                'extensions' => 'png, jpg, pdf, xls, doc'
+            ],
+        ];
+    }
+```
+
+* in controller action after successful save() add
+
+```php
+$model->uploadFile = UploadedFile::getInstance($model, 'uploadFile');
+D3files::saveYii2UploadFile($model->uploadFile, 'ModelName', $model->id);
+```
+
+* in form to Active form set 'enctype' = 'multipart/form-data',
+
+```php
+$form = ActiveForm::begin([
+                'id' => 'xxxxxxx',
+                'layout' => 'horizontal',
+                'enableClientValidation' => true,
+                'options' => [
+                    'enctype' => 'multipart/form-data',
+                    ],
+                ]
+    );
+
+```
+
+* in form view add upload field
+
+```php
+echo $form->field($model, 'uploadFile')->fileInput();
+```

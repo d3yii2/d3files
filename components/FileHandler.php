@@ -5,6 +5,7 @@ use Yii;
 use yii\web\NotFoundHttpException;
 use yii\base\InvalidParamException;
 use yii\web\ForbiddenHttpException;
+use yii\web\UploadedFile;
 
 class FileHandler
 {
@@ -34,7 +35,8 @@ class FileHandler
         $this->options['file_name']  = $options['file_name'];
         
         $fileExtension = pathinfo($this->options['file_name'])['extension'];
-        if (!preg_match($this->options['file_types'],$fileExtension)) {
+        if ($this->options['file_types']  != '*' 
+                && !preg_match($this->options['file_types'],$fileExtension)) {
             throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: ' . $fileExtension));
         }
         
@@ -73,6 +75,23 @@ class FileHandler
         }
         
         if (!move_uploaded_file($_FILES['upload_file']['tmp_name'], $this->getFilePath())) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
+        }
+        
+        return true;
+        
+    }
+
+    /**
+     * copy Yii2 UploadedFile
+     * @param UploadedFile $upoadFile 
+     * @return boolean
+     * @throws NotFoundHttpException
+     */
+    public function uploadYii2UloadFile(UploadedFile $upoadFile)
+    {
+        
+        if (!$upoadFile->saveAs($this->getFilePath())) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
         

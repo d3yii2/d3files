@@ -27,10 +27,10 @@ $t_no_results = Yii::t('d3files', 'No results found.');
 <table class="d3files-table table table-striped table-bordered">
 <?php
 
-foreach ($fileList as $row){
+foreach ($fileList as $row) {
     ?>
     <tr>
-        <td class="col-xs-11">
+        <td class="col-xs-12">
             <?=Html::a(
                     $row['file_name'],
                     ['/d3files/d3files/download', 'id' => $row['id']],

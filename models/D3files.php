@@ -14,8 +14,9 @@ use d3yii2\d3files\components\FileHandler;
  * @property string $file_name
  * @property string $add_datetime
  * @property integer $user_id
- * @property integer $deleted
  * @property string $notes
+ *
+ * @property D3filesModel[] $d3filesModels
  */
 class D3files extends ActiveRecord
 {
@@ -33,10 +34,10 @@ class D3files extends ActiveRecord
     public function rules()
     {
         return [
-            [['type_id', 'user_id', 'deleted'], 'integer'],
+            [['type_id', 'user_id'], 'integer'],
             [['file_name', 'add_datetime', 'user_id'], 'required'],
-            [['notes'], 'string'],
             [['add_datetime'], 'safe'],
+            [['notes'], 'string'],
             [['file_name'], 'string', 'max' => 255],
         ];
     }
@@ -52,7 +53,6 @@ class D3files extends ActiveRecord
             'file_name'    => Yii::t('d3files', 'File Name'),
             'add_datetime' => Yii::t('d3files', 'Add Datetime'),
             'user_id'      => Yii::t('d3files', 'User ID'),
-            'deleted'      => Yii::t('d3files', 'Deleted'),
             'notes'        => Yii::t('d3files', 'Notes'),
         ];
     }
@@ -67,7 +67,7 @@ class D3files extends ActiveRecord
      * @param int $userId
      * @throws HttpException
      */
-    public static function saveFile($fileName,$modelName,$modelId, $fileContent, $fileTypes, $userId = 0 )
+    public static function saveFile($fileName, $modelName, $modelId, $fileContent, $fileTypes, $userId = 0 )
     {
         $fileHandler = new FileHandler(
             [
@@ -87,11 +87,15 @@ class D3files extends ActiveRecord
         $model->user_id      = $userId;
         
         if ($model->save()) {
+
+            // Get or create model name id
+            $modelMN = new D3filesModelName();
+            $model_name_id = $modelMN->getByName($modelName, true);
             
             $modelM = new D3filesModel();
             $modelM->d3files_id = $model->id;
             $modelM->is_file = 1;
-            $modelM->model_name = $modelName;
+            $modelM->model_name_id = $model_name_id;
             $modelM->model_id = $modelId;
             $modelM->save();            
             
@@ -107,10 +111,9 @@ class D3files extends ActiveRecord
      * @param UploadedFile $uploadFile
      * @param string $modelName
      * @param int $modelId
-     * @param type $userId
      * @throws Exception
      */
-    public static function saveYii2UploadFile(UploadedFile $uploadFile, $modelName,$modelId)
+    public static function saveYii2UploadFile(UploadedFile $uploadFile, $modelName, $modelId)
     {
         
         $fileHandler = new FileHandler(
@@ -131,11 +134,15 @@ class D3files extends ActiveRecord
         $model->user_id      = \Yii::$app->person->user_id;
         
         if ($model->save()) {
+
+            // Get or create model name id
+            $modelMN = new D3filesModelName();
+            $model_name_id = $modelMN->getByName($modelName, true);
             
             $modelM = new D3filesModel();
             $modelM->d3files_id = $model->id;
             $modelM->is_file = 1;
-            $modelM->model_name = $modelName;
+            $modelM->model_name_id = $model_name_id;
             $modelM->model_id = $modelId;
             $modelM->save();            
             
@@ -158,7 +165,7 @@ class D3files extends ActiveRecord
      * get file list for widget
      * 
      * @param string $modelName model name
-     * @param int $modelId mder record PK value
+     * @param int $modelId model record PK value
      * @return array
      */
     public static function fileListForWidget($modelName, $modelId) {
@@ -169,16 +176,19 @@ class D3files extends ActiveRecord
               f.file_name,
               fm.id  file_model_id
             FROM
-              d3files f 
-              INNER JOIN d3files_model fm 
-                ON f.id = fm.d3files_id 
-            WHERE fm.model_name = :model_name 
+              d3files f
+              INNER JOIN d3files_model fm
+                ON f.id = fm.d3files_id
+              INNER JOIN d3files_model_name fmn
+                ON fm.model_name_id = fmn.id
+            WHERE fmn.name    = :model_name
               AND fm.model_id = :model_id
-              AND fm.deleted = 0
-                 ";
+              AND fm.deleted  = 0
+        ";
+
         $parameters = [
             ':model_name' => $modelName,
-            ':model_id' => $modelId,
+            ':model_id'   => $modelId,
         ];
         
         $connection = \Yii::$app->getDb();

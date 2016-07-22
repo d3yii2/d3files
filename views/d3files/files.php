@@ -11,6 +11,7 @@ $t_confirm    = Yii::t('d3files', 'Are you sure you want to delete this item?');
 $t_no_results = Yii::t('d3files', 'No results found.');
 
 $script = <<< JS
+
 $(function(){
     
     function showError(data, el)

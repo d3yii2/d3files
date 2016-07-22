@@ -41,28 +41,30 @@ class D3FilesWidget extends Widget
         if ($this->icon === null) {
             $this->icon = "glyphicon glyphicon-paperclip";
         }
-        if($this->readOnly){
+
+        if ($this->readOnly) {
             return $this->render(
                 'files_readonly',
                 [
-                    'model_name'   => $this->model_name,
-                    'model_id'     => $this->model_id,
-                    'title'        => $this->title,
-                    'icon'         => $this->icon,
-                    'hideTitle'    => $this->hideTitle,
-                    'fileList'     => $this->fileList,
+                    'model_name' => $this->model_name,
+                    'model_id'   => $this->model_id,
+                    'title'      => $this->title,
+                    'icon'       => $this->icon,
+                    'hideTitle'  => $this->hideTitle,
+                    'fileList'   => $this->fileList,
                 ]
             );
         }
+
         return $this->render(
             'files',
             [
-                'model_name'   => $this->model_name,
-                'model_id'     => $this->model_id,
-                'title'        => $this->title,
-                'icon'         => $this->icon,
-                'hideTitle'    => $this->hideTitle,
-                'fileList'     => $this->fileList,
+                'model_name' => $this->model_name,
+                'model_id'   => $this->model_id,
+                'title'      => $this->title,
+                'icon'       => $this->icon,
+                'hideTitle'  => $this->hideTitle,
+                'fileList'   => $this->fileList,
             ]
         );
         

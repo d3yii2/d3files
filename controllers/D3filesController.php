@@ -6,6 +6,7 @@ use Yii;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\components\FileHandler;
 use d3yii2\d3files\models\D3filesModel;
+use d3yii2\d3files\models\D3filesModelName;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\HttpException;
@@ -68,13 +69,15 @@ class D3filesController extends Controller
         $file = $this->findModel($id);
         $fileModel = $file->getD3filesModels()->where(['is_file' => 1])->one();
         
-        if(!$fileModel){
+        if (!$fileModel) {
             return false;
         }
+
+        $fileModelName = D3filesModelName::findOne($fileModel->model_name_id);
         
         $fileHandler = new FileHandler(
             [
-                'model_name' => $fileModel->model_name,
+                'model_name' => $fileModelName->name,
                 'model_id'   => $file->id,
                 'file_name'  => $file->file_name,
             ]
@@ -118,12 +121,16 @@ class D3filesController extends Controller
         $model->user_id      = Yii::$app->user->getId();
         
         if ($model->save()) {
+
+            // Get or create model name id
+            $modelMN = new D3filesModelName();
+            $model_name_id = $modelMN->getByName($request->post('model_name'), true);
             
             $modelM = new D3filesModel();
-            $modelM->d3files_id = $model->id;
-            $modelM->is_file = 1;
-            $modelM->model_name = $request->post('model_name');
-            $modelM->model_id = $id;
+            $modelM->d3files_id    = $model->id;
+            $modelM->is_file       = 1;
+            $modelM->model_name_id = $model_name_id;
+            $modelM->model_id      = $id;
             $modelM->save();
             
             $fileHandler->rename($model->id);

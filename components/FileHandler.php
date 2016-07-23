@@ -60,8 +60,11 @@ class FileHandler
     
     protected static function getUploadDirPath($model_name)
     {
+        $pos = strrpos($model_name, '\\');
+        $modelShortName = $pos === false ? $model_name : substr($model_name, $pos + 1);
+        
         return \Yii::$app->getModule('d3files')->upload_dir
-            . DIRECTORY_SEPARATOR . $model_name;
+            . DIRECTORY_SEPARATOR . $modelShortName;
     }
     
     /**

@@ -24,8 +24,7 @@ class D3FilesWidget extends Widget
         parent::init();
         D3Files::registerTranslations();
         
-        $reflection       = new \ReflectionClass($this->model);
-        $this->model_name = $reflection->getShortName();
+        $this->model_name = $this->model->className();
 
         $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);        
         

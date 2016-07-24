@@ -77,7 +77,7 @@ public $uploadFile;
 
 ```php
 $model->uploadFile = UploadedFile::getInstance($model, 'uploadFile');
-D3files::saveYii2UploadFile($model->uploadFile, 'ModelName', $model->id);
+D3files::saveYii2UploadFile($model->uploadFile, ModelName::className(), $model->id);
 ```
 
 * in form to Active form set 'enctype' = 'multipart/form-data',

@@ -33,6 +33,9 @@ class FileHandler
         $this->options['model_name'] = $options['model_name'];
         $this->options['model_id']   = $options['model_id'];
         $this->options['file_name']  = $options['file_name'];
+        if(isset($options['file_path'])){
+            $this->options['file_path']  = $options['file_path'];
+        }
         
         $fileExtension = pathinfo($this->options['file_name'])['extension'];
         if ($this->options['file_types']  != '*' 
@@ -57,8 +60,11 @@ class FileHandler
     
     protected static function getUploadDirPath($model_name)
     {
+        $pos = strrpos($model_name, '\\');
+        $modelShortName = $pos === false ? $model_name : substr($model_name, $pos + 1);
+        
         return \Yii::$app->getModule('d3files')->upload_dir
-            . DIRECTORY_SEPARATOR . $model_name;
+            . DIRECTORY_SEPARATOR . $modelShortName;
     }
     
     /**
@@ -105,6 +111,10 @@ class FileHandler
      */
     public function getFilePath()
     {
+        if(isset($this->options['file_path'])){
+            return $this->options['file_path'];
+        }
+        
         return $this->options['upload_dir'] . DIRECTORY_SEPARATOR
                 . self::createSaveFileName(
                     $this->options['model_id'],

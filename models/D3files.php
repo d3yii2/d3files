@@ -63,11 +63,11 @@ class D3files extends ActiveRecord
      * @param string $fileName
      * @param string $modelName
      * @param int $modelId
-     * @param string $fileContent
+     * @param string $filePath
      * @param int $userId
      * @throws HttpException
      */
-    public static function saveFile($fileName, $modelName, $modelId, $fileContent, $fileTypes, $userId = 0 )
+    public static function saveFile($fileName, $modelName, $modelId, $filePath, $fileTypes, $userId = 0 )
     {
         $fileHandler = new FileHandler(
             [
@@ -75,10 +75,9 @@ class D3files extends ActiveRecord
                 'model_id'   => uniqid(),
                 'file_name'  => $fileName,
                 'file_types'  => $fileTypes,
+                'file_path'  => $filePath,
             ]
         );
-
-        $fileHandler->save($fileContent);
         
         $model = new D3files();
 
@@ -109,7 +108,7 @@ class D3files extends ActiveRecord
     /**
      * Upload yii\web\UploadedFile
      * @param UploadedFile $uploadFile
-     * @param string $modelName
+     * @param string $modelName model name with name space
      * @param int $modelId
      * @throws Exception
      */

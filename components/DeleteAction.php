@@ -1,10 +1,11 @@
 <?php
 namespace d3yii2\d3files\components;
 
-use yii\base\Action;
 use Yii;
+use yii\base\Action;
 use yii\web\Response;
 use d3yii2\d3files\models\D3filesModel;
+use d3yii2\d3files\models\D3filesModelName;
 
 /**
  * Class DeleteAction
@@ -17,10 +18,18 @@ class DeleteAction extends Action
     public function run($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $model = D3filesModel::findOne($id);
-        $model->deleted = 1;
-        $model->save();
+
+        $fileModel     = D3filesModel::findOne($id);
+        $fileModelName = D3filesModelName::findOne($fileModel->model_name_id);
+
+        // Check access rights to the record the file is attached to
+        $this->controller->performReadValidation($fileModelName->name, $fileModel->model_id);
+
+        $fileModel->deleted = 1;
+        $fileModel->save();
+
         //return $this->controller->renderPartial('delete');
         return $this->controller->renderPartial('@vendor/d3yii2/d3files/views/d3files/delete');
+
     }
 }

@@ -46,4 +46,5 @@ return [
     'Notes' => 'Piezīmes',
     'Type ID' => 'Tips',
     'User ID' => 'Lietotāja ID',
+    'You don\'t have access to parent record' => 'Tev nav pieejas tiesību šim ierakstam',
 ];

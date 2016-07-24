@@ -1,8 +1,8 @@
 <?php
 namespace d3yii2\d3files\components;
 
-use yii\base\Action;
 use Yii;
+use yii\base\Action;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
@@ -31,6 +31,9 @@ class UploadAction extends Action
         if (empty($_POST['model_name'])) {
             throw new HttpException(422, Yii::t('d3files', 'mandatory POST parameter model_name is not set'));
         }
+
+        // Check access rights to the record the file is attached to
+        $this->controller->performReadValidation($_POST['model_name'], $id);
 
         $tmp_id = uniqid();
 

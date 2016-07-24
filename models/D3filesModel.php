@@ -91,10 +91,11 @@ class D3filesModel extends \yii\db\ActiveRecord
     public static function findFileLinks($d3files_id)
     {
         return D3filesModel::find()
-                ->select('model_name,model_id')
+                ->select('md.name model_name,model_id')
+                ->innerJoin('d3files_model_name mn', 'd3files_model.model_name_id = mn.id')
                 ->where([
-                    'd3files_id' => $d3files_id,
-                    'deleted' => 0,
+                    'd3files_model.d3files_id' => $d3files_id,
+                    'd3files_model.deleted' => 0,
                         ])
                 ->asArray()
                 ->all();

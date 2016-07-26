@@ -41,6 +41,14 @@ class D3FilesWidget extends Widget
             $this->icon = "glyphicon glyphicon-paperclip";
         }
 
+        //url prefix (module/controller)
+        $url_prefix = '/d3files/d3files/';
+
+        // Disabled controller actions, remove url prefix
+        if (Yii::$app->getModule('d3files')->disableController) {
+            $url_prefix = '';
+        }
+
         if ($this->readOnly) {
             return $this->render(
                 'files_readonly',
@@ -51,6 +59,7 @@ class D3FilesWidget extends Widget
                     'icon'       => $this->icon,
                     'hideTitle'  => $this->hideTitle,
                     'fileList'   => $this->fileList,
+                    'url_prefix' => $url_prefix,
                 ]
             );
         }
@@ -64,6 +73,7 @@ class D3FilesWidget extends Widget
                 'icon'       => $this->icon,
                 'hideTitle'  => $this->hideTitle,
                 'fileList'   => $this->fileList,
+                'url_prefix' => $url_prefix,
             ]
         );
         

@@ -1,10 +1,9 @@
 <?php
 use yii\helpers\Html;
 use yii\web\View;
+use yii\helpers\Url;
 
-$uploadUrl = Yii::$app->urlManager->createUrl(
-    ['d3files/d3files/upload', 'id' => $model_id]
-);
+$uploadUrl = Url::to([$url_prefix . 'd3filesupload', 'id' => $model_id]);
 
 $t_aria_label = Yii::t('d3files', 'Close');
 $t_confirm    = Yii::t('d3files', 'Are you sure you want to delete this item?');
@@ -172,17 +171,17 @@ foreach ($fileList as $row){
     <tr>
         <td class="col-xs-11">
             <?=Html::a(
-                    $row['file_name'],
-                    ['/d3files/d3files/download', 'id' => $row['id']],
-                    ['title' => Yii::t('d3files', 'Download')]
-                )?>
+                $row['file_name'],
+                [$url_prefix . 'd3filesdownload', 'id' => $row['id']],
+                ['title' => Yii::t('d3files', 'Download')]
+            ) ?>
         </td>
         <td class="text-center col-xs-1">
             <?=Html::a(
-                    '<span class="glyphicon glyphicon-trash"></span>',
-                    ['/d3files/d3files/delete', 'id' => $row['file_model_id']],
-                    ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
-                );?>
+                '<span class="glyphicon glyphicon-trash"></span>',
+                [$url_prefix . 'd3filesdelete', 'id' => $row['file_model_id']],
+                ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
+            ); ?>
         </td>
     </tr>
     <?php

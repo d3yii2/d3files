@@ -15,6 +15,7 @@ class D3Files extends \yii\base\Module
     
     public $upload_dir;
     public $file_types;
+    public $disableController;
     
     public function init()
     {

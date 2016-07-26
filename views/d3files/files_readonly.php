@@ -1,12 +1,5 @@
 <?php
 use yii\helpers\Html;
-//use yii\web\View;
-
-$uploadUrl = Yii::$app->urlManager->createUrl(
-    ['d3files/d3files/upload', 'id' => $model_id]
-);
-
-$t_no_results = Yii::t('d3files', 'No results found.');
 
 ?>
 <div class="d3files-widget">
@@ -32,10 +25,10 @@ foreach ($fileList as $row) {
     <tr>
         <td class="col-xs-12">
             <?=Html::a(
-                    $row['file_name'],
-                    ['/d3files/d3files/download', 'id' => $row['id']],
-                    ['title' => Yii::t('d3files', 'Download')]
-                )?>
+                $row['file_name'],
+                [$url_prefix . 'd3filesdownload', 'id' => $row['id']],
+                ['title' => Yii::t('d3files', 'Download')]
+            ) ?>
         </td>
     </tr>
     <?php

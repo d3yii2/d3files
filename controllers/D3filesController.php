@@ -15,10 +15,16 @@ class D3filesController extends Controller
 
     public function actions()
     {
+
+        // Disable controller actions
+        if (Yii::$app->getModule('d3files')->disableController) {
+            return [];
+        }
+
         return [
-            'download' => 'd3yii2\d3files\components\DownloadAction',
-            'upload'   => 'd3yii2\d3files\components\UploadAction',
-            'delete'   => 'd3yii2\d3files\components\DeleteAction',
+            'd3filesdownload' => 'd3yii2\d3files\components\DownloadAction',
+            'd3filesupload'   => 'd3yii2\d3files\components\UploadAction',
+            'd3filesdelete'   => 'd3yii2\d3files\components\DeleteAction',
         ];
     }
 
@@ -31,8 +37,8 @@ class D3filesController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
-                    'upload' => ['POST'],
+                    'd3filedelete' => ['POST'],
+                    'd3fileupload' => ['POST'],
                 ],
             ],
         ];

@@ -51,7 +51,7 @@ class FileHandler
             return $options['file_types'];
         }
         
-        if (!$file_types = \Yii::$app->getModule('d3files')->file_types) {
+        if (!$file_types = Yii::$app->getModule('d3files')->file_types) {
             $file_types = self::FILE_TYPES;
         }
         
@@ -63,7 +63,7 @@ class FileHandler
         $pos = strrpos($model_name, '\\');
         $modelShortName = $pos === false ? $model_name : substr($model_name, $pos + 1);
         
-        return \Yii::$app->getModule('d3files')->upload_dir
+        return Yii::$app->getModule('d3files')->upload_dir
             . DIRECTORY_SEPARATOR . $modelShortName;
     }
     
@@ -125,6 +125,7 @@ class FileHandler
     /**
      * save file. Alternative for method  upload()
      * @param string $fileContent
+     * @return boolean true
      */
     public function save(&$fileContent)
     {

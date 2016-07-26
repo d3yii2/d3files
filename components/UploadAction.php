@@ -3,7 +3,6 @@ namespace d3yii2\d3files\components;
 
 use Yii;
 use yii\base\Action;
-use d3yii2\d3files\controllers\D3filesController;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
@@ -29,20 +28,20 @@ class UploadAction extends Action
             throw new NotFoundHttpException(Yii::t('d3files', 'File not uploaded.'));
         }
 
-        if (empty($_POST['model_name'])) {
+        $modelName = Yii::$app->request->post('model_name');
+
+        if (empty($modelName)) {
             throw new HttpException(422, Yii::t('d3files', 'mandatory POST parameter model_name is not set'));
         }
 
         // Check access rights to the record the file is attached to
-        D3filesController::performReadValidation($_POST['model_name'], $id);
+        D3files::performReadValidation($modelName, $id);
 
         $tmp_id = uniqid();
 
-        $request = Yii::$app->request;
-
         $fileHandler = new FileHandler(
             [
-                'model_name' => $request->post('model_name'),
+                'model_name' => $modelName,
                 'model_id'   => $tmp_id,
                 'file_name'  => $_FILES['upload_file']['name'],
             ]
@@ -60,7 +59,7 @@ class UploadAction extends Action
 
             // Get or create model name id
             $modelMN = new D3filesModelName();
-            $model_name_id = $modelMN->getByName($request->post('model_name'), true);
+            $model_name_id = $modelMN->getByName($modelName, true);
 
             $modelM = new D3filesModel();
             $modelM->d3files_id    = $model->id;

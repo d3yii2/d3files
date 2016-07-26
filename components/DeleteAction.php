@@ -3,8 +3,8 @@ namespace d3yii2\d3files\components;
 
 use Yii;
 use yii\base\Action;
-use d3yii2\d3files\controllers\D3filesController;
 use yii\web\Response;
+use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
 
@@ -24,7 +24,7 @@ class DeleteAction extends Action
         $fileModelName = D3filesModelName::findOne($fileModel->model_name_id);
 
         // Check access rights to the record the file is attached to
-        D3filesController::performReadValidation($fileModelName->name, $fileModel->model_id);
+        D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
 
         $fileModel->deleted = 1;
         $fileModel->save();

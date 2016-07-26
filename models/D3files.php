@@ -6,6 +6,8 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\web\UploadedFile;
 use d3yii2\d3files\components\FileHandler;
+use yii\web\ForbiddenHttpException;
+
 /**
  * This is the model class for table "d3files".
  *
@@ -193,5 +195,13 @@ class D3files extends ActiveRecord
         $connection = \Yii::$app->getDb();
         $command = $connection->createCommand($sSql, $parameters);
         return $command->queryAll();        
-    }    
+    }
+
+    public function performReadValidation($model_name, $model_id)
+    {
+        $modelMain = $model_name::findOne($model_id);
+        if (!$modelMain) {
+            throw new ForbiddenHttpException(Yii::t('d3files', "You don't have access to parent record"));
+        }
+    }
 }

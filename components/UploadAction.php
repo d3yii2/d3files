@@ -21,11 +21,7 @@ class UploadAction extends Action
 
     /**
      * @var string parent model name (with namespace)
-     * $_POST['model_name'] is used if not set in standalone class configuration:
-     *      'd3filesupload' => [
-     *          'class'     => 'd3yii2\d3files\components\UploadAction',
-     *          'modelName' => 'app\models\Test',
-     *       ],
+     * $_POST['model_name'] is used if controller actions are not disabled
      */
     public $modelName;
 
@@ -39,8 +35,10 @@ class UploadAction extends Action
             throw new NotFoundHttpException(Yii::t('d3files', 'File not uploaded.'));
         }
 
-        // if modelName is not set use $_POST['model_name'] value
-        $this->modelName or $this->modelName = Yii::$app->request->post('model_name');
+        // If controller actions are not disabled, use $_POST['model_name']
+        if (!Yii::$app->getModule('d3files')->disableController) {
+            $this->modelName = Yii::$app->request->post('model_name');
+        }
 
         if (empty($this->modelName)) {
             throw new HttpException(422, Yii::t('d3files', 'mandatory POST parameter model_name is not set'));

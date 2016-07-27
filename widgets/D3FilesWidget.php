@@ -81,6 +81,9 @@ class D3FilesWidget extends Widget
     
     public function getViewPath()
     {
-        return dirname(__DIR__) . '/views/d3files/';
+        if (!$viewPath = Yii::$app->getModule('d3files')->viewPath) {
+            $viewPath = dirname(__DIR__) . '/views/d3files/';
+        }
+        return $viewPath;
     }
 }

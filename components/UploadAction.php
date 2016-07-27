@@ -90,9 +90,8 @@ class UploadAction extends Action
             'file_model_id' => $modelM->id,
         ];
 
-        //return $this->controller->renderPartial('upload', $renderParam);
-        return $this->controller->renderPartial(
-            '@vendor/d3yii2/d3files/views/d3files/upload',
+        return $this->controller->renderFile(
+            Yii::$app->getModule('d3files')->getView('upload'),
             $renderParam
         );
     }

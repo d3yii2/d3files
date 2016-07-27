@@ -16,6 +16,7 @@ class D3Files extends \yii\base\Module
     public $upload_dir;
     public $file_types;
     public $disableController;
+    public $viewPath;
     
     public function init()
     {
@@ -32,5 +33,11 @@ class D3Files extends \yii\base\Module
             'basePath'         => __DIR__ . '\messages',
             'forceTranslation' => true
         ];
+    }
+
+    public function getView($view)
+    {
+        $this->viewPath or $this->viewPath = __DIR__ . '/views/d3files/';
+        return $this->viewPath . $view . '.php';
     }
 }

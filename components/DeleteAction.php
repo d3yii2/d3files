@@ -29,8 +29,9 @@ class DeleteAction extends Action
         $fileModel->deleted = 1;
         $fileModel->save();
 
-        //return $this->controller->renderPartial('delete');
-        return $this->controller->renderPartial('@vendor/d3yii2/d3files/views/d3files/delete');
+        return $this->controller->renderFile(
+            Yii::$app->getModule('d3files')->getView('delete')
+        );
 
     }
 }

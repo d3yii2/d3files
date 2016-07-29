@@ -3,8 +3,10 @@
 
 ## Features
 
-* attach files to model record
+* attach files to model record (it is possible to attach one file to multiple models)
 * widget for model view
+* standalone actions to integrate in model's controllers to control access rights there
+* shared files for public access
 
 ## Installation
 ```bash
@@ -15,8 +17,12 @@ php composer.phar require d3yii2/d3files dev-master
 ```php
     'modules' => [
         'd3files' => [
-            'class'     => 'd3yii2\d3files\D3Files',
-            'uploadDir' => dirname(__DIR__) . '\upload\d3files',
+            'class'              => 'd3yii2\d3files\D3Files',
+            'uploadDir'          => dirname(__DIR__) . '\upload\d3files',
+            'disableController'  => true,  // set true to disable d3files controller to use model's controllers
+            'hashSalt'           => false, // Set salt in your web-local.php config, empty value will disable sharing
+            'sharedExpireDays'   => 5,
+            'sharedLeftLoadings' => 5,
         ],
     ],
 ```
@@ -99,4 +105,21 @@ $form = ActiveForm::begin([
 
 ```php
 echo $form->field($model, 'uploadFile')->fileInput();
+```
+
+### Shared (public) access
+
+* to create share implement share generation request in your code:
+
+```php
+//$id is D3filesModel model's ID
+$share = D3filesModel::createSharedModel($id, $expireDays, $leftLoadings);
+$shared_id   = $share['id'];
+$shared_hash = $share['hash'];
+```
+
+* and use those variables to create url:
+```php
+$url = 'http://www.yoursite.com/index.php?r=d3files/d3files/downloadshare&id=' . $shared_id . '&hash=' . $shared_hash;
+echo $url;
 ```

@@ -19,6 +19,10 @@ use Yii;
  */
 class D3filesModel extends \yii\db\ActiveRecord
 {
+
+    const SHARED_EXPIRE_DAYS   = 5;
+    const SHARED_LEFT_LOADINGS = 5;
+
     /**
      * @inheritdoc
      */
@@ -99,5 +103,52 @@ class D3filesModel extends \yii\db\ActiveRecord
                         ])
                 ->asArray()
                 ->all();
+    }
+
+    /**
+     * @todo uztaisīt šārēšanas metodi
+     * - izveido d3files_model_shared ierakstu
+     * - atgriezt hašu un ID
+     * @param integer $id D3filesModel ID
+     *
+     * @return array [integer D3filesModelShared ID, string hex hash]
+     */
+    public function createSharedModel($id)
+    {
+
+        if (!$hashSalt = Yii::$app->getModule('d3files')->hashSalt) {
+            return false;
+        }
+
+        if (!$expireDays = Yii::$app->getModule('d3files')->sharedExpireDays) {
+            $expireDays = self::SHARED_EXPIRE_DAYS;
+        }
+
+        if (!$leftLoadings = Yii::$app->getModule('d3files')->sharedLeftLoadings) {
+            $leftLoadings = self::SHARED_LEFT_LOADINGS;
+        }
+
+        if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0, 'is_file' => 1])) {
+            return false;
+        }
+
+        if (!$file = D3files::findOne($fileModel->d3files_id)) {
+            return false;
+        }
+
+        $fileModelShared = new D3filesModelShared();
+        $fileModelShared->d3files_model_id = $id;
+        $fileModelShared->expire_date      = new \yii\db\Expression(
+            'DATE_ADD(CURDATE(), INTERVAL ' . $expireDays . ' DAY)'
+        );
+        $fileModelShared->left_loadings    = $leftLoadings;
+
+        $fileModelShared->save();
+
+        $hashText = sprintf('%s:%s:%s', $fileModelShared->id, $file->file_name, $hashSalt);
+        $hash     = md5($hashText);
+
+        return ['id' => $fileModelShared->id, 'hash' => $hash];
+
     }
 }

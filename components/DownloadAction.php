@@ -4,6 +4,7 @@ namespace d3yii2\d3files\components;
 use Yii;
 use yii\base\Action;
 use d3yii2\d3files\models\D3files;
+use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
 use yii\web\NotFoundHttpException;
 
@@ -11,20 +12,24 @@ use yii\web\NotFoundHttpException;
  * Class DownloadAction
  * @package d3yii2\d3files\components
  *
- * Finds an existing D3files model record and downloads corresponding file
+ * Finds an existing D3filesModel record and downloads corresponding file
  */
 class DownloadAction extends Action
 {
     public function run($id)
     {
-        $file = $this->findModel($id);
-        $fileModel = $file->getD3filesModels()->where(['is_file' => 1])->one();
 
-        if (!$fileModel) {
-            return false;
+        if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0, 'is_file' => 1])) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
-        $fileModelName = D3filesModelName::findOne($fileModel->model_name_id);
+        if (!$file = D3files::findOne($fileModel->d3files_id)) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+        }
+
+        if (!$fileModelName = D3filesModelName::findOne($fileModel->model_name_id)) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+        }
 
         // Check access rights to the record the file is attached to
         D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
@@ -38,21 +43,5 @@ class DownloadAction extends Action
         );
 
         $fileHandler->download();
-    }
-
-    /**
-     * Finds the D3files model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return D3files the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = D3files::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
-        }
     }
 }

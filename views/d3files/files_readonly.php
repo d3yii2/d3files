@@ -26,7 +26,7 @@ foreach ($fileList as $row) {
         <td class="col-xs-12">
             <?=Html::a(
                 $row['file_name'],
-                [$url_prefix . 'd3filesdownload', 'id' => $row['id']],
+                [$url_prefix . 'd3filesdownload', 'id' => $row['file_model_id']],
                 ['title' => Yii::t('d3files', 'Download')]
             ) ?>
         </td>

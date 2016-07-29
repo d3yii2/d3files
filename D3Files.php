@@ -13,10 +13,13 @@ class D3Files extends \yii\base\Module
      */
     public $controllerNamespace = 'd3yii2\d3files\controllers';
     
-    public $upload_dir;
-    public $file_types;
+    public $uploadDir;
+    public $fileTypes;
     public $disableController;
     public $viewPath;
+    public $hashSalt;
+    public $sharedExpireDays;
+    public $sharedLeftLoadings;
     
     public function init()
     {

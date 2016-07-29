@@ -17,13 +17,16 @@ class D3filesController extends Controller
 
         // Disable controller actions
         if (Yii::$app->getModule('d3files')->disableController) {
-            return [];
+            return [
+                'downloadshare' => 'd3yii2\d3files\components\DownloadShareAction',
+            ];
         }
 
         return [
             'd3filesdownload' => 'd3yii2\d3files\components\DownloadAction',
             'd3filesupload'   => 'd3yii2\d3files\components\UploadAction',
             'd3filesdelete'   => 'd3yii2\d3files\components\DeleteAction',
+            'downloadshare'   => 'd3yii2\d3files\components\DownloadShareAction',
         ];
     }
 

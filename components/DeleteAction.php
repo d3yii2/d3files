@@ -7,6 +7,7 @@ use yii\web\Response;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
+use yii\web\NotFoundHttpException;
 
 /**
  * Class DeleteAction
@@ -20,8 +21,13 @@ class DeleteAction extends Action
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $fileModel     = D3filesModel::findOne($id);
-        $fileModelName = D3filesModelName::findOne($fileModel->model_name_id);
+        if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0])) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+        }
+
+        if (!$fileModelName = D3filesModelName::findOne($fileModel->model_name_id)) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+        }
 
         // Check access rights to the record the file is attached to
         D3files::performReadValidation($fileModelName->name, $fileModel->model_id);

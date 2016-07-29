@@ -15,8 +15,8 @@ php composer.phar require d3yii2/d3files dev-master
 ```php
     'modules' => [
         'd3files' => [
-            'class'      => 'd3yii2\d3files\D3Files',
-            'upload_dir' => dirname(__DIR__) . '\upload\d3files',
+            'class'     => 'd3yii2\d3files\D3Files',
+            'uploadDir' => dirname(__DIR__) . '\upload\d3files',
         ],
     ],
 ```

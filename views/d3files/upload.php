@@ -10,7 +10,7 @@ use yii\helpers\Html;
     <td class="col-xs-11">
         <?= Html::a(
             $file_name,
-            ['d3filesdownload', 'id' => $id],
+            ['d3filesdownload', 'id' => $file_model_id],
             ['title' => Yii::t('d3files', 'Download'),
         ]) ?>
     </td>

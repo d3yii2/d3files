@@ -3,7 +3,6 @@
 namespace d3yii2\d3files\models;
 
 use Yii;
-use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "d3files_model_name".

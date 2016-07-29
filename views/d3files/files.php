@@ -166,13 +166,13 @@ $this->registerJs($script, View::POS_END, 'd3files');
 <table class="d3files-table table table-striped table-bordered">
 <?php
 
-foreach ($fileList as $row){
+foreach ($fileList as $row) {
     ?>
     <tr>
         <td class="col-xs-11">
             <?=Html::a(
                 $row['file_name'],
-                [$url_prefix . 'd3filesdownload', 'id' => $row['id']],
+                [$url_prefix . 'd3filesdownload', 'id' => $row['file_model_id']],
                 ['title' => Yii::t('d3files', 'Download')]
             ) ?>
         </td>

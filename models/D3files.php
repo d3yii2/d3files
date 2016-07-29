@@ -76,7 +76,7 @@ class D3files extends ActiveRecord
                 'model_name' => $modelName,
                 'model_id'   => uniqid(),
                 'file_name'  => $fileName,
-                'file_types'  => $fileTypes,
+                'file_types' => $fileTypes,
                 'file_path'  => $filePath,
             ]
         );
@@ -122,7 +122,7 @@ class D3files extends ActiveRecord
                 'model_name' => $modelName,
                 'model_id'   => uniqid(),
                 'file_name'  => $uploadFile->name,
-                'file_types'  => '*', //yii2 model controll file types
+                'file_types' => '*', //yii2 model control file types
             ]
         );
 

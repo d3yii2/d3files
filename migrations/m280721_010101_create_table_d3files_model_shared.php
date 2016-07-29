@@ -14,6 +14,7 @@ class m280721_010101_create_table_d3files_model_shared extends Migration
             CREATE TABLE `d3files_model_shared` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `d3files_model_id` int(10) unsigned NOT NULL,
+              `hash` char(32) CHARACTER SET ascii NOT NULL,
               `expire_date` date NOT NULL,
               `left_loadings` tinyint(4) NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`),

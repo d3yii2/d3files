@@ -32,12 +32,14 @@ class DownloadShareAction extends Action
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
-        if (!preg_match('#^[0-9A-F]{32}$#', strtoupper($hash))) {
+        $hash = strtoupper($hash);
+
+        if (!preg_match('#^[0-9A-F]{32}$#', $hash)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
         if (!$fileModelShared = D3filesModelShared::find()
-            ->where(['and', "id=$id", "left_loadings>0", "expire_date>=CURDATE()"])->one()
+            ->where(['and', "id=$id", "hash='$hash'", "left_loadings>0", "expire_date>=CURDATE()"])->one()
         ) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
@@ -54,22 +56,6 @@ class DownloadShareAction extends Action
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
-        $hashSalt = Yii::$app->getModule('d3files')->hashSalt;
-
-        if (empty($hashSalt)) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
-        }
-
-        /**
-         * Compare hash, use Yii::$app->getModule('d3files')->hashSalt
-         */
-        $hashText    = sprintf('%s:%s:%s', $id, $file->file_name, $hashSalt);
-        $correctHash = md5($hashText);
-
-        if ($hash != $correctHash) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
-        }
-
         $fileModelShared->left_loadings--;
         $fileModelShared->save();
 
@@ -82,21 +68,5 @@ class DownloadShareAction extends Action
         );
 
         $fileHandler->download();
-    }
-
-    /**
-     * Finds the D3files model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return D3files the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = D3files::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
-        }
     }
 }

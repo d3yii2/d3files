@@ -106,25 +106,24 @@ class D3filesModel extends \yii\db\ActiveRecord
     }
 
     /**
-     * @todo uztaisīt šārēšanas metodi
-     * - izveido d3files_model_shared ierakstu
-     * - atgriezt hašu un ID
      * @param integer $id D3filesModel ID
+     * @param integer $expireDays the period of validity days
+     * @param integer $leftLoadings allowed download count
      *
      * @return array [integer D3filesModelShared ID, string hex hash]
      */
-    public function createSharedModel($id)
+    public function createSharedModel($id, $expireDays = null, $leftLoadings = null)
     {
 
         if (!$hashSalt = Yii::$app->getModule('d3files')->hashSalt) {
             return false;
         }
 
-        if (!$expireDays = Yii::$app->getModule('d3files')->sharedExpireDays) {
+        if (!$expireDays && !$expireDays = Yii::$app->getModule('d3files')->sharedExpireDays) {
             $expireDays = self::SHARED_EXPIRE_DAYS;
         }
 
-        if (!$leftLoadings = Yii::$app->getModule('d3files')->sharedLeftLoadings) {
+        if (!$leftLoadings && !$leftLoadings = Yii::$app->getModule('d3files')->sharedLeftLoadings) {
             $leftLoadings = self::SHARED_LEFT_LOADINGS;
         }
 
@@ -146,9 +145,11 @@ class D3filesModel extends \yii\db\ActiveRecord
         $fileModelShared->save();
 
         $hashText = sprintf('%s:%s:%s', $fileModelShared->id, $file->file_name, $hashSalt);
-        $hash     = md5($hashText);
 
-        return ['id' => $fileModelShared->id, 'hash' => $hash];
+        $fileModelShared->hash = strtoupper(md5($hashText));
+        $fileModelShared->save();
+
+        return ['id' => $fileModelShared->id, 'hash' => $fileModelShared->hash];
 
     }
 }

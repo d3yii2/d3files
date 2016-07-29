@@ -9,6 +9,7 @@ use Yii;
  *
  * @property string $id
  * @property string $d3files_model_id
+ * @property string $hash
  * @property string $expire_date
  * @property integer $left_loadings
  *
@@ -30,9 +31,10 @@ class D3filesModelShared extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['d3files_model_id', 'expire_date'], 'required'],
+            [['d3files_model_id', 'hash', 'expire_date'], 'required'],
             [['d3files_model_id', 'left_loadings'], 'integer'],
             [['expire_date'], 'safe'],
+            [['hash'], 'string', 'max' => 32],
             [['d3files_model_id'], 'exist', 'skipOnError' => true, 'targetClass' => D3filesModel::className(), 'targetAttribute' => ['d3files_model_id' => 'id']],
         ];
     }
@@ -45,6 +47,7 @@ class D3filesModelShared extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('d3files', 'ID'),
             'd3files_model_id' => Yii::t('d3files', 'D3files Model ID'),
+            'hash' => Yii::t('d3files', 'Hash'),
             'expire_date' => Yii::t('d3files', 'Expire Date'),
             'left_loadings' => Yii::t('d3files', 'Left Loadings'),
         ];

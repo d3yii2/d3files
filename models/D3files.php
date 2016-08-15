@@ -197,7 +197,7 @@ class D3files extends ActiveRecord
         return $command->queryAll();        
     }
 
-    public function performReadValidation($model_name, $model_id)
+    public static function performReadValidation($model_name, $model_id)
     {
         $modelMain = $model_name::findOne($model_id);
         if (!$modelMain) {

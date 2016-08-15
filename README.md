@@ -54,6 +54,61 @@ yii migrate
     ) ?>
 ```
 
+### Add actions to actual controller
+
+```php
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'only' => ['d3filesdownload', 'd3filesupload', 'd3filesdelete'],
+                'rules' => [
+                    // deny all POST requests
+                    [
+                        'allow' => true,
+                        'actions' => [
+                            'd3filesdownload',
+                            'd3filesupload',
+                            'd3filesdelete',
+                        ],
+                        'roles' => ['role1','role2],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'd3filedelete' => ['POST'],
+                    'd3fileupload' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
+    public function actions() {
+        return [
+            'd3filesdownload' => [
+                'class' => 'd3yii2\d3files\components\DownloadAction',
+                'modelName' => RkInvoice::className(),
+            ],
+            'd3filesupload'   => [
+                'class' => 'd3yii2\d3files\components\UploadAction',
+                'modelName' => RkInvoice::className(),
+            ],
+            'd3filesdelete'   => [
+                'class' => 'd3yii2\d3files\components\DeleteAction',
+                'modelName' => RkInvoice::className(),
+            ],
+            
+        ];
+    }
+
+```php
+
 ### Active Form
 
 * to Active form model add propery for uploading file

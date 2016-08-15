@@ -17,6 +17,9 @@ use yii\web\NotFoundHttpException;
  */
 class DeleteAction extends Action
 {
+    
+    public $modelName;
+    
     public function run($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -29,6 +32,15 @@ class DeleteAction extends Action
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
+        /**
+         * validate modelname
+         */
+        if (Yii::$app->getModule('d3files')->disableController) {
+            if ($fileModelName->name != $this->modelName) {
+                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+            }            
+        }        
+        
         // Check access rights to the record the file is attached to
         D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
 

@@ -16,6 +16,9 @@ use yii\web\NotFoundHttpException;
  */
 class DownloadAction extends Action
 {
+    
+    public $modelName;
+    
     public function run($id)
     {
 
@@ -26,11 +29,21 @@ class DownloadAction extends Action
         if (!$file = D3files::findOne($fileModel->d3files_id)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
-
+        
         if (!$fileModelName = D3filesModelName::findOne($fileModel->model_name_id)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
+        /**
+         * validate modelname
+         */
+        if (Yii::$app->getModule('d3files')->disableController) {
+            if ($fileModelName->name != $this->modelName) {
+                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+            }            
+        }
+        
+        
         // Check access rights to the record the file is attached to
         D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
 

@@ -41,7 +41,7 @@ class UploadAction extends Action
         }
 
         if (empty($this->modelName)) {
-            throw new HttpException(422, Yii::t('d3files', 'mandatory POST parameter model_name is not set'));
+            throw new HttpException(422, Yii::t('d3files', 'mandatory POST parameter modelName is not set'));
         }
 
         // Check access rights to the record the file is attached to

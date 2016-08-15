@@ -1,7 +1,7 @@
 <?php
 use yii\db\Migration;
 
-class m280721_010101_create_table_d3files_model_shared extends Migration
+class m160721_010104_create_table_d3files_model_shared extends Migration
 {
 
     /**

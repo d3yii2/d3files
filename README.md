@@ -62,7 +62,7 @@ yii migrate
      */
     public function behaviors()
     {
-        return [
+        $addBehaviors = [
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
                 'only' => ['d3filesdownload', 'd3filesupload', 'd3filesdelete'],
@@ -75,18 +75,20 @@ yii migrate
                             'd3filesupload',
                             'd3filesdelete',
                         ],
-                        'roles' => ['role1','role2],
+                        'roles' => ['role1','role2'],
                     ],
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => \yii\filters\VerbFilter::className(),
                 'actions' => [
                     'd3filedelete' => ['POST'],
                     'd3fileupload' => ['POST'],
                 ],
             ],
         ];
+        
+        return array_merge(parent::behaviors(), $addBehaviors);
     }
 
     public function actions() {

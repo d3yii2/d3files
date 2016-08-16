@@ -22,7 +22,10 @@ class DownloadAction extends Action
     public function run($id)
     {
 
-        if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0, 'is_file' => 1])) {
+        if (!$fileModel = D3filesModel::findOne([
+            'id' => $id, 
+            'deleted' => 0
+            ])) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
@@ -43,13 +46,32 @@ class DownloadAction extends Action
             }            
         }
         
-        
         // Check access rights to the record the file is attached to
         D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
 
+        $modelName = $fileModelName->name;
+        
+        if(!$fileModel->is_file){
+            if (!$realFileModel = D3filesModel::findOne([
+                'd3files_id' => $fileModel->d3files_id, 
+                //'deleted' => 0, 
+                'is_file' => 1
+                ])) {
+                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+            }
+            if (!$realfileModelName = D3filesModelName::findOne($realFileModel->model_name_id)) {
+                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+            }   
+            
+            $modelName = $realfileModelName->name;
+            
+
+            //$modelName
+        }
+        
         $fileHandler = new FileHandler(
             [
-                'model_name' => $fileModelName->name,
+                'model_name' => $modelName,
                 'model_id'   => $file->id,
                 'file_name'  => $file->file_name,
             ]

@@ -91,7 +91,7 @@ class UploadAction extends Action
         ];
 
         return $this->controller->renderFile(
-            Yii::$app->getModule('d3files')->getView('upload'),
+            Yii::$app->getModule('d3files')->getView('d3files/upload'),
             $renderParam
         );
     }

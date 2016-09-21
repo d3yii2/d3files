@@ -40,7 +40,7 @@ class D3Files extends \yii\base\Module
 
     public function getView($view)
     {
-        $this->viewPath or $this->viewPath = __DIR__ . '/views/d3files/';
-        return $this->viewPath . $view . '.php';
+        $this->viewPath or $this->viewPath = __DIR__ . '/views';
+        return $this->viewPath . '/' . $view . '.php';
     }
 }

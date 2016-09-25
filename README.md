@@ -1,5 +1,4 @@
-# d3files (inspired from d2files)
-
+# d3files (inspired from d2files)  [![Total Downloads](https://img.shields.io/packagist/dt/d3yii2/d3files.svg?style=flat-square)](https://packagist.org/packages/dektrium/yii2-user) 
 
 ## Features
 

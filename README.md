@@ -108,7 +108,7 @@ yii migrate
         ];
     }
 
-```php
+```
 
 ### Active Form
 
@@ -134,6 +134,13 @@ public $uploadFile;
         ];
     }
 ```
+
+* in controller add use
+
+```php
+use d3yii2\d3files\models\D3files;
+```
+
 
 * in controller action after successful save() add
 

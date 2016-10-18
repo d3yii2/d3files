@@ -2,17 +2,17 @@
     "name": "d3yii2/d3files",
     "description": "file uploader",
     "keywords": ["files","uploader","widget","yii","phundament"],
-    "type": "yii-extension",
     "license": "BSD-2-Clause",
     "authors": [
         {
             "name": "Ivars Jukams",
-            "email": "ivars.ju@gmail.com"
+            "email": "ivars.ju@gmail.com",
+            "name": "Uldis Nelsons",
+            "email": "uldis@weberp.lv"
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "dmstr/yii2-migrate-command": "@stable"
+        "php": ">=5.4.0"
     },
     "autoload": {
         "psr-4": {

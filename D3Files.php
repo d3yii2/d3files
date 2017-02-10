@@ -20,6 +20,7 @@ class D3Files extends \yii\base\Module
     public $hashSalt;
     public $sharedExpireDays;
     public $sharedLeftLoadings;
+    public $imageExtensions = ['jpg', 'gif', 'png', 'bmp'];
     
     public function init()
     {

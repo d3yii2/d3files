@@ -197,6 +197,28 @@ class D3files extends ActiveRecord
         return $command->queryAll();        
     }
 
+    /**
+     * get file list with file_path
+     *
+     * @param string $modelName model name
+     * @param int $modelId model record PK value
+     * @return array
+     */
+    public static function getRecordFilesList($modelName, $modelId) {
+        $filesList = self::fileListForWidget($modelName, $modelId);
+        foreach($filesList as $k => $fileRow){
+            $fileHandler = new FileHandler(
+                    [
+                        'model_name' => $modelName,
+                        'model_id'   => $fileRow['id'],
+                        'file_name'  => $fileRow['file_name'],
+                    ]
+                );
+            $filesList[$k]['file_path'] = $fileHandler->getFilePath();
+        }
+
+        return $filesList;
+    }
     public static function performReadValidation($model_name, $model_id)
     {
         $modelMain = $model_name::findOne($model_id);

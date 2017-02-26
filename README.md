@@ -186,3 +186,9 @@ $shared_hash = $share['hash'];
 $url = 'http://www.yoursite.com/index.php?r=d3files/d3files/downloadshare&id=' . $shared_id . '&hash=' . $shared_hash;
 echo $url;
 ```
+
+### Get record files list 
+
+```php
+$filesList = D3Files::getRecordFilesList($model::className(),$model->id)
+```

@@ -158,11 +158,8 @@ class FileHandler
     
     public function download()
     {
-        $file_path = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
-                . self::createSaveFileName(
-                    $this->options['model_id'],
-                    $this->options['file_name']
-                );
+
+        $file_path = $this->getFilePath();
         
         if (!is_file($file_path)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));

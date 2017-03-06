@@ -1,4 +1,5 @@
 # d3files (inspired from d2files)  [![Total Downloads](https://img.shields.io/packagist/dt/d3yii2/d3files.svg?style=flat-square)](https://packagist.org/packages/d3yii2/d3files) 
+Extension for file uploading and attaching to the models
 
 ## Features
 
@@ -192,3 +193,6 @@ echo $url;
 ```php
 $filesList = D3Files::getRecordFilesList($model::className(),$model->id)
 ```
+
+### Change log
+ - 0.9.0 (Feb 26, 2017) - added RU translation

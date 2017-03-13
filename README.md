@@ -191,7 +191,18 @@ echo $url;
 ### Get record files list 
 
 ```php
-$filesList = D3Files::getRecordFilesList($model::className(),$model->id)
+use d3yii2\d3files\models\D3files;
+$filesList = D3files::getRecordFilesList($model::className(),$model->id)
+```
+
+### Attach existing file to record
+
+```php
+$fileTypes = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|log|mxl|xml|zip)$/i';
+$model = Users::findOne($id);
+$fileName = 'MyAvatar.jpg';
+$filePath = '/temp/avatar.jpg';
+D3files::saveFile($fileName, Users::className(), $model->id, $filePath, $fileTypes);
 ```
 
 ### Change log

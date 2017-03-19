@@ -18,7 +18,8 @@
     "homepage": "https://github.com/d3yii2/d3files",
     "require": {
         "php": ">=5.4.0",
-        "yiisoft/yii2": "~2.0.0"
+        "yiisoft/yii2": "~2.0.0",
+        "d3yii2/d3files": "0.9"
     },
     "autoload": {
         "psr-4": {

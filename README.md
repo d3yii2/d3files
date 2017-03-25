@@ -1,5 +1,6 @@
 # d3files (inspired from d2files)  
 [![Total Downloads](https://img.shields.io/packagist/dt/d3yii2/d3files.svg?style=flat-square)](https://packagist.org/packages/d3yii2/d3files) 
+[![Dependency Status](https://www.versioneye.com/php/yiisoft:d3yii2/d3files/badge.png)](https://www.versioneye.com/php/yiisoft:d3yii2/d3files)
 [![Code Climate](https://img.shields.io/codeclimate/github/d3yii2/d3files.svg)](https://codeclimate.com/github/d3yii2/d3files)
 
 Extension for file uploading and attaching to the models

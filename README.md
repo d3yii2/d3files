@@ -1,7 +1,10 @@
 # d3files (inspired from d2files)  
+[![Latest Stable Version](https://poser.pugx.org/d3yii2/d3files/v/stable)](https://packagist.org/packages/d3yii2/d3files)
 [![Total Downloads](https://img.shields.io/packagist/dt/d3yii2/d3files.svg?style=flat-square)](https://packagist.org/packages/d3yii2/d3files) 
+[![Latest Unstable Version](https://poser.pugx.org/d3yii2/d3files/v/unstable)](https://packagist.org/packages/d3yii2/d3files)
 [![Dependency Status](https://www.versioneye.com/user/projects/586a414e49bf2b00437d42ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/586a414e49bf2b00437d42ba)
 [![Code Climate](https://img.shields.io/codeclimate/github/d3yii2/d3files.svg)](https://codeclimate.com/github/d3yii2/d3files)
+[![License](https://poser.pugx.org/d3yii2/d3files/license)](https://packagist.org/packages/d3yii2/d3files)
 
 Extension for file uploading and attaching to the models
 

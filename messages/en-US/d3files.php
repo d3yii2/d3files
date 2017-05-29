@@ -46,5 +46,5 @@ return [
     'User ID' => 'User ID',
     'mandatory POST parameter model_name is not set' => 'mandatory POST parameter model_name is not set',
     'upload_file is not set' => 'upload_file is not set',
-    'You don\'t have access to parent record', => 'You don\'t have access to parent record'
+    'You don\'t have access to parent record' => 'You don\'t have access to parent record'
 ];

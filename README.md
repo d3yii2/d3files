@@ -26,7 +26,7 @@ php composer.phar require d3yii2/d3files dev-master
         'd3files' => [
             'class'              => 'd3yii2\d3files\D3Files',
             'uploadDir'          => dirname(__DIR__) . '\upload\d3files',
-            'disableController'  => true,  // set true to disable d3files controller to use model's controllers
+            'disableController'  => false,  // set true to disable d3files controller to use model's controllers
             'hashSalt'           => false, // Set salt in your web-local.php config, empty value will disable sharing
             'sharedExpireDays'   => 5,
             'sharedLeftLoadings' => 5,
@@ -65,6 +65,17 @@ Allow upload, download, delete files for model record.
 ```
 
 ### Acces control
+
+In config disableController set true fordisabling use d3files controler, where no realised any acces control.
+```php
+    'modules' => [
+        'd3files' => [
+            ....
+            'disableController'  => true,  // set true to disable d3files controller to use model's controllers
+            .....
+        ],
+    ],
+```
 
 For implementing access control add separate actions for upload, download and delete to model controller
 

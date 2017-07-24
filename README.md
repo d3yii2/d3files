@@ -77,7 +77,7 @@ In config disableController set true fordisabling use d3files controler, where n
     ],
 ```
 
-For implementing access control add separate actions for upload, download and delete to model controller
+For implementing access control add separate actions for upload, download and delete to model controller. Can implement any standard Yii2 access control. For example RBAC. 
 
 ```php
     /**

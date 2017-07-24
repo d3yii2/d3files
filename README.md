@@ -47,7 +47,10 @@ yii migrate
 ```
 
 ## Usage
-### VIEW
+### Widdget
+
+Allow upload, download, delete files for model record.
+
 ```php
     <?= d3yii2\d3files\widgets\D3FilesWidget::widget(
         [
@@ -61,7 +64,9 @@ yii migrate
     ) ?>
 ```
 
-### Add actions to actual controller
+### Acces control
+
+For implementing access control add separate actions for upload, download and delete to model controller
 
 ```php
     /**

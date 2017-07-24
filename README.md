@@ -10,9 +10,9 @@ Extension for file uploading and attaching to the models
 
 ## Features
 
-* attach files to model record (it is possible to attach one file to multiple models)
+* attach files to model record (it is possible to attach to one model multiple files)
 * widget for model view
-* standalone actions to integrate in model's controllers to control access rights there
+* access rights realised as standalone actions (separate dowload, upload, delete) by integrating in model's controllers
 * shared files for public access
 
 ## Installation

@@ -134,6 +134,20 @@ For implementing access control add separate actions for upload, download and de
 
 ```
 
+Widget
+```php
+d3yii2\d3files\widgets\D3FilesWidget::widget(
+    [
+        'model' => $model,
+        'model_id' => $model->id,
+        'title' => 'Attachments',
+        'icon' => false,
+        'hideTitle' => false,
+        'readOnly' => false
+    ]
+)
+```
+
 ### Active Form
 
 * to Active form model add propery for uploading file

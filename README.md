@@ -249,5 +249,5 @@ D3files::saveFile($fileName, Users::className(), $model->id, $filePath, $fileTyp
 
 ### Change log
  - 0.9.0 (Feb 26, 2017) - added RU translation
- - 0.9.2 (May 29, 2017) - auto creating upload directories
- - 0.9.3 (Nov 16, 2017) - added parameter controllerRoute  
+ - 0.9.3 (May 29, 2017) - auto creating upload directories
+ - 0.9.4 (Nov 16, 2017) - added parameter controllerRoute  

@@ -3,6 +3,7 @@
 namespace d3yii2\d3files\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "d3files_model_shared".
@@ -15,7 +16,7 @@ use Yii;
  *
  * @property D3filesModel $d3filesModel
  */
-class D3filesModelShared extends \yii\db\ActiveRecord
+class D3filesModelShared extends ActiveRecord
 {
     /**
      * @inheritdoc

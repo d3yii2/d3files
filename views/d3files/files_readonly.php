@@ -3,7 +3,7 @@ use yii\helpers\Html;
 
 ?>
 <div class="d3files-widget">
-<table class="table table-striped table-bordered" style="margin-bottom: 0px; border-bottom: 0;">
+<table class="table table-striped table-bordered" style="margin-bottom: 0; border-bottom: 0;">
     <?php
     if (!$hideTitle) {
         ?>

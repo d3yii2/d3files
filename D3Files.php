@@ -2,11 +2,12 @@
 namespace d3yii2\d3files;
 
 use Yii;
+use yii\base\Module;
 
 /**
  * d3files module definition class
  */
-class D3Files extends \yii\base\Module
+class D3Files extends Module
 {
     /**
      * @inheritdoc
@@ -16,7 +17,6 @@ class D3Files extends \yii\base\Module
     public $uploadDir;
     public $fileTypes;
     public $disableController;
-    public $viewPath;
     public $hashSalt;
     public $sharedExpireDays;
     public $sharedLeftLoadings;

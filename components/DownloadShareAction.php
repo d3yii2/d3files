@@ -28,7 +28,7 @@ class DownloadShareAction extends Action
          * id - only digits > 0
          * hash - only hex, exactly 32 chars long
          */
-        if (!preg_match('#^[1-9][0-9]*$#', $id)) {
+        if (!preg_match('#^[1-9]\d*$#', $id)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
@@ -39,7 +39,7 @@ class DownloadShareAction extends Action
         }
 
         if (!$fileModelShared = D3filesModelShared::find()
-            ->where(['and', "id=$id", "hash='$hash'", "left_loadings>0", "expire_date>=CURDATE()"])->one()
+            ->where(['and', "id=$id", "hash='$hash'", 'left_loadings>0', 'expire_date>=CURDATE()'])->one()
         ) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }

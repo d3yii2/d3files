@@ -3,6 +3,8 @@
 namespace d3yii2\d3files\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "d3files_model".
@@ -17,7 +19,7 @@ use Yii;
  * @property D3filesModelName $modelName
  * @property D3files $d3files
  */
-class D3filesModel extends \yii\db\ActiveRecord
+class D3filesModel extends ActiveRecord
 {
 
     const SHARED_EXPIRE_DAYS   = 5;
@@ -82,8 +84,8 @@ class D3filesModel extends \yii\db\ActiveRecord
         $modelMN = new D3filesModelName();
         $model_name_id = $modelMN->getByName($model_name, true);
 
-        $model = D3filesModel::findOne($id);
-        $newModel = new D3filesModel();
+        $model = self::findOne($id);
+        $newModel = new self();
         $newModel->d3files_id = $model->d3files_id;
         $newModel->is_file = 0;
         $newModel->model_name_id = $model_name_id;
@@ -94,7 +96,7 @@ class D3filesModel extends \yii\db\ActiveRecord
     
     public static function findFileLinks($d3files_id)
     {
-        return D3filesModel::find()
+        return self::find()
                 ->select('mn.name model_name,model_id')
                 ->innerJoin('d3files_model_name mn', 'd3files_model.model_name_id = mn.id')
                 ->where([
@@ -110,7 +112,7 @@ class D3filesModel extends \yii\db\ActiveRecord
      * @param integer $expireDays the period of validity days
      * @param integer $leftLoadings allowed download count
      *
-     * @return array [integer D3filesModelShared ID, string hex hash]
+     * @return array|bool [integer D3filesModelShared ID, string hex hash]
      */
     public function createSharedModel($id, $expireDays = null, $leftLoadings = null)
     {
@@ -127,7 +129,7 @@ class D3filesModel extends \yii\db\ActiveRecord
             $leftLoadings = self::SHARED_LEFT_LOADINGS;
         }
 
-        if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0, 'is_file' => 1])) {
+        if (!$fileModel = self::findOne(['id' => $id, 'deleted' => 0, 'is_file' => 1])) {
             return false;
         }
 
@@ -137,7 +139,7 @@ class D3filesModel extends \yii\db\ActiveRecord
 
         $fileModelShared = new D3filesModelShared();
         $fileModelShared->d3files_model_id = $id;
-        $fileModelShared->expire_date      = new \yii\db\Expression(
+        $fileModelShared->expire_date      = new Expression(
             'DATE_ADD(CURDATE(), INTERVAL ' . $expireDays . ' DAY)'
         );
         $fileModelShared->left_loadings    = $leftLoadings;

@@ -39,7 +39,7 @@ class FileHandler
         }
         
         $fileExtension = pathinfo($this->options['file_name'])['extension'];
-        if ($this->options['file_types']  != '*' 
+        if ($this->options['file_types']  !== '*'
                 && !preg_match($this->options['file_types'],$fileExtension)) {
             throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: ' . $fileExtension));
         }

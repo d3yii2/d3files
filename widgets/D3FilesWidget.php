@@ -45,7 +45,7 @@ class D3FilesWidget extends Widget
         if(property_exists($this->model,'d3filesControllerRoute')){
             $this->controllerRoute = $this->model->d3filesControllerRoute;
         }
-        $this->model_name = $this->model->className();
+        $this->model_name = $this->model::className();
 
         $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);        
         

@@ -12,7 +12,7 @@ Extension for file uploading and attaching to the models
 
 * attach files to model record (it is possible to attach to one model multiple files)
 * widget for model view
-* access rights realised as standalone actions (separate dowload, upload, delete) by integrating in model's controllers
+* access rights realised as standalone actions (separate download, upload, delete) by integrating in model's controllers
 * shared files for public access
 
 ## Installation
@@ -52,7 +52,7 @@ yii migrate
 ```
 
 ## Usage
-### Widdget
+### Widget
 
 Allow upload, download, delete files for model record.
 
@@ -61,7 +61,7 @@ Allow upload, download, delete files for model record.
         [
             'model'     => $model,
             'model_id'  => $model->id,
-            'title'     => 'Wiget Title',
+            'title'     => 'Widget Title',
             'icon'      => false,
             'hideTitle' => false,
             'readOnly'  => false
@@ -69,9 +69,9 @@ Allow upload, download, delete files for model record.
     ) ?>
 ```
 
-### Acces control
+### Access control
 
-In config disableController set true fordisabling use d3files controler, where no realised any acces control.
+In config disableController set true for disabling use d3files controller, where no realised any access control.
 ```php
     'modules' => [
         'd3files' => [
@@ -155,7 +155,7 @@ d3yii2\d3files\widgets\D3FilesWidget::widget(
 
 ### Active Form
 
-* to Active form model add propery for uploading file
+* to Active form model add property for uploading file
 
 ```php
 
@@ -249,4 +249,5 @@ D3files::saveFile($fileName, Users::className(), $model->id, $filePath, $fileTyp
 
 ### Change log
  - 0.9.0 (Feb 26, 2017) - added RU translation
- - 0.9.2 (May 29, 2017) - auto creating upload directories 
+ - 0.9.2 (May 29, 2017) - auto creating upload directories
+ - 0.9.3 (Nov 16, 2017) - added parameter controllerRoute  

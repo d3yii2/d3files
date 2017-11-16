@@ -41,7 +41,7 @@ class DownloadAction extends Action
          * validate modelname
          */
         if (Yii::$app->getModule('d3files')->disableController) {
-            if ($fileModelName->name != $this->modelName) {
+            if ($fileModelName->name !== $this->modelName) {
                 throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
             }            
         }

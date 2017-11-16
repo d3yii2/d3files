@@ -6,6 +6,7 @@ use yii\base\Action;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
+use yii\db\Expression;
 use yii\web\Response;
 use yii\web\NotFoundHttpException;
 use yii\web\HttpException;
@@ -47,7 +48,7 @@ class UploadAction extends Action
         // Check access rights to the record the file is attached to
         D3files::performReadValidation($this->modelName, $id);
 
-        $tmp_id = uniqid();
+        $tmp_id = uniqid('d3f',false);
 
         $fileHandler = new FileHandler(
             [
@@ -62,7 +63,7 @@ class UploadAction extends Action
         $model = new D3files();
 
         $model->file_name    = $_FILES['upload_file']['name'];
-        $model->add_datetime = new \yii\db\Expression('NOW()');
+        $model->add_datetime = new Expression('NOW()');
         $model->user_id      = Yii::$app->user->getId();
 
         if ($model->save()) {

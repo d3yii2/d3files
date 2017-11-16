@@ -3,6 +3,7 @@
 namespace d3yii2\d3files\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "d3files_model_name".
@@ -12,7 +13,7 @@ use Yii;
  *
  * @property D3filesModel[] $d3filesModels
  */
-class D3filesModelName extends \yii\db\ActiveRecord
+class D3filesModelName extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -60,7 +61,7 @@ class D3filesModelName extends \yii\db\ActiveRecord
      */
     public function getByName($name, $addIfNotSet)
     {
-        $model = D3filesModelName::find()
+        $model = self::find()
             ->select('id')
             ->where(['name' => $name])
             ->one();
@@ -73,7 +74,7 @@ class D3filesModelName extends \yii\db\ActiveRecord
             return null;
         }
 
-        $newModel = new D3filesModelName();
+        $newModel = new self();
         $newModel->name = $name;
         $newModel->save();
 

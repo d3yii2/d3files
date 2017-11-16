@@ -23,9 +23,12 @@ php composer.phar require d3yii2/d3files dev-master
             'hashSalt'           => false, // Set salt in your web-local.php config, empty value will disable sharing
             'sharedExpireDays'   => 5,
             'sharedLeftLoadings' => 5,
+            'controllerRoute'    => 'delivery/attachments', //define controler route, where defined  
         ],
     ],
 ```
+
+
 
 * migration configuration. Add to console parameters migration path
 ```php

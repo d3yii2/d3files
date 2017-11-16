@@ -1,11 +1,18 @@
-# d3files (inspired from d2files)  [![Total Downloads](https://img.shields.io/packagist/dt/d3yii2/d3files.svg?style=flat-square)](https://packagist.org/packages/d3yii2/d3files) 
+# d3files (inspired from d2files)  
+[![Latest Stable Version](https://poser.pugx.org/d3yii2/d3files/v/stable)](https://packagist.org/packages/d3yii2/d3files)
+[![Total Downloads](https://img.shields.io/packagist/dt/d3yii2/d3files.svg?style=flat-square)](https://packagist.org/packages/d3yii2/d3files) 
+[![Latest Unstable Version](https://poser.pugx.org/d3yii2/d3files/v/unstable)](https://packagist.org/packages/d3yii2/d3files)
+[![Dependency Status](https://www.versioneye.com/user/projects/586a414e49bf2b00437d42ba/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/586a414e49bf2b00437d42ba)
+[![Code Climate](https://img.shields.io/codeclimate/github/d3yii2/d3files.svg)](https://codeclimate.com/github/d3yii2/d3files)
+[![License](https://poser.pugx.org/d3yii2/d3files/license)](https://packagist.org/packages/d3yii2/d3files)
+
 Extension for file uploading and attaching to the models
 
 ## Features
 
-* attach files to model record (it is possible to attach one file to multiple models)
+* attach files to model record (it is possible to attach to one model multiple files)
 * widget for model view
-* standalone actions to integrate in model's controllers to control access rights there
+* access rights realised as standalone actions (separate dowload, upload, delete) by integrating in model's controllers
 * shared files for public access
 
 ## Installation
@@ -19,7 +26,7 @@ php composer.phar require d3yii2/d3files dev-master
         'd3files' => [
             'class'              => 'd3yii2\d3files\D3Files',
             'uploadDir'          => dirname(__DIR__) . '\upload\d3files',
-            'disableController'  => true,  // set true to disable d3files controller to use model's controllers
+            'disableController'  => false,  // set true to disable d3files controller to use model's controllers
             'hashSalt'           => false, // Set salt in your web-local.php config, empty value will disable sharing
             'sharedExpireDays'   => 5,
             'sharedLeftLoadings' => 5,
@@ -28,13 +35,15 @@ php composer.phar require d3yii2/d3files dev-master
     ],
 ```
 
-
-
-* migration configuration. Add to console parameters migration path
+* migration configuration. Add to console migration definition path
 ```php
-    'yii.migrations' => [
-        '@vendor/d3yii2/d3files/migrations',
-    ],
+    'controllerMap' => [
+           'migrate' => [
+               'class' => 'yii\console\controllers\MigrateController',
+               'migrationPath' => [
+                   '@d3yii2/d3files/migrations',
+               ],
+           ],
 ```
 
 * do migration
@@ -43,7 +52,10 @@ yii migrate
 ```
 
 ## Usage
-### VIEW
+### Widdget
+
+Allow upload, download, delete files for model record.
+
 ```php
     <?= d3yii2\d3files\widgets\D3FilesWidget::widget(
         [
@@ -57,7 +69,20 @@ yii migrate
     ) ?>
 ```
 
-### Add actions to actual controller
+### Acces control
+
+In config disableController set true fordisabling use d3files controler, where no realised any acces control.
+```php
+    'modules' => [
+        'd3files' => [
+            ....
+            'disableController'  => true,  // set true to disable d3files controller to use model's controllers
+            .....
+        ],
+    ],
+```
+
+For implementing access control add separate actions for upload, download and delete to model controller. Can implement any standard Yii2 access control. For example RBAC. 
 
 ```php
     /**
@@ -112,6 +137,20 @@ yii migrate
         ];
     }
 
+```
+
+Widget
+```php
+d3yii2\d3files\widgets\D3FilesWidget::widget(
+    [
+        'model' => $model,
+        'model_id' => $model->id,
+        'title' => 'Attachments',
+        'icon' => false,
+        'hideTitle' => false,
+        'readOnly' => false
+    ]
+)
 ```
 
 ### Active Form
@@ -210,3 +249,4 @@ D3files::saveFile($fileName, Users::className(), $model->id, $filePath, $fileTyp
 
 ### Change log
  - 0.9.0 (Feb 26, 2017) - added RU translation
+ - 0.9.2 (May 29, 2017) - auto creating upload directories 

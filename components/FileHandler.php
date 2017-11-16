@@ -2,6 +2,7 @@
 namespace d3yii2\d3files\components;
 
 use Yii;
+use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\base\InvalidParamException;
 use yii\web\ForbiddenHttpException;
@@ -79,8 +80,14 @@ class FileHandler
         if (!isset($_FILES['upload_file'])) {
             throw new InvalidParamException(Yii::t('d3files', 'upload_file is not set'));
         }
-        
-        if (!move_uploaded_file($_FILES['upload_file']['tmp_name'], $this->getFilePath())) {
+
+        $filePath = $this->getFilePath();
+        $dir = dirname($filePath);
+        if(!file_exists($dir)){
+            FileHelper::createDirectory($dir);
+        }
+
+        if (!move_uploaded_file($_FILES['upload_file']['tmp_name'], $filePath)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
         

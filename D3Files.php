@@ -34,7 +34,7 @@ class D3Files extends Module
         $i18n->translations['d3files'] = [
             'class'            => 'yii\i18n\PhpMessageSource',
             'sourceLanguage'   => 'en-US',
-            'basePath'         => __DIR__ . '\messages',
+            'basePath'         => __DIR__ . '/messages',
             'forceTranslation' => true
         ];
     }

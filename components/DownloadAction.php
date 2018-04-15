@@ -18,6 +18,8 @@ class DownloadAction extends Action
 {
     
     public $modelName;
+
+    public $downloadType = 'download';
     
     public function run($id)
     {
@@ -76,7 +78,14 @@ class DownloadAction extends Action
                 'file_name'  => $file->file_name,
             ]
         );
+        if($this->downloadType === 'download') {
+            $fileHandler->download();
+            return;
+        }
 
-        $fileHandler->download();
+        if($this->downloadType === 'open') {
+            $fileHandler->open();
+            return;
+        }
     }
 }

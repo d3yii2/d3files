@@ -182,6 +182,26 @@ class FileHandler
         exit;
         
     }
+
+    public function open()
+    {
+
+        $file_path = $this->getFilePath();
+
+        if (!is_file($file_path)) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+        }
+        $mimeType = FileHelper::getMimeTypeByExtension($this->options['file_name']);
+        header('Content-Description: File Transfer');
+        header('Content-Type: '.$mimeType);
+        header('Content-Disposition: inline; filename="' . $this->options['file_name'] . '"');
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Length: ' . filesize($file_path));
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', filemtime($file_path)));
+        readfile($file_path);
+        exit;
+
+    }
     
     protected static function createSaveFileName($d3files_id, $file_name)
     {

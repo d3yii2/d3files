@@ -11,7 +11,7 @@ use yii\web\UploadedFile;
 class FileHandler
 {
     
-    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt)$/i';
+    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip)$/i';
     
     protected $options;
 

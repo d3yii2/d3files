@@ -21,6 +21,7 @@ class D3Files extends Module
     public $sharedExpireDays;
     public $sharedLeftLoadings;
     public $imageExtensions = ['jpg', 'gif', 'png', 'bmp'];
+    public $models;
     
     public function init()
     {

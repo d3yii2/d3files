@@ -23,6 +23,7 @@ class FileHandler
 {
 
     public const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip|csv)$/i';
+    public const ID_SPLIT_LENGTH = 3;
 
     protected $options;
 
@@ -159,6 +160,173 @@ class FileHandler
         }
 
         return true;
+
+    }
+
+    /**
+     * Get model options from module configuration
+     * @return array
+     */
+    public function getModelOptions(): array
+    {
+        $models = Yii::$app->getModule('d3files')->models;
+
+        foreach ($models as $modelOptions) {
+            if($this->options['model_name'] === $modelOptions['Class']) {
+                return $modelOptions;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Get the depth level
+     * @return int
+     * @throws \Exception
+     */
+    public function getDepthLevel(): int
+    {
+        $options = $this->getModelOptions();
+
+        if (empty($options['dirStructure'])) {
+            return 1;
+        }
+
+        $structure = $options['dirStructure'];
+
+        $levelDefs = [
+            'flat' => 1,
+            '2levels' => 2,
+            '3levels' => 3,
+        ];
+
+        if (!isset($levelDefs[$structure])) {
+            throw new \Exception('Undefined Directory structure: ' . $structure);
+        }
+
+        return $levelDefs[$structure];
+    }
+
+    /**
+     * @param int $fileId
+     * @return string
+     * @throws \Exception
+     */
+    private function calculateFileName(int $fileId): string
+    {
+        if (!$this->hasExpectedlength($fileId)) {
+            return $fileId;
+        }
+
+        // Get last x chars according to split lenght
+        $lastChars = substr($fileId, -self::ID_SPLIT_LENGTH);
+
+        $lastCharsCount = strlen($lastChars);
+
+        if (self::ID_SPLIT_LENGTH === $lastCharsCount) {
+            return $lastChars;
+        }
+
+        $name = $this->addNullChars($fileId);
+
+        return $name;
+    }
+
+    /**
+     * Add null chars to file or directory name
+     * @param $id
+     * @return string
+     */
+    private function addNullChars($id): string
+    {
+        $lastChars = substr($id, -self::ID_SPLIT_LENGTH);
+
+        $lastCharsCount = strlen($lastChars);
+
+        $nullsCount = self::ID_SPLIT_LENGTH - $lastCharsCount;
+
+        $nulls = '';
+
+        for ($i = 0; $i < $nullsCount; $i++) {
+            $nulls .= '0';
+        }
+
+        $name = $nulls . $lastChars;
+
+        return $name;
+    }
+
+    /**
+     * Check if file ID is in expected length according to directory depth option
+     * @return string
+     * @throws \Exception
+     */
+    public function hasExpectedlength(int $fileId): bool
+    {
+        $levels = $this->getDepthLevel();
+
+        $expectedLength = $levels * self::ID_SPLIT_LENGTH;
+
+        $fileIdLength = strlen($fileId);
+
+        $hasExpectedLength = $fileIdLength <= $expectedLength;
+
+        return $hasExpectedLength;
+    }
+
+    public function getFileSubdirectory(int $fileId): string
+    {
+        if (!$this->hasExpectedlength($fileId)) {
+            return '';
+        }
+
+        $levels = $this->getDepthLevel();
+
+        $name = '';
+
+        for ($i = 1; $i < $levels; $i++) {
+
+            $fileId = substr($fileId, 0, -self::ID_SPLIT_LENGTH);
+
+            $idLength = strlen($fileId);
+
+            if ($idLength >= self::ID_SPLIT_LENGTH) {
+                $subname = substr($fileId, -self::ID_SPLIT_LENGTH);
+                $name = $subname . DIRECTORY_SEPARATOR . $name;
+                continue;
+            }
+
+            $name = $this->addNullChars($fileId) . DIRECTORY_SEPARATOR . $name;
+        }
+
+        return $name;
+    }
+
+    /**
+     * get file path for saving uploaded file
+     * @return string
+     * @throws \Exception
+     */
+    public function getFilePath(): string
+    {
+        if(isset($this->options['file_path'])){
+            return $this->options['file_path'];
+        }
+
+        $fileId = $this->options['model_id'];
+
+        $subdirectory = $this->getFileSubdirectory($fileId);
+
+        $uploadDir = $this->options['upload_dir'] . DIRECTORY_SEPARATOR . $subdirectory;
+
+        $fileId = $this->calculateFileName($fileId);
+
+        return $uploadDir
+                . self::createSaveFileName(
+                    $fileId,
+                    $this->options['file_name']
+                );
     }
 
     /**

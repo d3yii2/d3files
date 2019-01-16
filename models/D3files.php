@@ -73,6 +73,11 @@ class D3files extends ActiveRecord
      */
     public static function saveFile($fileName, $modelName, $modelId, $filePath, $fileTypes, $userId = 0 )
     {
+        // Just stop if the file not exists or have forbidden type
+        if(FileHandler::isForbiddenFileType($filePath, $fileTypes) || !is_file($filePath)) {
+            return;
+        }
+        
         $fileHandler = new FileHandler(
             [
                 'model_name' => $modelName,

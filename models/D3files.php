@@ -213,15 +213,7 @@ class D3files extends ActiveRecord
      */
     public static function getRecordFilesList($modelName, $modelId) {
         $filesList = self::fileListForWidget($modelName, $modelId);
-        $fileTypes = \Yii::$app->getModule('d3files')->fileTypes;
-
         foreach($filesList as $k => $fileRow){
-           
-            if(FileHandler::isForbiddenFileType($fileRow['file_name'], $fileTypes)) {
-                unset($filesList[$k]);
-                continue;
-            }
-            
             $fileHandler = new FileHandler(
                     [
                         'model_name' => $modelName,

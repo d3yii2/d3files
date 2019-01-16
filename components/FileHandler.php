@@ -38,19 +38,12 @@ class FileHandler
             $this->options['file_path']  = $options['file_path'];
         }
         
-        if (self::isForbiddenFileType($this->options['file_name'], $this->options['file_types'])) {
+        $fileExtension = pathinfo($this->options['file_name'])['extension'];
+        if ($this->options['file_types']  !== '*'
+                && !preg_match($this->options['file_types'],$fileExtension)) {
             throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: ' . $fileExtension));
         }
         
-    }
-    
-    public static function isForbiddenFileType($fileName, $fileTypes)
-    {
-        $fileExtension = pathinfo($fileName)['extension'];
-
-        $hasForbidden = $fileTypes  !== '*' && !preg_match($fileTypes, $fileExtension);
-        
-        return $hasForbidden;
     }
     
     protected static function getAllowedFileTypes($options = [])

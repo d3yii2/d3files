@@ -39,7 +39,7 @@ class FileHandler
         }
         
         if (self::isForbiddenFileType($this->options['file_name'], $this->options['file_types'])) {
-            throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: ' . $fileExtension));
+            throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: ' . pathinfo($this->options['file_name'])['extension']));
         }
         
     }

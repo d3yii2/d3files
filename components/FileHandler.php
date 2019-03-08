@@ -2,31 +2,31 @@
 namespace d3yii2\d3files\components;
 
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
-use yii\base\InvalidParamException;
 use yii\web\ForbiddenHttpException;
 use yii\web\UploadedFile;
 
 class FileHandler
 {
     
-    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt)$/i';
+    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip)$/i';
     
     protected $options;
 
     public function __construct($options) {
         
         if (!isset($options['model_name'])) {
-            throw new InvalidParamException(Yii::t('d3files', 'UploadHandler mandatory option module_name is not set'));
+            throw new InvalidArgumentException(Yii::t('d3files', 'UploadHandler mandatory option module_name is not set'));
         }
         
         if (!isset($options['model_id'])) {
-            throw new InvalidParamException(Yii::t('d3files', 'UploadHandler mandatory option model_id is not set'));
+            throw new InvalidArgumentException(Yii::t('d3files', 'UploadHandler mandatory option model_id is not set'));
         }
         
         if (!isset($options['file_name'])) {
-            throw new InvalidParamException(Yii::t('d3files', 'UploadHandler mandatory option file_name is not set'));
+            throw new InvalidArgumentException(Yii::t('d3files', 'UploadHandler mandatory option file_name is not set'));
         }
         
         $this->options['upload_dir'] = self::getUploadDirPath($options['model_name']); 
@@ -70,23 +70,20 @@ class FileHandler
     
     /**
      * copy posted file to upload directory
-     * @return boolean
-     * @throws InvalidParamException
+     * @return bool
      * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
      */
     public function upload()
     {
         
         if (!isset($_FILES['upload_file'])) {
-            throw new InvalidParamException(Yii::t('d3files', 'upload_file is not set'));
+            throw new InvalidArgumentException(Yii::t('d3files', 'upload_file is not set'));
         }
 
         $filePath = $this->getFilePath();
-        $dir = dirname($filePath);
-        if(!file_exists($dir)){
-            FileHelper::createDirectory($dir);
-        }
-
+        $dir = \dirname($filePath);
+        FileHelper::createDirectory($dir);
         if (!move_uploaded_file($_FILES['upload_file']['tmp_name'], $filePath)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
@@ -95,16 +92,19 @@ class FileHandler
         
     }
 
+
     /**
      * copy Yii2 UploadedFile
-     * @param UploadedFile $upoadFile 
-     * @return boolean
+     * @param UploadedFile $uploadedFile
+     * @return bool
      * @throws NotFoundHttpException
+     * @throws \yii\base\Exception
      */
-    public function uploadYii2UloadFile(UploadedFile $upoadFile)
+    public function uploadYii2UloadFile(UploadedFile $uploadedFile)
     {
-        
-        if (!$upoadFile->saveAs($this->getFilePath())) {
+        $filePath = $this->getFilePath();
+        FileHelper::createDirectory(\dirname($filePath));
+        if (!$uploadedFile->saveAs($filePath)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
         
@@ -131,18 +131,23 @@ class FileHandler
 
     /**
      * save file. Alternative for method  upload()
-     * @param string $fileContent
-     * @return boolean true
+     * @param $fileContent
+     * @return bool
+     * @throws \yii\base\Exception
      */
     public function save(&$fileContent)
     {
-        file_put_contents($this->getFilePath(), $fileContent);
+        $filePath = $this->getFilePath();
+        FileHelper::createDirectory(\dirname($filePath));
+        file_put_contents($filePath, $fileContent);
         
         return true;
     }
 
     public function rename($new_id) {
-        
+
+        FileHelper::createDirectory($this->options['upload_dir']);
+
         $newName = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
             . self::createSaveFileName(
                 $new_id,
@@ -153,7 +158,7 @@ class FileHandler
     }
     
     public function remove() {
-        
+
         $oldName = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
             . self::createSaveFileName(
                 $this->options['model_id'],
@@ -181,6 +186,26 @@ class FileHandler
         readfile($file_path);
         exit;
         
+    }
+
+    public function open()
+    {
+
+        $file_path = $this->getFilePath();
+
+        if (!is_file($file_path)) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+        }
+        $mimeType = FileHelper::getMimeTypeByExtension($this->options['file_name']);
+        header('Content-Description: File Transfer');
+        header('Content-Type: '.$mimeType);
+        header('Content-Disposition: inline; filename="' . $this->options['file_name'] . '"');
+        header('Content-Transfer-Encoding: binary');
+        header('Content-Length: ' . filesize($file_path));
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', filemtime($file_path)));
+        readfile($file_path);
+        exit;
+
     }
     
     protected static function createSaveFileName($d3files_id, $file_name)

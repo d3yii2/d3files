@@ -34,6 +34,10 @@ class D3FilesWidget extends Widget
     /** @var string file handling controller route. If empty, then use actual controller  */
     public $controllerRoute = '';
 
+    public $viewByFancyBox = false;
+
+    public $viewByFancyBoxExtensions = ['pdf','jpg','jpeg','png','txt','html'];
+
     /** @var  array */
     protected $fileList;
 
@@ -77,6 +81,8 @@ class D3FilesWidget extends Widget
                     'hideTitle'  => $this->hideTitle,
                     'fileList'   => $this->fileList,
                     'url_prefix' => $url_prefix,
+                    'viewByFancyBox' => $this->viewByFancyBox,
+                    'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions
                 ]
             );
         }
@@ -91,6 +97,8 @@ class D3FilesWidget extends Widget
                 'hideTitle'  => $this->hideTitle,
                 'fileList'   => $this->fileList,
                 'url_prefix' => $url_prefix,
+                'viewByFancyBox' => $this->viewByFancyBox,
+                'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions
             ]
         );
         

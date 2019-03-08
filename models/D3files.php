@@ -59,10 +59,10 @@ class D3files extends ActiveRecord
             'notes'        => Yii::t('d3files', 'Notes'),
         ];
     }
-    
+
     /**
      * alternative for uploading file
-     * 
+     *
      * @param string $fileName
      * @param string $modelName
      * @param int $modelId
@@ -82,31 +82,31 @@ class D3files extends ActiveRecord
                 'file_path'  => $filePath,
             ]
         );
-        
+
         $model = new self();
 
         $model->file_name    = $fileName;
         $model->add_datetime = new Expression('NOW()');
         $model->user_id      = $userId;
-        
+
         if ($model->save()) {
 
             // Get or create model name id
             $modelMN = new D3filesModelName();
             $model_name_id = $modelMN->getByName($modelName, true);
-            
+
             $modelM = new D3filesModel();
             $modelM->d3files_id = $model->id;
             $modelM->is_file = 1;
             $modelM->model_name_id = $model_name_id;
             $modelM->model_id = $modelId;
-            $modelM->save();            
-            
+            $modelM->save();
+
             $fileHandler->rename($model->id);
         } else {
             $fileHandler->remove();
             throw new \Exception(500, Yii::t('d3files', 'Insert DB record failed'));
-        }        
+        }
     }
 
     /**
@@ -118,7 +118,7 @@ class D3files extends ActiveRecord
      */
     public static function saveYii2UploadFile(UploadedFile $uploadFile, $modelName, $modelId)
     {
-        
+
         $fileHandler = new FileHandler(
             [
                 'model_name' => $modelName,
@@ -129,47 +129,48 @@ class D3files extends ActiveRecord
         );
 
         $fileHandler->uploadYii2UloadFile($uploadFile);
-        
+
         $model = new self();
 
         $model->file_name    = $uploadFile->name;
         $model->add_datetime = new Expression('NOW()');
         $model->user_id      = \Yii::$app->person->user_id;
-        
+
         if ($model->save()) {
 
             // Get or create model name id
             $modelMN = new D3filesModelName();
             $model_name_id = $modelMN->getByName($modelName, true);
-            
+
             $modelM = new D3filesModel();
             $modelM->d3files_id = $model->id;
             $modelM->is_file = 1;
             $modelM->model_name_id = $model_name_id;
             $modelM->model_id = $modelId;
-            $modelM->save();            
-            
+            $modelM->save();
+
             $fileHandler->rename($model->id);
         } else {
             $fileHandler->remove();
             throw new \Exception(500, Yii::t('d3files', 'Insert DB record failed'));
-        }        
+        }
     }
-    
+
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getD3filesModels()
     {
         return $this->hasMany(D3filesModel::className(), ['d3files_id' => 'id']);
-    }     
-    
+    }
+
     /**
      * get file list for widget
-     * 
-     * @param string $modelName model name
-     * @param int $modelId model record PK value
+     *
+     * @param $modelName
+     * @param $modelId
      * @return array
+     * @throws \yii\db\Exception
      */
     public static function fileListForWidget($modelName, $modelId) {
 
@@ -193,29 +194,32 @@ class D3files extends ActiveRecord
             ':model_name' => $modelName,
             ':model_id'   => $modelId,
         ];
-        
+
         $connection = \Yii::$app->getDb();
         $command = $connection->createCommand($sSql, $parameters);
-        return $command->queryAll();        
+        return $command->queryAll();
     }
+
 
     /**
      * get file list with file_path
      *
-     * @param string $modelName model name
-     * @param int $modelId model record PK value
+     * @param $modelName
+     * @param $modelId
      * @return array
+     * @throws ForbiddenHttpException
      */
-    public static function getRecordFilesList($modelName, $modelId) {
+    public static function getRecordFilesList($modelName, $modelId)
+    {
         $filesList = self::fileListForWidget($modelName, $modelId);
         foreach($filesList as $k => $fileRow){
             $fileHandler = new FileHandler(
-                    [
-                        'model_name' => $modelName,
-                        'model_id'   => $fileRow['id'],
-                        'file_name'  => $fileRow['file_name'],
-                    ]
-                );
+                [
+                    'model_name' => $modelName,
+                    'model_id'   => $fileRow['id'],
+                    'file_name'  => $fileRow['file_name'],
+                ]
+            );
             $filesList[$k]['file_path'] = $fileHandler->getFilePath();
         }
 

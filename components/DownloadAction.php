@@ -18,7 +18,11 @@ class DownloadAction extends Action
 {
     
     public $modelName;
-    
+
+    public $downloadType = 'download';
+
+    const THE_REQUESTED_FILE_DOES_NOT_EXIST = 'The requested file does not exist.';
+
     public function run($id)
     {
 
@@ -26,15 +30,18 @@ class DownloadAction extends Action
             'id' => $id, 
             'deleted' => 0
             ])) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+            \Yii::error( 'Can not find D3filesModel. id='.$id);
+            throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
         }
 
         if (!$file = D3files::findOne($fileModel->d3files_id)) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+            \Yii::error( 'Can not find D3files. id='.$fileModel->d3files_id);
+            throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
         }
         
         if (!$fileModelName = D3filesModelName::findOne($fileModel->model_name_id)) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+            \Yii::error( 'Can not find D3filesModelName. id=' . $fileModel->model_name_id);
+            throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
         }
 
         /**
@@ -42,7 +49,8 @@ class DownloadAction extends Action
          */
         if (Yii::$app->getModule('d3files')->disableController) {
             if ($fileModelName->name !== $this->modelName) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+                \Yii::error( 'Incorrect model name. $fileModelName->name=' . $fileModelName->name . ' ;$this->modelNameid=' . $this->modelName);
+                throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
             }            
         }
         
@@ -57,10 +65,12 @@ class DownloadAction extends Action
                 //'deleted' => 0, 
                 'is_file' => 1
                 ])) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+                \Yii::error( 'No found $realFileModel d3files_id=' . $fileModel->d3files_id);
+                throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
             }
             if (!$realfileModelName = D3filesModelName::findOne($realFileModel->model_name_id)) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+                \Yii::error( 'No found $realfileModelName id=' . $realFileModel->model_name_id);
+                throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
             }   
             
             $modelName = $realfileModelName->name;
@@ -76,7 +86,14 @@ class DownloadAction extends Action
                 'file_name'  => $file->file_name,
             ]
         );
+        if($this->downloadType === 'download') {
+            $fileHandler->download();
+            return;
+        }
 
-        $fileHandler->download();
+        if($this->downloadType === 'open') {
+            $fileHandler->open();
+            return;
+        }
     }
 }

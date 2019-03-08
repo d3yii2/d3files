@@ -3,6 +3,13 @@ use yii\helpers\Html;
 use yii\web\View;
 use yii\helpers\Url;
 
+/**
+ * @var bool $viewByFancyBox
+ * @var array $viewByFancyBoxExtensions
+ * @var array $fileList
+ */
+
+
 $uploadUrl = Url::to([$url_prefix . 'd3filesupload', 'id' => $model_id]);
 
 $t_aria_label = Yii::t('d3files', 'Close');
@@ -135,6 +142,19 @@ $(function(){
 JS;
 
 $this->registerJs($script, View::POS_END, 'd3files');
+
+if($viewByFancyBox) {
+    echo newerton\fancybox3\FancyBox::widget([
+        'target' => '[data-fancybox]',
+        'config' => [
+            'type' => 'iframe',
+            'iframe' => [
+                'preload' => false
+            ]
+        ],
+    ]);
+}
+
 ?>
 <div class="d3files-widget">
 <table class="table table-striped table-bordered" style="margin-bottom: 0; border-bottom: 0;">
@@ -167,6 +187,7 @@ $this->registerJs($script, View::POS_END, 'd3files');
 <?php
 
 foreach ($fileList as $row) {
+    $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
     ?>
     <tr>
         <td class="col-xs-11">
@@ -176,6 +197,31 @@ foreach ($fileList as $row) {
                 ['title' => Yii::t('d3files', 'Download')]
             ) ?>
         </td>
+        <?php
+        if($viewByFancyBox) {
+            ?>
+            <td class="col-xs-1">
+                <?php
+                if(in_array($ext,$viewByFancyBoxExtensions, true)){
+                    $fbUrl = [
+                        $url_prefix . 'd3filesopen',
+                        'id' => $row['file_model_id']
+                    ];
+                    $fbOptions= [
+                        'data-fancybox' => true,
+                        'data-type' => 'iframe',
+                        'fancybox' => 'fancybox',
+                        'data-src' => \yii\helpers\Url::to($fbUrl)
+                    ];
+
+                    echo Html::a('<i class="fa fa-external-link"></i>',
+                        'javascript:;', $fbOptions);
+                }
+                ?>
+            </td>
+            <?php
+        }
+        ?>
         <td class="text-center col-xs-1">
             <?=Html::a(
                 '<span class="glyphicon glyphicon-trash"></span>',

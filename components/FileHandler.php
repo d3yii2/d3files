@@ -11,7 +11,7 @@ use yii\web\UploadedFile;
 class FileHandler
 {
     
-    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip)$/i';
+    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip|csv)$/i';
     
     protected $options;
 
@@ -37,10 +37,12 @@ class FileHandler
         if(isset($options['file_path'])){
             $this->options['file_path']  = $options['file_path'];
         }
-        
+
+        $fileTypes = self::getAllowedFileTypes($options);
+
         $fileExtension = pathinfo($this->options['file_name'])['extension'];
-        if ($this->options['file_types']  !== '*'
-                && !preg_match($this->options['file_types'],$fileExtension)) {
+        if ($fileTypes  !== '*'
+                && !preg_match($fileTypes, $fileExtension)) {
             throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: ' . $fileExtension));
         }
         
@@ -52,11 +54,9 @@ class FileHandler
             return $options['file_types'];
         }
         
-        if (!$file_types = Yii::$app->getModule('d3files')->fileTypes) {
-            $file_types = self::FILE_TYPES;
-        }
+        $fileTypes = Yii::$app->getModule('d3files')->fileTypes ?? self::FILE_TYPES;
         
-        return $file_types;
+        return $fileTypes;
     }
     
     protected static function getUploadDirPath($model_name)

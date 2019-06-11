@@ -36,6 +36,8 @@ class D3FilesWidget extends Widget
 
     public $viewByFancyBox = false;
 
+    public $template = 'files';
+
     public $viewByFancyBoxExtensions = ['pdf','jpg','jpeg','png','txt','html'];
 
     /** @var  array */
@@ -72,7 +74,7 @@ class D3FilesWidget extends Widget
 
         if ($this->readOnly) {
             return $this->render(
-                'files_readonly',
+                $this->template . '_readonly',
                 [
                     'model_name' => $this->model_name,
                     'model_id'   => $this->model_id,
@@ -88,7 +90,7 @@ class D3FilesWidget extends Widget
         }
 
         return $this->render(
-            'files',
+            $this->template,
             [
                 'model_name' => $this->model_name,
                 'model_id'   => $this->model_id,

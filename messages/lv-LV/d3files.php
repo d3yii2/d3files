@@ -18,6 +18,7 @@
  */
 return [
     'File not uploaded.' => 'Fails netika augšuplādēts',
+    'Filter by Attachment' => 'Atlasīt pēc pielikuma',
     'Forbidden file type' => 'Neatļauts faila tips',
     'ID' => '',
     'Insert DB record failed' => 'Neizdevās izveidot datubāzes ierakstu',
@@ -44,6 +45,7 @@ return [
     'Model Name' => 'Modeļa nosaukums',
     'No results found.' => 'Nekas nav atrasts.',
     'Notes' => 'Piezīmes',
+    'Select attachment' => 'Izvēlies pielikumu',
     'Type ID' => 'Tips',
     'User ID' => 'Lietotāja ID',
     'You don\'t have access to parent record' => 'Tev nav pieejas tiesību šim ierakstam',

@@ -124,4 +124,34 @@ class D3FilesWidget extends Widget
         return $this->fileList;
     }
 
+    /**
+     * Get element attributes for Modal box load script
+     * @param array $attachmentUrl
+     * @param array $file
+     * @param string $modalSelector
+     * @param string $modalContentSelector
+     * @return array
+     */
+    public static function getModalLoadAttributes(array $attachmentUrl, array $file, string $modalSelector, string $modalContentSelector): array
+    {
+
+        $ext = strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
+
+        $attrs = [
+            'data-toggle' => 'modal',
+            'data-src' => \yii\helpers\Url::to($attachmentUrl),
+            'data-target' => $modalSelector,
+            'data-content-target' => $modalContentSelector,
+        ];
+
+        if ('pdf' === $ext) {
+            $attrs['data-load-action'] = 'pdf';
+        } elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+            $attrs['data-load-action'] = 'image';
+        } else {
+            $attrs['data-load-action'] = 'ajax';
+        }
+
+        return $attrs;
+    }
 }

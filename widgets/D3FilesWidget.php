@@ -41,7 +41,7 @@ class D3FilesWidget extends Widget
     public $viewByFancyBoxExtensions = ['pdf','jpg','jpeg','png','txt','html'];
 
     /** @var  array */
-    protected $fileList;
+    public $fileList;
 
     public function init()
     {
@@ -53,8 +53,9 @@ class D3FilesWidget extends Widget
         }
         $this->model_name = $this->model::className();
 
-        $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);        
-        
+        if (!$this->fileList) {
+            $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);
+        }
     }
     
     public function run()
@@ -113,4 +114,14 @@ class D3FilesWidget extends Widget
         }
         return $viewPath . '/d3files/';
     }
+
+    /**
+     * Get the list of readed model files
+     * @return array
+     */
+    public function getFileList(): array
+    {
+        return $this->fileList;
+    }
+
 }

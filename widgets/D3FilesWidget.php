@@ -43,6 +43,9 @@ class D3FilesWidget extends Widget
     /** @var  array */
     public $fileList;
 
+    /** @var callable implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php */
+    public $actionColumn;
+
     public function init()
     {
         parent::init();
@@ -85,7 +88,8 @@ class D3FilesWidget extends Widget
                     'fileList'   => $this->fileList,
                     'url_prefix' => $url_prefix,
                     'viewByFancyBox' => $this->viewByFancyBox,
-                    'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions
+                    'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions,
+                    'actionColumn' => $this->actionColumn
                 ]
             );
         }
@@ -139,7 +143,7 @@ class D3FilesWidget extends Widget
 
         $attrs = [
             'data-toggle' => 'modal',
-            'data-src' => \yii\helpers\Url::to($attachmentUrl),
+            'data-src' => Url::to($attachmentUrl),
             'data-target' => $modalSelector,
             'data-content-target' => $modalContentSelector,
         ];

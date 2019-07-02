@@ -7,6 +7,7 @@ use yii\base\Widget;
 use d3yii2\d3files\D3Files;
 use d3yii2\d3files\models\D3files as ModelD3Files;
 use yii\db\ActiveRecord;
+use yii\helpers\Url;
 
 class D3FilesWidget extends Widget
 {
@@ -105,7 +106,8 @@ class D3FilesWidget extends Widget
                 'fileList'   => $this->fileList,
                 'url_prefix' => $url_prefix,
                 'viewByFancyBox' => $this->viewByFancyBox,
-                'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions
+                'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions,
+                'actionColumn' => $this->actionColumn
             ]
         );
         

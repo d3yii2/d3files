@@ -145,7 +145,7 @@ class D3FilesWidget extends Widget
 
         $attrs = [
             'data-toggle' => 'modal',
-            'data-src' => Url::to($attachmentUrl),
+            'data-src' => Url::to($attachmentUrl, true),
             'data-target' => $modalSelector,
             'data-content-target' => $modalContentSelector,
         ];

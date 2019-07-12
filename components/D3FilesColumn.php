@@ -21,10 +21,16 @@ class D3FilesColumn extends DataColumn
     public $model;
     public $modelClass;
     public $listBoxOptions = [];
+    public $listTemplate;
 
     private $dataProviderIds = [];
     private $recordsWithFiles = [];
     private $controllerRoute = false;
+
+    public const TEMPLATE_DROPDOWN_LIST = 'dropdown-list';
+    public const TEMPLATE_UL_LIST = 'list';
+    public const TEMPLATE_FILES = 'files';
+    public const TEMPLATE_ATTACHMENT_ICON = 'attachment-icon';
 
     /**
      * Set the initial properties on class init
@@ -41,6 +47,8 @@ class D3FilesColumn extends DataColumn
             'class' => 'form-control limiter-max__250',
             'prompt' => \Yii::t('d3files', 'Filter by Attachment')
         ];
+
+        $this->listTemplate = self::TEMPLATE_FILES;
 
         parent::init();
     }
@@ -86,15 +94,13 @@ class D3FilesColumn extends DataColumn
         $search = Yii::$app->request->get('RkInvoiceSearch');
 
         $files = !empty($model->filesList) ? json_decode($model->filesList, true) : [];
-
-        $filesCount = count($files);
-
+        
         $params = [
             'model' => $this->modelClass,
             'model_id' => $model->id,
             'readOnly' => true,
             'viewByFancyBox' => true,
-            'template' => $filesCount > 1 ? 'dropdown-list' : 'list',
+            'template' => self::TEMPLATE_ATTACHMENT_ICON,
             'fileList' => $files,
         ];
 

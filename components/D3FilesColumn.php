@@ -87,13 +87,10 @@ class D3FilesColumn extends DataColumn
      */
     public function renderDataCellContent($model, $key, $index): string
     {
-        if (empty($this->recordsWithFiles[$model->id])) {
-            //return '';
-        }
 
         $search = Yii::$app->request->get('RkInvoiceSearch');
 
-        $files = !empty($model->filesList) ? json_decode($model->filesList, true) : [];
+        $files = !empty($this->recordsWithFiles[$model->id]) ? $this->recordsWithFiles[$model->id] : [];
         
         $params = [
             'model' => $this->modelClass,

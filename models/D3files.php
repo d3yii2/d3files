@@ -266,7 +266,7 @@ class D3files extends ActiveRecord
             WHERE fm.model_id IN (' . implode(',',  $ids) . ')
               AND fmn.name    = :model_name
               AND fm.deleted  = 0
-            ORDER BY model_id
+            ORDER BY file_model_id
         ';
 
         $parameters = [

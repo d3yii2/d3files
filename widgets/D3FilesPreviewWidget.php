@@ -32,7 +32,7 @@ class D3FilesPreviewWidget extends Widget
      */
     public function init()
     {
-        // Ja uzdots modelis, tad piedžoinot atachmentu sarakstu
+        // Join the attachments list if model specified
         if ($this->model) {
             $this->fileList = ModelD3Files::fileListForWidget($this->model::className(), $this->model->id);
         }
@@ -64,7 +64,7 @@ class D3FilesPreviewWidget extends Widget
             return;
         }
 
-        // Parāda ikonu tikai tad ja ir PDF. Ja vairāki, tad ielādē pirmo.
+        // Load first attachment by the extension as set in: $this->defaultExtension (PDF by default)
         foreach ($this->fileList as $row) {
             $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
             if ($this->defaultExtension === $ext && in_array($ext, $this->viewExtensions, true)) {

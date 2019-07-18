@@ -159,6 +159,16 @@ d3yii2\d3files\widgets\D3FilesWidget::widget(
 )
 ```
 
+Preview widget (load in modal dialog window)
+```php
+d3yii2\d3files\widgets\D3FilesPreviewWidget::widget([
+    'model' => $model,           // Model to load attachment(s) from
+    'fileList' => [...]          // Resulting array of the ModelD3Files::fileListForWidget if the attachments are joined already. Required if model not specified.
+    'defaultExtension' => 'pdf', // Optional (PDF by default),
+    'viewExtensions' => ['pdf']  // Optional.- (['pdf', 'png', 'jpg', 'jpeg'] by default)
+])
+```
+
 ### Active Form
 
 * to Active form model add property for uploading file

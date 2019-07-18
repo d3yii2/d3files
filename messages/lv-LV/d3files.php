@@ -45,6 +45,7 @@ return [
     'Model Name' => 'Modeļa nosaukums',
     'No results found.' => 'Nekas nav atrasts.',
     'Notes' => 'Piezīmes',
+    'Preview atachment' => 'Priekšskatīt pielikumu',
     'Select attachment' => 'Izvēlies pielikumu',
     'Type ID' => 'Tips',
     'User ID' => 'Lietotāja ID',

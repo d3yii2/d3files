@@ -22,6 +22,7 @@ class D3FilesColumn extends DataColumn
     public $modelClass;
     public $listBoxOptions = [];
     public $listTemplate;
+    public $showFilter = false;
 
     private $dataProviderIds = [];
     private $recordsWithFiles = [];
@@ -43,10 +44,12 @@ class D3FilesColumn extends DataColumn
             $this->controllerRoute = $this->model->d3filesControllerRoute;
         }
 
-        $this->listBoxOptions = [
-            'class' => 'form-control limiter-max__250',
-            'prompt' => \Yii::t('d3files', 'Filter by Attachment')
-        ];
+        if ($this->showFilter) {
+            $this->listBoxOptions = [
+                'class' => 'form-control limiter-max__250',
+                'prompt' => \Yii::t('d3files', 'Filter by Attachment')
+            ];
+        }
 
         $this->listTemplate = self::TEMPLATE_FILES;
 
@@ -119,6 +122,10 @@ class D3FilesColumn extends DataColumn
      */
     protected function renderFilterCellContent(): string
     {
+        if (!$this->showFilter) {
+            return '';
+        }
+
         $items = D3files::forListBox($this->modelClass, $this->dataProviderIds);
 
         $dropdown = Html::activeDropDownList(

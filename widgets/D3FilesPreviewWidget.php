@@ -37,6 +37,8 @@ class D3FilesPreviewWidget extends Widget
             $this->fileList = ModelD3Files::fileListForWidget($this->model::className(), $this->model->id);
         }
 
+        $thModalParams = [];
+
         if ('pdf' === $this->defaultExtension) {
             Yii::$app->view->on(BlankonView::EVENT_END_BODY, function () {
 
@@ -47,10 +49,13 @@ class D3FilesPreviewWidget extends Widget
                     ]
                 );
             });
+
+            // Make modal almost full-height of the page
+            $thModalParams['dialogHtmlOptions'] = ['style' => 'height:80%'];
         }
 
         // Uses the same EVENT_END_BODY itself
-        ThModal::widget();
+        ThModal::widget($thModalParams);
     }
 
     /**

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="latin1" collation="latin1_swedish_ci">blankon_20190620</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="d3files" view="colnames">
+<left>195</left>
+<top>170</top>
+<width>116</width>
+<height>165</height>
+<sql_create_table>CREATE TABLE `d3files` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `type_id` smallint(5) unsigned DEFAULT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `add_datetime` datetime NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `notes` text,
+  PRIMARY KEY (`id`),
+  KEY `type_id` (`type_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1098 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="d3files_model" view="colnames">
+<left>466</left>
+<top>127</top>
+<width>129</width>
+<height>165</height>
+<sql_create_table>CREATE TABLE `d3files_model` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `d3files_id` int(10) unsigned NOT NULL,
+  `is_file` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `model_name_id` smallint(5) unsigned NOT NULL,
+  `model_id` bigint(20) DEFAULT NULL,
+  `deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `d3files_id` (`d3files_id`),
+  KEY `model_id` (`model_id`,`model_name_id`,`deleted`),
+  KEY `model_name_id` (`model_name_id`,`d3files_id`,`deleted`),
+  CONSTRAINT `d3files_model_ibfk_1` FOREIGN KEY (`d3files_id`) REFERENCES `d3files` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1322 DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="d3files_model_name" view="colnames">
+<left>734</left>
+<top>170</top>
+<width>70</width>
+<height>97</height>
+<sql_create_table>CREATE TABLE `d3files_model_name` (
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) CHARACTER SET ascii NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1</sql_create_table>
+</table>
+<table name="d3files_model_shared" view="colnames">
+<left>683</left>
+<top>405</top>
+<width>134</width>
+<height>148</height>
+<sql_create_table>CREATE TABLE `d3files_model_shared` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `d3files_model_id` int(10) unsigned NOT NULL,
+  `hash` char(32) CHARACTER SET ascii NOT NULL,
+  `expire_date` date NOT NULL,
+  `left_loadings` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `d3files_id` (`d3files_model_id`),
+  CONSTRAINT `d3files_model_shared_ibfk_1` FOREIGN KEY (`d3files_model_id`) REFERENCES `d3files_model` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+<table name="d3files_type" view="colnames">
+<left>374</left>
+<top>473</top>
+<width>112</width>
+<height>114</height>
+<sql_create_table>CREATE TABLE `d3files_type` (
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `type` varchar(50) NOT NULL,
+  `model_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>

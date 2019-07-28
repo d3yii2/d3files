@@ -64,7 +64,13 @@ Allow upload, download, delete files for model record.
             'title'     => 'Widget Title',
             'icon'      => false,
             'hideTitle' => false,
-            'readOnly'  => false
+            'readOnly'  => false,
+            //'viewByFancyBox' => false,
+            //'controllerRoute'=>'/d3emails/email/', //use if different controllers
+            // 'actionColumn' => static function ($row) {
+            //    return 'OK';
+            //} 
+            
         ]
     ) ?>
 ```
@@ -151,6 +157,16 @@ d3yii2\d3files\widgets\D3FilesWidget::widget(
         'readOnly' => false
     ]
 )
+```
+
+Preview widget (load in modal dialog window)
+```php
+d3yii2\d3files\widgets\D3FilesPreviewWidget::widget([
+    'model' => $model,           // Model to load attachment(s) from
+    'fileList' => [...]          // Resulting array of the ModelD3Files::fileListForWidget if the attachments are joined already. Required if model not specified.
+    'defaultExtension' => 'pdf', // Optional (PDF by default),
+    'viewExtensions' => ['pdf']  // Optional.- (['pdf', 'png', 'jpg', 'jpeg'] by default)
+])
 ```
 
 ### Active Form
@@ -251,3 +267,4 @@ D3files::saveFile($fileName, Users::className(), $model->id, $filePath, $fileTyp
  - 0.9.0 (Feb 26, 2017) - added RU translation
  - 0.9.3 (May 29, 2017) - auto creating upload directories
  - 0.9.4 (Nov 16, 2017) - added parameter controllerRoute  
+ - 0.9.13 (Jul 2, 2018) - added action column

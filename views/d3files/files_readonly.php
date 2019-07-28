@@ -1,10 +1,13 @@
 <?php
+
+use eaBlankonThema\widget\ThFancyBoxLink;
 use yii\helpers\Html;
 
 /**
  * @var bool $viewByFancyBox
  * @var array $viewByFancyBoxExtensions
  * @var array $fileList
+ * @var  $actionColumn
  */
 
 if($viewByFancyBox) {
@@ -49,13 +52,22 @@ foreach ($fileList as $row) {
             ) ?>
         </td>
         <?php
+        if($actionColumn) {
+            ?>
+            <td class="col-xs-1">
+                <?php
+                echo call_user_func($actionColumn,$row);
+                ?>
+            </td>
+            <?php
+        }
         if($viewByFancyBox) {
             $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
             ?>
             <td class="col-xs-1">
                 <?php
                 if(in_array($ext,$viewByFancyBoxExtensions, true)){
-                    echo \eaBlankonThema\widget\ThFancyBoxLink::widget([
+                    echo ThFancyBoxLink::widget([
                         'text' => Yii::t('d3files', 'View'),
                         'options' => [
                             //'class' => 'unpaid-invoice-table-actions-col'

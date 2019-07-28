@@ -7,6 +7,7 @@ use yii\base\Widget;
 use d3yii2\d3files\D3Files;
 use d3yii2\d3files\models\D3files as ModelD3Files;
 use yii\db\ActiveRecord;
+use yii\helpers\Url;
 
 class D3FilesWidget extends Widget
 {
@@ -36,10 +37,15 @@ class D3FilesWidget extends Widget
 
     public $viewByFancyBox = false;
 
+    public $template = 'files';
+
     public $viewByFancyBoxExtensions = ['pdf','jpg','jpeg','png','txt','html'];
 
     /** @var  array */
-    protected $fileList;
+    public $fileList;
+
+    /** @var callable implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php */
+    public $actionColumn;
 
     public function init()
     {
@@ -51,8 +57,9 @@ class D3FilesWidget extends Widget
         }
         $this->model_name = $this->model::className();
 
-        $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);        
-        
+        if (!$this->fileList) {
+            $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);
+        }
     }
     
     public function run()
@@ -72,7 +79,7 @@ class D3FilesWidget extends Widget
 
         if ($this->readOnly) {
             return $this->render(
-                'files_readonly',
+                $this->template . '_readonly',
                 [
                     'model_name' => $this->model_name,
                     'model_id'   => $this->model_id,
@@ -82,13 +89,14 @@ class D3FilesWidget extends Widget
                     'fileList'   => $this->fileList,
                     'url_prefix' => $url_prefix,
                     'viewByFancyBox' => $this->viewByFancyBox,
-                    'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions
+                    'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions,
+                    'actionColumn' => $this->actionColumn
                 ]
             );
         }
 
         return $this->render(
-            'files',
+            $this->template,
             [
                 'model_name' => $this->model_name,
                 'model_id'   => $this->model_id,
@@ -98,7 +106,8 @@ class D3FilesWidget extends Widget
                 'fileList'   => $this->fileList,
                 'url_prefix' => $url_prefix,
                 'viewByFancyBox' => $this->viewByFancyBox,
-                'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions
+                'viewByFancyBoxExtensions' => $this->viewByFancyBoxExtensions,
+                'actionColumn' => $this->actionColumn
             ]
         );
         
@@ -110,5 +119,45 @@ class D3FilesWidget extends Widget
             $viewPath = dirname(__DIR__) . '/views';
         }
         return $viewPath . '/d3files/';
+    }
+
+    /**
+     * Get the list of readed model files
+     * @return array
+     */
+    public function getFileList(): array
+    {
+        return $this->fileList;
+    }
+
+    /**
+     * Get element attributes for Modal box load script
+     * @param array $attachmentUrl
+     * @param array $file
+     * @param string $modalSelector
+     * @param string $modalContentSelector
+     * @return array
+     */
+    public static function getModalLoadAttributes(array $attachmentUrl, array $file, string $modalSelector, string $modalContentSelector): array
+    {
+
+        $ext = strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
+
+        $attrs = [
+            'data-toggle' => 'modal',
+            'data-src' => Url::to($attachmentUrl, true),
+            'data-target' => $modalSelector,
+            'data-content-target' => $modalContentSelector,
+        ];
+
+        if ('pdf' === $ext) {
+            $attrs['data-load-action'] = 'pdf';
+        } elseif (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+            $attrs['data-load-action'] = 'image';
+        } else {
+            $attrs['data-load-action'] = 'ajax';
+        }
+
+        return $attrs;
     }
 }

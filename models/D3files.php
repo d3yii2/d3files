@@ -232,4 +232,74 @@ class D3files extends ActiveRecord
             throw new ForbiddenHttpException(Yii::t('d3files', "You don't have access to parent record"));
         }
     }
+
+    /**
+     * @param string $modelClass
+     * @param array $ids
+     * @return array
+     * @throws \yii\db\Exception
+     */
+    public static function getAllByModelRecordIds(string $modelClass, array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        // Sanitization
+        $ids = array_map(
+            function ($id) { return (int) $id; },
+            $ids
+        );
+
+        $sSql = '
+            SELECT 
+              f.id,
+              f.file_name,
+              fm.id  file_model_id,
+              fm.model_id
+            FROM
+              d3files f
+              INNER JOIN d3files_model fm
+                ON f.id = fm.d3files_id
+              INNER JOIN d3files_model_name fmn
+                ON fm.model_name_id = fmn.id
+            WHERE fm.model_id IN (' . implode(',',  $ids) . ')
+              AND fmn.name    = :model_name
+              AND fm.deleted  = 0
+            ORDER BY file_model_id
+        ';
+
+        $parameters = [
+            ':model_name' => $modelClass,
+        ];
+
+        $connection = \Yii::$app->getDb();
+        $command = $connection->createCommand($sSql, $parameters);
+        return $command->queryAll();
+    }
+
+    /**
+     * @param string $modelClass
+     * @param array $modelIds
+     * @return array
+     * @throws \yii\db\Exception
+     */
+
+    public static function forListBox(string $modelClass, array $modelIds): array
+    {
+        $records = self::getAllByModelRecordIds($modelClass, $modelIds);
+
+        $items = [];
+
+        foreach ($records as $record) {
+            $fileExt = pathinfo($record['file_name'], PATHINFO_EXTENSION);
+
+            if (isset($items[$fileExt])) {
+                continue;
+            }
+            $items[$fileExt] = $fileExt;
+        }
+
+        return $items;
+    }
 }

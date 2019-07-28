@@ -7,6 +7,7 @@ use yii\helpers\Url;
  * @var bool $viewByFancyBox
  * @var array $viewByFancyBoxExtensions
  * @var array $fileList
+ * @var  $actionColumn
  */
 
 
@@ -211,12 +212,21 @@ foreach ($fileList as $row) {
                         'data-fancybox' => true,
                         'data-type' => 'iframe',
                         'fancybox' => 'fancybox',
-                        'data-src' => \yii\helpers\Url::to($fbUrl)
+                        'data-src' => Url::to($fbUrl)
                     ];
 
                     echo Html::a('<i class="fa fa-external-link"></i>',
                         'javascript:;', $fbOptions);
                 }
+                ?>
+            </td>
+            <?php
+        }
+        if($actionColumn) {
+            ?>
+            <td class="col-xs-1">
+                <?php
+                echo call_user_func($actionColumn,$row);
                 ?>
             </td>
             <?php

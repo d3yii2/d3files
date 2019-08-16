@@ -4,14 +4,14 @@ use yii\web\View;
 use yii\helpers\Url;
 
 /**
- * @var bool $viewByFancyBox
- * @var array $viewByFancyBoxExtensions
+ * @var bool $modalPreview
+ * @var array $viewByExtensions
  * @var array $fileList
  * @var  $actionColumn
  */
 
 
-$uploadUrl = Url::to([$url_prefix . 'd3filesupload', 'id' => $model_id]);
+$uploadUrl = Url::to([$urlPrefix . 'd3filesupload', 'id' => $model_id]);
 
 $t_aria_label = Yii::t('d3files', 'Close');
 $t_confirm    = Yii::t('d3files', 'Are you sure you want to delete this item?');
@@ -144,7 +144,7 @@ JS;
 
 $this->registerJs($script, View::POS_END, 'd3files');
 
-if($viewByFancyBox) {
+if($modalPreview) {
     echo newerton\fancybox3\FancyBox::widget([
         'target' => '[data-fancybox]',
         'config' => [
@@ -194,18 +194,18 @@ foreach ($fileList as $row) {
         <td class="col-xs-11">
             <?=Html::a(
                 $row['file_name'],
-                [$url_prefix . 'd3filesdownload', 'id' => $row['file_model_id']],
+                [$urlPrefix . 'd3filesdownload', 'id' => $row['file_model_id']],
                 ['title' => Yii::t('d3files', 'Download')]
             ) ?>
         </td>
         <?php
-        if($viewByFancyBox) {
+        if($modalPreview) {
             ?>
             <td class="col-xs-1">
                 <?php
-                if(in_array($ext,$viewByFancyBoxExtensions, true)){
+                if(in_array($ext,$viewByExtensions, true)){
                     $fbUrl = [
-                        $url_prefix . 'd3filesopen',
+                        $urlPrefix . 'd3filesopen',
                         'id' => $row['file_model_id']
                     ];
                     $fbOptions= [
@@ -235,7 +235,7 @@ foreach ($fileList as $row) {
         <td class="text-center col-xs-1">
             <?=Html::a(
                 '<span class="glyphicon glyphicon-trash"></span>',
-                [$url_prefix . 'd3filesdelete', 'id' => $row['file_model_id']],
+                [$urlPrefix . 'd3filesdelete', 'id' => $row['file_model_id']],
                 ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
             ); ?>
         </td>

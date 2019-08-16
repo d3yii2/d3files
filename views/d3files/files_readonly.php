@@ -4,13 +4,13 @@ use eaBlankonThema\widget\ThFancyBoxLink;
 use yii\helpers\Html;
 
 /**
- * @var bool $viewByFancyBox
- * @var array $viewByFancyBoxExtensions
+ * @var bool $modalPreview
+ * @var array $viewByExtensions
  * @var array $fileList
  * @var  $actionColumn
  */
 
-if($viewByFancyBox) {
+if($modalPreview) {
     echo newerton\fancybox3\FancyBox::widget([
         'target' => '[data-fancybox]',
         'config' => [
@@ -47,7 +47,7 @@ foreach ($fileList as $row) {
         <td class="col-xs-12">
             <?=Html::a(
                 $row['file_name'],
-                [$url_prefix . 'd3filesdownload', 'id' => $row['file_model_id']],
+                [$urlPrefix . 'd3filesdownload', 'id' => $row['file_model_id']],
                 ['title' => Yii::t('d3files', 'Download')]
             ) ?>
         </td>
@@ -61,19 +61,19 @@ foreach ($fileList as $row) {
             </td>
             <?php
         }
-        if($viewByFancyBox) {
+        if($modalPreview) {
             $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
             ?>
             <td class="col-xs-1">
                 <?php
-                if(in_array($ext,$viewByFancyBoxExtensions, true)){
+                if(in_array($ext,$viewByExtensions, true)){
                     echo ThFancyBoxLink::widget([
                         'text' => Yii::t('d3files', 'View'),
                         'options' => [
                             //'class' => 'unpaid-invoice-table-actions-col'
                         ],
                         'url' => [
-                            $url_prefix . 'd3filesopen',
+                            $urlPrefix . 'd3filesopen',
                             'id' => $row['file_model_id']
                         ]
                     ]);

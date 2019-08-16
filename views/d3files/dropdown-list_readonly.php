@@ -6,9 +6,10 @@ use yii\helpers\Html;
 
 \d3yii2\d3files\D3FilesAsset::register($this);
 /**
- * @var string $url_prefix
- * @var string $viewByFancyBox
+ * @var string $urlPrefix
+ * @var string $modalPreview
  * @var array $fileList
+ * @var array $viewByExtensions
  */
 
 if (empty($fileList)) {
@@ -20,11 +21,11 @@ if (empty($fileList)) {
 
     foreach ($fileList as $row) {
         $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
-        if ($viewByFancyBox && in_array($ext, $viewByFancyBoxExtensions, true)) {
-            $fileUrl =         $fileUrl = [
-                $url_prefix . 'd3filesopen',
+        if ($modalPreview && in_array($ext, $viewByExtensions, true)) {
+            $fileUrl = \yii\helpers\Url::to([
+                $urlPrefix . 'd3filesopen',
                 'id' => $row['file_model_id']
-            ];
+            ]);
 
             $dataAttributes = D3FilesWidget::getModalLoadAttributes(
                 $fileUrl,
@@ -33,11 +34,7 @@ if (empty($fileList)) {
                 '.' . ThModal::MODAL_CONTENT_CLASS
             );
 
-            $dataAttributesStr = '';
-
-            foreach ($dataAttributes as $key => $val) {
-                $dataAttributesStr .= ' ' . $key . '="' . $val . '"';
-            } ?>
+            $dataAttributesStr = Html::renderTagAttributes($dataAttributes); ?>
             <option value="<?= $row['file_name'] ?>"<?= $dataAttributesStr ?>><?= $row['file_name'] ?></option>
             <?php
         }

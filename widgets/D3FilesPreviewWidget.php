@@ -1,15 +1,16 @@
 <?php
 
 namespace d3yii2\d3files\widgets;
-
-use d3yii2\d3files\models\D3files as ModelD3Files;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaBlankonThema\widget\ThModal;
 use eaBlankonThema\yii2\web\BlankonView;
+use d3yii2\d3files\D3FilesPreviewAsset;
+use eaBlankonThema\widget\ThButton;
 use Exception;
 use Yii;
-use yii\base\Widget;
+use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\helpers\Url;
 
 /**
  * Class D3FilesPreviewWidget
@@ -17,84 +18,54 @@ use yii\helpers\Json;
  * Usage by model \d3yii2\d3files\widgets\D3FilesPreviewWidget::widget(['model' => $model])
  * Usage by fileList (attachments are joined already) \d3yii2\d3files\widgets\D3FilesPreviewWidget::widget(['fileList' => $fileList])
  */
-class D3FilesPreviewWidget extends Widget
+class D3FilesPreviewWidget extends D3FilesWidget
 {
-    public $listenEvents = ['.d3files-attachment-load' => PDFObject::LISTEN_EVENT_CLICK];
-    public $targetElementClass = ThModal::MODAL_CONTENT_CLASS;
-    public $viewExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
-    public $urlPrefix = '';
-    public $model;
-    public $fileList = [];
-    public $defaultExtension = 'pdf';
+    public $icon = 'external-link';
+    public $viewExtension = 'pdf';
+    public $currentFile = null;
+    public $prevFile = null;
+    public $nextFile = null;
+
+    public const TEMPLATE_MODAL = '_modal';
 
     /**
      * @throws Exception
      */
-    public function init()
+    public function init(): void
     {
-        // Join the attachments list if model specified
-        if ($this->model) {
-            $this->fileList = ModelD3Files::fileListForWidget($this->model::className(), $this->model->id);
+        if (empty($this->model_name)) {
+            $this->model_name = $this->model::className();
         }
 
-        $thModalParams = [];
+        $this->modalPreview = true;
+        $this->readOnly = true;
 
-        if ('pdf' === $this->defaultExtension) {
-            Yii::$app->view->on(BlankonView::EVENT_END_BODY, function () {
-
-                echo PDFObject::widget(
-                    [
-                        'listenEvents' => $this->listenEvents,
-                        'targetElementClass' => $this->targetElementClass,
-                    ]
-                );
-            });
-
-            // Make modal almost full-height of the page
-            $thModalParams['dialogHtmlOptions'] = ['style' => 'height:80%'];
-        }
-
-        // Uses the same EVENT_END_BODY itself
-        ThModal::widget($thModalParams);
+        parent::init();
     }
 
     /**
-     * @return string|void
+     * @return string
      */
-    public function run()
+    public function run(): string
     {
         parent::run();
 
-        if (empty($this->fileList)) {
-            return;
+        $firstViewFile = parent::getFirstFileHavingExt($this->fileList, $this->viewExtension);
+
+        if ($firstViewFile) {
+
+            return $this->render(
+                self::TEMPLATE_MODAL,
+                [
+                    'icon' => $this->icon,
+                    'fileList' => $this->fileList,
+                    'urlPrefix' => $this->urlPrefix,
+                    'file' => $firstViewFile,
+                    'modelId' => $this->model_id,
+            ]
+            );
         }
 
-        // Load first attachment by the extension as set in: $this->defaultExtension (PDF by default)
-        foreach ($this->fileList as $row) {
-            $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
-            if ($this->defaultExtension === $ext && in_array($ext, $this->viewExtensions, true)) {
-                $fileUrl = $fileUrl = [
-                    $this->urlPrefix . 'd3filesopen',
-                    'id' => $row['file_model_id']
-                ];
-                $dataAttributes = D3FilesWidget::getModalLoadAttributes(
-                    $fileUrl,
-                    $row,
-                    '#' . ThModal::MODAL_ID,
-                    '.' . ThModal::MODAL_CONTENT_CLASS
-                );
-
-                $dataAttributesStr = '';
-
-                foreach ($dataAttributes as $key => $val) {
-                    $dataAttributesStr .= ' ' . $key . '="' . $val . '"';
-                } ?>
-                <a href="javascript:" title="<?= Yii::t('d3files', 'Preview atachment') ?>"<?= $dataAttributesStr ?>
-                   class="d3files-attachment-load"
-                   data-files-list='<?= Json::encode($this->fileList) ?>'><i class="fa fa-file-text-o"></i></a>
-                <?php
-                break;
-            }
-        }
+        return '';
     }
 }

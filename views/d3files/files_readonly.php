@@ -4,13 +4,13 @@ use eaBlankonThema\widget\ThFancyBoxLink;
 use yii\helpers\Html;
 
 /**
- * @var bool $modalPreview
+ * @var bool $viewType
  * @var array $viewByExtensions
  * @var array $fileList
  * @var  $actionColumn
  */
 
-if($modalPreview) {
+if($viewType) {
     echo newerton\fancybox3\FancyBox::widget([
         'target' => '[data-fancybox]',
         'config' => [
@@ -61,7 +61,7 @@ foreach ($fileList as $row) {
             </td>
             <?php
         }
-        if($modalPreview) {
+        if($viewType) {
             $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
             ?>
             <td class="col-xs-1">

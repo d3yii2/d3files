@@ -1,16 +1,9 @@
 <?php
 
 namespace d3yii2\d3files\widgets;
-use d3yii2\pdfobject\widgets\PDFObject;
-use eaBlankonThema\widget\ThModal;
-use eaBlankonThema\yii2\web\BlankonView;
-use d3yii2\d3files\D3FilesPreviewAsset;
-use eaBlankonThema\widget\ThButton;
+
 use Exception;
-use Yii;
-use yii\helpers\Html;
-use yii\helpers\Json;
-use yii\helpers\Url;
+use yii\base\Widget;
 
 /**
  * Class D3FilesPreviewWidget
@@ -22,22 +15,16 @@ class D3FilesPreviewWidget extends D3FilesWidget
 {
     public $icon = 'external-link';
     public $viewExtension = 'pdf';
-    public $currentFile = null;
-    public $prevFile = null;
-    public $nextFile = null;
-
-    public const TEMPLATE_MODAL = '_modal';
+    public $currentFile;
+    public $prevFile;
+    public $nextFile;
+    public $view = parent::VIEW_MODAL_BUTTON;
 
     /**
      * @throws Exception
      */
     public function init(): void
     {
-        if (empty($this->model_name)) {
-            $this->model_name = $this->model::className();
-        }
-
-        $this->modalPreview = true;
         $this->readOnly = true;
 
         parent::init();
@@ -48,24 +35,46 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public function run(): string
     {
-        parent::run();
-
-        $firstViewFile = parent::getFirstFileHavingExt($this->fileList, $this->viewExtension);
+        $firstViewFile = self::getFirstFileHavingExt($this->fileList, $this->viewExtension);
 
         if ($firstViewFile) {
 
+            /** @var Widget $this */
             return $this->render(
-                self::TEMPLATE_MODAL,
+                $this->view,
                 [
                     'icon' => $this->icon,
                     'fileList' => $this->fileList,
                     'urlPrefix' => $this->urlPrefix,
                     'file' => $firstViewFile,
                     'modelId' => $this->model_id,
-            ]
+                ]
             );
         }
 
         return '';
+    }
+
+    /**
+     * Get element data attributes for modal or inline box scripts
+     * @param string $attachmentUrl
+     * @param string $dataTargetSelector
+     * @param string $contentTargetSelector
+     * @return array
+     */
+    public static function getPreviewButtonDataAttributes(
+        string $attachmentUrl,
+        string $dataTargetSelector,
+        string $contentTargetSelector
+    ): array {
+        $attrs = [
+            'data-src' => $attachmentUrl,
+            'data-target' => $dataTargetSelector,
+            'data-content-target' => $contentTargetSelector,
+        ];
+
+       $attrs['data-toggle'] = 'modal';
+
+        return $attrs;
     }
 }

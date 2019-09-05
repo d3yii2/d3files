@@ -15,5 +15,6 @@ class D3FilesPreviewAsset extends AssetBundle
     public $depends = [
         'yii\web\JqueryAsset',
         'd3yii2\d3files\D3FilesAsset',
+        'd3yii2\pdfobject\PDFObjectAsset',
     ];
 }

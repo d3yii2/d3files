@@ -4,12 +4,11 @@ namespace d3yii2\d3files\components;
 
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\widgets\D3FilesPreviewWidget;
-use d3yii2\d3files\widgets\D3FilesWidget;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
 use yii\grid\DataColumn;
 use yii\helpers\Html;
-use yii\helpers\Json;
 
 /**
  * Class D3FilesColumn
@@ -43,7 +42,7 @@ class D3FilesColumn extends DataColumn
             $this->filterListBoxOptions = array_merge(
                 [
                     'class' => 'form-control limiter-max__250',
-                    'prompt' => \Yii::t('d3files', 'Filter by Attachment')
+                    'prompt' => Yii::t('d3files', 'Filter by Attachment')
                 ],
                 $this->filterListBoxOptions
             );
@@ -63,7 +62,11 @@ class D3FilesColumn extends DataColumn
             $this->dataProviderIds[] = $row->id;
         }
 
-        $recordsWithFiles = D3files::getAllByModelRecordIds($this->modelClass, $this->dataProviderIds);
+        try {
+            $recordsWithFiles = D3files::getAllByModelRecordIds($this->modelClass, $this->dataProviderIds);
+        } catch (Exception $e) {
+            return;
+        }
 
         foreach ($recordsWithFiles as $fileModel) {
             if (!isset($this->recordsWithFiles[$fileModel['model_id']])) {
@@ -94,8 +97,7 @@ class D3FilesColumn extends DataColumn
 
         $options = array_merge(
             [
-                'model' => $this->modelClass,
-                'model_id' => $model->id,
+                'model' => $model,
                 'fileList' => $modelFiles,
             ],
             $this->previewOptions
@@ -105,9 +107,7 @@ class D3FilesColumn extends DataColumn
             $options['viewByExtensions'] = [$search['attachment_type']];
         }
 
-        $cellContent = D3FilesPreviewWidget::widget($options);
-
-        return $cellContent;
+        return D3FilesPreviewWidget::widget($options);
     }
 
     /**
@@ -115,7 +115,7 @@ class D3FilesColumn extends DataColumn
      * The default implementation simply renders a space.
      * This method may be overridden to customize the rendering of the filter cell (if any).
      * @return string
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function renderFilterCellContent(): string
     {
@@ -129,7 +129,7 @@ class D3FilesColumn extends DataColumn
             $this->model,
             'attachment_type',
             $items,
-            $this->listBoxOptions
+            $this->filterListBoxOptions
         );
 
         return $dropdown;

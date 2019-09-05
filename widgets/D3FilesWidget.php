@@ -2,86 +2,111 @@
 
 namespace d3yii2\d3files\widgets;
 
-use d3yii2\d3files\D3FilesPreviewAsset;
-use d3yii2\pdfobject\widgets\PDFObject;
-use eaBlankonThema\widget\ThButton;
-use eaBlankonThema\widget\ThModal;
-use eaBlankonThema\yii2\web\BlankonView;
-use Exception;
-use Yii;
-use yii\base\Event;
-use yii\base\Widget;
+use d3system\exceptions\D3Exception;
 use d3yii2\d3files\D3Files;
+use d3yii2\d3files\D3FilesPreviewAsset;
 use d3yii2\d3files\models\D3files as ModelD3Files;
+use d3yii2\pdfobject\widgets\PDFObject;
+use eaBlankonThema\assetbundles\AjaxAsset;
+use eaBlankonThema\widget\ThButton;
+use Exception;
+use ReflectionClass;
+use ReflectionException;
+use Yii;
+use yii\base\Widget;
 use yii\db\ActiveRecord;
-use yii\helpers\Html;
-use yii\helpers\Json;
 
 /**
  * Class`D3FilesWidget`
  * @package d3yii2\d3files\widgets
+ * @var ActiveRecord $model
+ * @var string $model_name
+ * @var int $model_id
+ * @var string $title
+ * @var string $icon
+ * @var bool $hideTitle
+ * @var bool $readOnly
+ * @var string $controllerRoute
+ * @var bool $viewByFancyBox
+ * @var string $viewType
+ * @var string $view
+ * @var array $viewByExtensions
+ * @var array $fileList
+ * @var callable $actionColumn
+ * @var string $urlPrefix
+ * @var string $dialogWidgetClass
+ * @var array $pdfObjectOptions
+ * @var string VIEW_DROPDOWN_LIST
+ * @var string VIEW_FILES_LIST
+ * @var string VIEW_MODAL_BUTTON
+ * @var string VIEW_INLINE_BUTTON
+ * @var string VIEW_IFRAME
+ * @var string VIEW_TYPE_MODAL
+ * @var string VIEW_TYPE_INLINE
+ * @var string EMBED_CONTENT_CLASS
  */
 class D3FilesWidget extends Widget
 {
-    /** @var  ActiveRecord */
     public $model;
-
-    /** @var  string */
     public $model_name;
-
-    /** @var  int */
     public $model_id;
-
-    /** @var  string */
     public $title;
-
-    /** @var  string */
-    public $icon = 'glyphicon glyphicon-paperclip';
-
-    /** @var  bool */
+    public /** @noinspection SpellCheckingInspection */
+        $icon = 'glyphicon glyphicon-paperclip';
     public $hideTitle = false;
-
-    /** @var  bool */
     public $readOnly;
-
-    /** @var string file handling controller route. If empty, then use actual controller  */
+    // File handling controller route. If empty, then use actual controller
     public $controllerRoute = '';
 
-    /** @deprecated $viewByFancyBox */
+    /**
+     * @deprecated $viewByFancyBox
+     * @since 0.9.18
+     * Fancybox window has been replaced with modal dialog
+     * Use $viewType instead
+     */
     public $viewByFancyBox = false;
 
-    public $modalPreview = true;
+    /** @example D3FilesWidget::VIEW_TYPE_MODAL */
+    public $viewType = self::VIEW_TYPE_MODAL;
+    public $view = self::VIEW_FILES_LIST;
 
-    public $template = self::TEMPLATE_FILES;
-
-    /** @deprecated $viewByFancyBoxExtensions */
-    public $viewByFancyBoxExtensions = ['pdf','jpg','jpeg','png','txt','html'];
-
-    public $viewByExtensions = ['pdf','jpg','jpeg','png','txt','html'];
-
-    /** @var  array */
+    /**
+     * @var array
+     * @deprecated $viewByFancyBoxExtensions
+     * Has been renamed since 0.9.18
+     * Use $viewByExtensions instead
+     */
+    public $viewByFancyBoxExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'txt', 'html'];
+    //File extensions allowed to view
+    public $viewByExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'txt', 'html'];
     public $fileList;
-
-    /** @var callable implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php */
+    // Implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php
     public $actionColumn;
-
-    /** @var string */
     public $urlPrefix = '/d3files/d3files/';
-
     public $dialogWidgetClass = 'eaBlankonThema\widget\ThModal';
     public $pdfObjectOptions = [];
 
-    public const TEMPLATE_DROPDOWN_LIST = 'dropdown-list';
-    public const TEMPLATE_FILES = 'files';
+    public const VIEW_DROPDOWN_LIST = 'dropdown-list';
+    public const VIEW_FILES_LIST = 'files-list';
+    public const VIEW_MODAL_BUTTON = '_modal_button';
+    public const VIEW_INLINE_BUTTON = '_inline_button';
+    public const VIEW_IFRAME = '_iframe';
+    public const VIEW_TYPE_MODAL = 'modal';
+    public const VIEW_TYPE_INLINE = 'inline';
+    public const EMBED_CONTENT_CLASS = 'd3files-embed-content';
+
+    private $modelAllowedExtensions;
 
     /**
+     * @throws ReflectionException
      * @throws \yii\db\Exception
+     * @throws Exception
      */
     public function init(): void
     {
         D3Files::registerTranslations();
 
-        if(property_exists($this->model,'d3filesControllerRoute')){
+        if (property_exists($this->model, 'd3filesControllerRoute')) {
             $this->controllerRoute = $this->model->d3filesControllerRoute;
         }
 
@@ -90,72 +115,68 @@ class D3FilesWidget extends Widget
             $this->urlPrefix = $this->controllerRoute;
         }
 
-        $this->model_name = $this->model::className();
+        if (!$this->model_name) {
+            $this->model_name = get_class($this->model);
+        }
 
+        if (!$this->model_id && $this->model) {
+            $this->model_id = $this->model->primaryKey;
+        }
+
+        // Load the file list if has not been set in constructor
         if (!$this->fileList) {
             $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);
         }
 
-        //@FIXME - backward compatibility
+        $this->modelAllowedExtensions = Yii::$app->getModule('d3files')->getModelAllowedExtensions($this->model);
+
+        // Backward compatibility
         if ($this->viewByFancyBox) {
-            $this->modalPreview = true;
+            $this->viewType = self::VIEW_TYPE_MODAL;
         }
 
-        //@FIXME - backward compatibility
+        // Backward compatibility
         if ($this->viewByFancyBoxExtensions) {
             $this->viewByExtensions = $this->viewByFancyBoxExtensions;
         }
 
-        if ($this->modalPreview) {
+        $hasPdf = false;
+        $hasAjax = false;
 
-            $hasPdf = false;
-            $hasAjax = false;
+        // Check for PDF and AJAX loaded attachments to  assets
+        foreach ($this->fileList as $i => $file) {
+            $ext = self::getFileExtension($file);
 
-            foreach ($this->fileList as $file) {
-                $ext = self::getFileExtension($file);
-
-                if (!in_array($ext, $this->viewByExtensions, true)) {
-                    continue;
-                }
-
-                if ('pdf' === $ext) {
-                    $hasPdf = true;
-                } else {
-                    $hasAjax = true;
-                }
+            if (!in_array($ext, $this->viewByExtensions, true)) {
+                continue;
             }
 
-            Yii::$app->view->on(BlankonView::EVENT_BEGIN_PAGE, function ($event) use ($hasAjax) {
+            if ('pdf' === $ext) {
+                $hasPdf = true;
+            } else {
+                $hasAjax = true;
+            }
+        }
 
-                D3FilesPreviewAsset::register(Yii::$app->view);
+        if (self::VIEW_TYPE_MODAL === $this->viewType) {
+            D3FilesPreviewAsset::register(Yii::$app->view);
+        }
 
-                if ($hasAjax) {
-                    \eaBlankonThema\assetbundles\AjaxAsset::register(Yii::$app->view);
-                }
+        // If AJAX load required, register the assets
+        if ($hasAjax && !isset(Yii::$app->view->params['AjaxAssetRegistered'])) {
+            AjaxAsset::register(Yii::$app->view);
 
-                //@FIXME - this can block any other attached events?
-                 $event->handled = true;
-            });
+            // Avoid the asets registering multiple times by widget second calls
+            Yii::$app->view->params['AjaxAssetRegistered'] = true;
+        }
 
-            if ($hasPdf) {
+        $pageFooterHtml = null;
 
-                Yii::$app->view->on(BlankonView::EVENT_END_BODY, function ($event) {
+        // Ensure modal preview is enabled and the layout rendered once
+        if (self::VIEW_TYPE_MODAL === $this->viewType && !isset(Yii::$app->view->params['ThModalRendered'])) {
 
-                 if (empty($this->pdfObjectOptions['targetElementClass'])) {
-
-                        $r = new \ReflectionClass($this->dialogWidgetClass);
-                        $modalContentClass = $r->getConstant('MODAL_CONTENT_CLASS');
-
-                        if (null !== $modalContentClass) {
-                            $this->pdfObjectOptions['targetElementClass'] = $modalContentClass;
-                        }
-                    }
-
-                    echo \d3yii2\pdfobject\widgets\PDFObject::widget($this->pdfObjectOptions);
-
-                    //@FIXME - this can block any other attached events?
-                    //$event->handled = true;
-                });
+            if (is_callable($this->dialogWidgetClass)) {
+                throw new D3Exception('Invalid Modal Dialog class: ' . $this->dialogWidgetClass);
             }
 
             $modalOptions = [];
@@ -165,34 +186,73 @@ class D3FilesWidget extends Widget
 
             $modalOptions['toolbarContent'] = $this->getPrevNextFileButtons();
 
-            $this->dialogWidgetClass::widget($modalOptions);
+            // Avoid rendering the HTML multiple times by widget second calls
+            Yii::$app->view->params['ThModalRendered'] = true;
+
+            // Render the PdfObject content iframe in the footer if the files have PDF extension
+            if ($hasPdf
+                // && !isset(Yii::$app->view->params['PdfObjectRendered'])
+            ) {
+
+                $this->pdfObjectOptions['showCloseButton'] = false;
+
+                $modalOptions['content'] = $this->getPdfContent($this->pdfObjectOptions);
+
+                // Avoid rendering the HTML multiple times by widget second calls
+                Yii::$app->view->params['PdfObjectRendered'] = true;
+            }
+            $pageFooterHtml .= $this->dialogWidgetClass::widget($modalOptions);
+
+        }
+
+        if ($pageFooterHtml) {
+            Yii::$app->view->setPageFooter($pageFooterHtml);
         }
     }
 
     /**
+     * @param array $options
+     * @return string
+     * @throws Exception
+     */
+    public function getPdfContent(array $options = []): string
+    {
+        $defaultOptions = [
+            'closeButtonOptions' => [
+                'label' => Yii::t('d3emails', 'Close')
+            ]
+        ];
+
+        $pdfOptions = array_merge($defaultOptions, $options);
+
+        return PDFObject::widget($pdfOptions);
+    }
+
+    /**
      * @return string|void
+     * @throws Exception
      */
     public function run()
     {
-        
         if ($this->title === null) {
             $this->title = Yii::t('d3files', 'Attachments');
         }
 
         return $this->render(
-            $this->template,
+            $this->view,
             [
                 'model_name' => $this->model_name,
-                'model_id'   => $this->model_id,
-                'title'      => $this->title,
-                'icon'       => $this->icon,
-                'hideTitle'  => $this->hideTitle,
-                'fileList'   => $this->fileList,
+                'model_id' => $this->model_id,
+                'title' => $this->title,
+                'icon' => $this->icon,
+                'hideTitle' => $this->hideTitle,
+                'fileList' => $this->fileList,
                 'urlPrefix' => $this->urlPrefix,
-                'modalPreview' => $this->modalPreview,
+                'viewType' => $this->viewType,
                 'viewByExtensions' => $this->viewByExtensions,
                 'actionColumn' => $this->actionColumn,
                 'readOnly' => $this->readOnly,
+                'embedContent' => $this->getPdfContent(),
             ]
         );
     }
@@ -218,37 +278,13 @@ class D3FilesWidget extends Widget
     }
 
     /**
-     * Get element attributes for Modal box load script
-     * @param string $attachmentUrl
-     * @param array $file
-     * @param string $modalSelector
-     * @param string $modalContentSelector
-     * @return array
-     */
-    public static function getModalLoadAttributes(string $attachmentUrl, array $file, string $modalSelector, string $modalContentSelector): array
-    {
-        $ext = strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
-
-        $attrs = [
-            'data-toggle' => 'modal',
-            'data-src' => $attachmentUrl,
-            'data-target' => $modalSelector,
-            'data-content-target' => $modalContentSelector,
-        ];
-
-        return $attrs;
-    }
-
-     /**
      * Get file extension
      * @param array $file
      * @return string
      */
     public static function getFileExtension(array $file): string
     {
-        $ext = strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
-
-        return $ext;
+        return strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
     }
 
     /**
@@ -274,7 +310,8 @@ class D3FilesWidget extends Widget
      * @param string $ext
      * @return array
      */
-    public static function getFilesListByExt(array $files, string $ext): array {
+    public static function getFilesListByExt(array $files, string $ext): array
+    {
         $list = [];
         foreach ($files as $file) {
             $fileExt = self::getFileExtension($file);
@@ -304,12 +341,14 @@ class D3FilesWidget extends Widget
 
         //@FIXME - ThButton nevar padot css klasi (htmlOptions tiek pārrakstīts)
         //$buttons = ThButton::widget($attrs);
-        $buttons = '<a id="w80" class="btn btn-success d3files-preview-prev-button">' . Yii::t('d3files', 'Previous Attachment') . '</a>';
+        $buttons = '<a id="w80" class="btn btn-success d3files-preview-prev-button">' . Yii::t('d3files',
+                'Previous Attachment') . '</a>';
 
-        $attrs['label'] = Yii::t('d3files', 'Next Attachment');
-        $attrs['htmlOptions']['class'] = 'd3files-preview-next-button';
+        //$attrs['label'] = Yii::t('d3files', 'Next Attachment');
+        //$attrs['htmlOptions']['class'] = 'd3files-preview-next-button';
 
-        $buttons .= '<a id="w80" class="btn btn-success d3files-preview-next-button">' . Yii::t('d3files', 'Next Attachment') . '</a>';
+        $buttons .= '<a id="w80" class="btn btn-success d3files-preview-next-button">' . Yii::t('d3files',
+                'Next Attachment') . '</a>';
         //$buttons .= ' ' . ThButton::widget($attrs);
 
         return $buttons;

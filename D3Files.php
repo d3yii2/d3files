@@ -3,6 +3,7 @@ namespace d3yii2\d3files;
 
 use Yii;
 use yii\base\Module;
+use yii\db\ActiveRecord;
 
 /**
  * d3files module definition class
@@ -21,7 +22,8 @@ class D3Files extends Module
     public $sharedExpireDays;
     public $sharedLeftLoadings;
     public $imageExtensions = ['jpg', 'gif', 'png', 'bmp'];
-    
+    public $models = [];
+
     public function init()
     {
         parent::init();
@@ -44,4 +46,24 @@ class D3Files extends Module
         $this->viewPath or $this->viewPath = __DIR__ . '/views';
         return $this->viewPath . '/' . $view . '.php';
     }
+
+    /**
+     * @param ActiveRecord $model
+     * @return array
+     */
+    public function getModelAllowedExtensions(ActiveRecord $model): array
+    {
+        if (empty($this->models)) {
+            return [];
+        }
+
+        foreach ($this->models as $item) {
+            if ($item['class'] === $model::className()) {
+                return explode('|', $item['allowedExtensions']);
+            }
+        }
+
+        return [];
+    }
+
 }

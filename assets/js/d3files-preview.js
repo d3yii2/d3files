@@ -1,8 +1,8 @@
 (function ($) {
     "use strict";
 
-    $.D3FilesPreview = function (options) {
-        this.files = options.files;
+    $.D3FilesPreview = function () {
+        this.files = {};
         this.handlers = {
             previewButton: $('.d3files-preview-button'),
             //previewDropdown: $('.d3files-preview-dropdown'),
@@ -18,24 +18,40 @@
         this.prevFile = null;
         this.nextFile = null;
         this.prevNextBySelection = true;
+        this.pdfOptions = {};
         //console.log(this);
     };
 
     //assigning an object literal to the prototype is a shorter syntax
     //than assigning one property at a time
     $.D3FilesPreview.prototype = {
+        setOption: function(prop, val) {
+            this.prop = val;
+        },
+        setPdfObject: function(o) {
+            if ('undefined' === typeof D3PDF) {
+                console.log('D3PDF is not defined. Missing pdfobject-custom.js ?');
+                return false;
+            }
+            D3PDF.construct(o);
+        },
         reflow: function () {
             this.updateRows();
+
+            // Make class accesible into event
+            var self = this;
+
             $(this.handlers.previewButton).on('click', function () {
-                d3fp.modalMessages.empty();
-                d3fp.handleView($(this));
+                self.modalMessages.empty();
+                self.handleView($(this));
             });
             $(this.handlers.prevButton).on('click', function () {
-                d3fp.handlePrev();
+                self.handlePrev();
             });
             $(this.handlers.nextButton).on('click', function () {
-                d3fp.handleNext();
+                self.handleNext();
             });
+
         },
         handleView: function (e) {
             //console.log(e);
@@ -83,9 +99,8 @@
         loadPreview: function (rowId) {
             var link = $('#d3files-preview-button-' + rowId),
                 url = link.data('src'),
-                targetElSel = link.data('content-target'),
                 modelFiles = link.data('files-list');
-            loadContent(url, targetElSel);
+            D3PDF.embed(url);
             this.rowId = rowId;
         },
         getPrevRowIdBySelection: function () {
@@ -155,8 +170,6 @@
             return r;
         }
     };
-
-    var d3fp = new $.D3FilesPreview({files: {}});
+    var d3fp = new $.D3FilesPreview();
     d3fp.reflow();
-
 }(jQuery));

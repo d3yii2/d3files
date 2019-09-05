@@ -4,7 +4,7 @@ use yii\web\View;
 use yii\helpers\Url;
 
 /**
- * @var bool $modalPreview
+ * @var bool $viewType
  * @var array $viewByExtensions
  * @var array $fileList
  * @var  $actionColumn
@@ -144,7 +144,7 @@ JS;
 
 $this->registerJs($script, View::POS_END, 'd3files');
 
-if($modalPreview) {
+if($viewType) {
     echo newerton\fancybox3\FancyBox::widget([
         'target' => '[data-fancybox]',
         'config' => [
@@ -199,7 +199,7 @@ foreach ($fileList as $row) {
             ) ?>
         </td>
         <?php
-        if($modalPreview) {
+        if($viewType) {
             ?>
             <td class="col-xs-1">
                 <?php

@@ -219,7 +219,7 @@ class D3FilesWidget extends Widget
     {
         $defaultOptions = [
             'closeButtonOptions' => [
-                'label' => Yii::t('d3emails', 'Close')
+                'label' => Yii::t('d3files', 'Close')
             ]
         ];
 

@@ -1,17 +1,15 @@
 <?php
 
-use d3yii2\d3files\D3FilesAsset;
 use d3yii2\d3files\widgets\D3FilesWidget;
 use eaBlankonThema\widget\ThModal;
 use yii\helpers\Html;
-use yii\helpers\Url;
 
-D3FilesAsset::register($this);
+\d3yii2\d3files\D3FilesAsset::register($this);
 /**
  * @var string $urlPrefix
  * @var string $viewType
- * @var array $fileList
  * @var array $viewByExtensions
+ * @var array $fileList
  */
 
 if (empty($fileList)) {
@@ -24,16 +22,20 @@ if (empty($fileList)) {
     foreach ($fileList as $row) {
         $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
         if ($viewType && in_array($ext, $viewByExtensions, true)) {
-            $fileUrl = Url::to([
+            $fileUrl =         $fileUrl = [
                 $urlPrefix . 'd3filesopen',
                 'id' => $row['file_model_id']
-            ]);
+            ];
 
             $dataAttributes = D3FilesWidget::getPreviewButtonDataAttributes(
                 $fileUrl, '#' . ThModal::MODAL_ID, '.' . ThModal::MODAL_CONTENT_CLASS
             );
 
-            $dataAttributesStr = Html::renderTagAttributes($dataAttributes); ?>
+            $dataAttributesStr = '';
+
+            foreach ($dataAttributes as $key => $val) {
+                $dataAttributesStr .= ' ' . $key . '="' . $val . '"';
+            } ?>
             <option value="<?= $row['file_name'] ?>"<?= $dataAttributesStr ?>><?= $row['file_name'] ?></option>
             <?php
         }

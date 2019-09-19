@@ -170,6 +170,13 @@ class D3FilesWidget extends Widget
             Yii::$app->view->params['AjaxAssetRegistered'] = true;
         }
 
+        if ($hasPdf) {
+            $this->pdfObjectOptions = array_merge(
+                ['closeButtonOptions' => ['label' => Yii::t('d3files', 'Close')]],
+                $this->pdfObjectOptions
+            );
+        }
+
         $pageFooterHtml = null;
 
         // Ensure modal preview is enabled and the layout rendered once
@@ -190,19 +197,15 @@ class D3FilesWidget extends Widget
             Yii::$app->view->params['ThModalRendered'] = true;
 
             // Render the PdfObject content iframe in the footer if the files have PDF extension
-            if ($hasPdf
-                // && !isset(Yii::$app->view->params['PdfObjectRendered'])
-            ) {
-
+            if ($hasPdf && !isset(Yii::$app->view->params['PdfObjectRendered'])) {
+                $this->pdfObjectOptions['targetElementClass'] = self::EMBED_CONTENT_CLASS;
                 $this->pdfObjectOptions['showCloseButton'] = false;
-
                 $modalOptions['content'] = $this->getPdfContent($this->pdfObjectOptions);
 
                 // Avoid rendering the HTML multiple times by widget second calls
                 Yii::$app->view->params['PdfObjectRendered'] = true;
             }
             $pageFooterHtml .= $this->dialogWidgetClass::widget($modalOptions);
-
         }
 
         if ($pageFooterHtml) {
@@ -217,13 +220,7 @@ class D3FilesWidget extends Widget
      */
     public function getPdfContent(array $options = []): string
     {
-        $defaultOptions = [
-            'closeButtonOptions' => [
-                'label' => Yii::t('d3files', 'Close')
-            ]
-        ];
-
-        $pdfOptions = array_merge($defaultOptions, $options);
+        $pdfOptions = array_merge($this->pdfObjectOptions, $options);
 
         return PDFObject::widget($pdfOptions);
     }

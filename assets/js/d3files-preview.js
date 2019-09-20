@@ -156,7 +156,7 @@
         /* Get the array of row ids by selected checkboxes */
         getCheckedRowIds: function () {
             var selected = [];
-            $('#ThGridViewTable input:checked').each(function () {
+            $('#ThGridViewTable tbody input[type="checkbox"]:checked').each(function () {
                 selected.push($(this).val());
             });
             return selected;
@@ -164,7 +164,7 @@
         /* Get the array of row ids */
         getAllRowIds: function () {
             var r = [];
-            $('#ThGridViewTable input').each(function () {
+            $('#ThGridViewTable tbody input[type="checkbox"]').each(function () {
                 r.push($(this).val());
             });
             return r;

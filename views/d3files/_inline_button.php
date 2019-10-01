@@ -18,4 +18,4 @@ use yii\helpers\Url;
 
 $attrs = D3FilesPreviewWidget::getPreviewButtonAttributes($modelId, $file, $fileList, $urlPrefix);
 
-echo Html::a('<i class="fa fa-' . $icon . '"></i>', 'javascript:void(0)', $attrs);
+echo Html::a('<span class="' . $icon . '"></span>', 'javascript:void(0)', $attrs);

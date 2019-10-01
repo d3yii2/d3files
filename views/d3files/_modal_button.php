@@ -16,6 +16,8 @@ use yii\helpers\Url;
  * @var int $modelId
  */
 
+$file = D3FilesWidget::getFirstFileHavingExt($fileList, 'pdf');
+
 $attrs = D3FilesPreviewWidget::getPreviewModalButtonAttributes($modelId, $file, $fileList, $urlPrefix);
 
-echo Html::a('<i class="fa fa-' . $icon . '"></i>', 'javascript:;', $attrs);
+echo Html::a('<span class="' . $icon . '"></span>', 'javascript:void(0)', $attrs);

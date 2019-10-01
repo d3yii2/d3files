@@ -37,25 +37,9 @@ use yii\helpers\Url;
                 </td>
                 <td class="col-xs-1">
                     <?php
-                    $ext = strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
-                    if (in_array($ext, $viewByExtensions, true)) {
-
-                        $attrs = [
-                            'text' => Yii::t('d3files', 'Preview atachment'),
-                            'file' => $file,
-                            'fileList' => $fileList,
-                            'urlPrefix' => $urlPrefix,
-                            'viewByExtensions' => $viewByExtensions,
-                            'icon' => $icon,
-                            'modelId' => $modelId,
-                        ];
-
-                        $view = D3FilesWidget::VIEW_TYPE_MODAL === $viewType
-                            ? D3FilesWidget::VIEW_MODAL_BUTTON
-                            : D3FilesWidget::VIEW_INLINE_BUTTON;
-
-                        echo $this->render($view, $attrs);
-                    } ?>
+                    if (isset($previewButton)) {
+                        echo $this->render($previewButton, $_params_);
+                     }?>
                 </td>
                 <?php
                 if ($actionColumn && is_callable($actionColumn)) {

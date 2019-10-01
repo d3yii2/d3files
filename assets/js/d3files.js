@@ -5,7 +5,7 @@ $(function(){
         $('.d3files-alert').remove();
 
         var html = '<div class="d3files-alert alert alert-danger alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
-        html += '<button type="button" class="close" data-dismiss="alert" aria-label="$t_aria_label"><span aria-hidden="true">&times;</span></button>';
+        html += '<button type="button" class="close" data-dismiss="alert" aria-label="' + JSVars.i18n.aria_label + '"><span aria-hidden="true">&times;</span></button>';
         html += '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> ';
         html += '<strong>' + data.status + '</strong> ';
         html += '<span class="sr-only">' + data.name + '</span> ';
@@ -19,7 +19,7 @@ $(function(){
 
         $('.d3files-alert').remove();
 
-        if (!confirm('$t_confirm')) {
+        if (!confirm(JSVars.i18n.confirm)) {
             return false;
         }
 
@@ -44,7 +44,7 @@ $(function(){
         });
 
         function addEmptyRow() {
-            var html = '<tr><td colspan="2"><div class="empty">$t_no_results</div></td></tr>';
+            var html = '<tr><td colspan="2"><div class="empty">' + JSVars.i18n.no_results + '</div></td></tr>';
             tbl.append(html);
         }
 

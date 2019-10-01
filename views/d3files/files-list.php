@@ -19,12 +19,8 @@ use yii\helpers\Url;
 \d3yii2\d3files\D3FilesAsset::register($this);
 
 $uploadUrl = Url::to([$urlPrefix . 'd3filesupload', 'id' => $model_id]);
-
-$t_aria_label = Yii::t('d3files', 'Close');
-$t_confirm = Yii::t('d3files', 'Are you sure you want to delete this item?');
-$t_no_results = Yii::t('d3files', 'No results found.');
-
 ?>
+
 <div class="panel d3files-widget">
     <?php
     if (!$hideTitle) {
@@ -73,3 +69,11 @@ $t_no_results = Yii::t('d3files', 'No results found.');
         ) ?>
     </div>
 </div>
+<?php
+$i18n = \yii\helpers\Json::encode([
+    'aria_label' => Yii::t('d3files', 'Close'),
+    'confirm' => Yii::t('d3files', 'Are you sure you want to delete this item?'),
+    'no_results' => Yii::t('d3files', 'No results found.'),
+]);
+$this->registerJs('var JSVars = {i18n: ' . $i18n . '};')
+?>

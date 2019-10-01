@@ -47,23 +47,4 @@ class D3Files extends Module
         return $this->viewPath . '/' . $view . '.php';
     }
 
-    /**
-     * @param ActiveRecord $model
-     * @return array
-     */
-    public function getModelAllowedExtensions(ActiveRecord $model): array
-    {
-        if (empty($this->models)) {
-            return [];
-        }
-
-        foreach ($this->models as $item) {
-            if ($item['class'] === $model::className()) {
-                return explode('|', $item['allowedExtensions']);
-            }
-        }
-
-        return [];
-    }
-
 }

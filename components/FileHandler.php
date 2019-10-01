@@ -38,18 +38,29 @@ class FileHandler
             $this->options['file_path']  = $options['file_path'];
         }
 
-        $fileTypes = self::getAllowedFileTypes($options);
+        $fileTypes = self::getAllowedFileTypes($this->options);
 
         $fileExtension = pathinfo($this->options['file_name'])['extension'];
         if ($fileTypes  !== '*'
                 && !preg_match($fileTypes, $fileExtension)) {
-            throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: ' . $fileExtension));
+            throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: {0}',  [$fileExtension]));
         }
-        
+
     }
-    
-    protected static function getAllowedFileTypes($options = [])
+
+    /**
+     * @param array $options
+     * @return string
+     */
+    protected static function getAllowedFileTypes(array $options = []): string
     {
+        // Check for model defined attachment types first
+        $model = new \ReflectionClass($options['model_name']);
+        $modelFileTypes = $model->getConstant('D3FILES_ALLOWED_EXT_REGEXP');
+        if ($modelFileTypes) {
+            return $modelFileTypes;
+        }
+
         if (isset($options['file_types'])) {
             return $options['file_types'];
         }

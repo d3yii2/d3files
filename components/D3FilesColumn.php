@@ -64,7 +64,8 @@ class D3FilesColumn extends DataColumn
 
         try {
             $recordsWithFiles = D3files::getAllByModelRecordIds($this->modelClass, $this->dataProviderIds);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
+            Yii::error('D3FilesColumn::initFiles exception: ' . $exception->getMessage());
             return;
         }
 
@@ -87,27 +88,31 @@ class D3FilesColumn extends DataColumn
      */
     public function renderDataCellContent($model, $key, $index): string
     {
-        if (empty($this->recordsWithFiles[$model->id])) {
-            return '';
+        try {
+            if (empty($this->recordsWithFiles[$model->id])) {
+                return '';
+            }
+
+            $modelFiles = $this->recordsWithFiles[$model->id];
+
+            $search = Yii::$app->request->get('RkInvoiceSearch');
+
+            $options = array_merge(
+                [
+                    'model' => $model,
+                    'fileList' => $modelFiles,
+                ],
+                $this->previewOptions
+            );
+
+            if (!empty($search['attachment_type'])) {
+                $options['viewByExtensions'] = [$search['attachment_type']];
+            }
+
+            return D3FilesPreviewWidget::widget($options);
+        }catch (\Exception $exception){
+            Yii::error('D3FilesColumn::renderDataCellContent exception: ' . $exception->getMessage());
         }
-
-        $modelFiles = $this->recordsWithFiles[$model->id];
-
-        $search = Yii::$app->request->get('RkInvoiceSearch');
-
-        $options = array_merge(
-            [
-                'model' => $model,
-                'fileList' => $modelFiles,
-            ],
-            $this->previewOptions
-        );
-
-        if (!empty($search['attachment_type'])) {
-            $options['viewByExtensions'] = [$search['attachment_type']];
-        }
-
-        return D3FilesPreviewWidget::widget($options);
     }
 
     /**

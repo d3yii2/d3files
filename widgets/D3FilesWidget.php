@@ -110,7 +110,13 @@ class D3FilesWidget extends Widget
             $this->title = Yii::t('d3files', 'Attachments');
         }
 
-        return $this->render($this->view, $this->getViewParams());
+        try {
+            return $this->render($this->view, $this->getViewParams());
+        }catch (Exception $exception){
+            Yii::error('D3FilesWidget:run Exception: ' . $exception->getMessage());
+        }
+
+        return '';
     }
 
     /**

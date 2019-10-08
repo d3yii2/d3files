@@ -2,6 +2,7 @@
 
 namespace d3yii2\d3files\widgets;
 
+use Exception;
 use Yii;
 use yii\base\Widget;
 use d3yii2\d3files\models\D3filesModel;
@@ -27,6 +28,7 @@ class D3FilesFileDownloadWidget extends Widget
     
     public function run()
     {
+        try {
             return $this->render(
                 'file_download',
                 [
@@ -35,7 +37,11 @@ class D3FilesFileDownloadWidget extends Widget
                     'fileName'      => $this->fileName,
                 ]
             );
-        
+        }catch (Exception $exception){
+            Yii::error('D3FilesFileDownloadWidget:run Exception: ' . $exception->getMessage());
+        }
+
+        return '';
     }
     
     public function getViewPath()

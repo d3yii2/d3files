@@ -1,8 +1,9 @@
 <?php
 
-use d3yii2\pdfobject\widgets\PDFObject;
+use d3yii2\d3files\D3FilesAsset;
+use d3yii2\d3files\widgets\D3FilesPreviewWidget;
 
-\d3yii2\d3files\D3FilesAsset::register($this);
+D3FilesAsset::register($this);
 /**
  * @var string $urlPrefix
  * @var string $viewType
@@ -10,6 +11,6 @@ use d3yii2\pdfobject\widgets\PDFObject;
  * @var array $fileList
  */
 
-echo \d3yii2\d3files\widgets\D3FilesPreviewWidget::widget([
+echo D3FilesPreviewWidget::widget([
     'fileList' => $fileList,
 ]);

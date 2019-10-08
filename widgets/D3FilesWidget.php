@@ -5,7 +5,6 @@ namespace d3yii2\d3files\widgets;
 use d3yii2\d3files\D3Files;
 use d3yii2\d3files\models\D3files as ModelD3Files;
 use Exception;
-use ReflectionException;
 use Yii;
 use yii\base\Widget;
 use yii\db\ActiveRecord;
@@ -29,6 +28,8 @@ use yii\db\ActiveRecord;
  * @var string $urlPrefix
  * @var string VIEW_DROPDOWN_LIST
  * @var string VIEW_FILES_LIST
+ *
+ * @property array $viewParams
  */
 class D3FilesWidget extends Widget
 {
@@ -69,7 +70,6 @@ class D3FilesWidget extends Widget
     public const VIEW_FILES_LIST = 'files-list';
 
     /**
-     * @throws ReflectionException
      * @throws \yii\db\Exception
      * @throws Exception
      */
@@ -170,7 +170,7 @@ class D3FilesWidget extends Widget
      * @param string $extension
      * @return array|null
      */
-    public static function getFirstFileHavingExt(array $files, string $extension): ?array
+    public static function getFirstFileHavingExt(array $files, string $extension): array
     {
         foreach ($files as $file) {
             $fileExtension = strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
@@ -178,7 +178,7 @@ class D3FilesWidget extends Widget
                 return $file;
             }
         }
-        return null;
+        return [];
     }
 
     /**

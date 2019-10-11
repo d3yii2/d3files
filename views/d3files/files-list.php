@@ -37,10 +37,11 @@ $uploadUrl = Url::to([$urlPrefix . 'd3filesupload', 'id' => $model_id]);
                 <?php
                 if (!$readOnly): ?>
                 <div class="pull-right" data-toggle="tooltip" data-title="<?php echo Yii::t('d3files', 'Upload file'); ?>">
-                    <div class="btn btn-success btn-xs">
-                        <span class="glyphicon glyphicon-plus align-middle"></span>
-                        <input type="file" class="d3file-input" style="display: none;" data-url="<?php echo $uploadUrl; ?>" name="<?php echo $model_name; ?>"/>
-                    </div>
+                    <label class="d3files-upload-btn btn btn-success btn-xs" data-title="<?php echo Yii::t('d3files', 'Upload file'); ?>">
+                        <input type="file" class="d3file-input" style="display: none;" data-url="<?php echo $uploadUrl; ?>"
+                               name="<?php echo $model_name; ?>"/>
+                        <span class="glyphicon glyphicon-plus align-middle" style="cursor: pointer;"></span>
+                    </label>
                 </div>
                 <?php
                 endif; ?>

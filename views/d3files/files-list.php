@@ -72,11 +72,3 @@ $uploadUrl = Url::to([$urlPrefix . 'd3filesupload', 'id' => $model_id]);
         <?= $this->render('_list_table', $_params_) ?>
     </div>
 </div>
-<?php
-$i18n = \yii\helpers\Json::encode([
-    'aria_label' => Yii::t('d3files', 'Close'),
-    'confirm' => Yii::t('d3files', 'Are you sure you want to delete this item?'),
-    'no_results' => Yii::t('d3files', 'No results found.'),
-]);
-$this->registerJs('var JSVars = {i18n: ' . $i18n . '};')
-?>

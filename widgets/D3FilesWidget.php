@@ -98,6 +98,10 @@ class D3FilesWidget extends Widget
         if (!$this->fileList) {
             $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);
         }
+
+        if (!$this->readOnly) {
+            $this->registerJsTranslations();
+        }
     }
 
     /**
@@ -203,5 +207,15 @@ class D3FilesWidget extends Widget
             }
         }
         return $list;
+    }
+
+    public function registerJsTranslations()
+    {
+        $i18n = \yii\helpers\Json::encode([
+            'aria_label' => Yii::t('d3files', 'Close'),
+            'confirm' => Yii::t('d3files', 'Are you sure you want to delete this item?'),
+            'no_results' => Yii::t('d3files', 'No results found.'),
+        ]);
+        Yii::$app->getView()->registerJs('var D3FilesVars = {i18n: ' . $i18n . '};', Yii::$app->getView()::POS_HEAD);
     }
 }

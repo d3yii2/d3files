@@ -1,7 +1,6 @@
 <?php
 
-use d3yii2\d3files\widgets\D3FilesWidget;
-use d3yii2\pdfobject\widgets\PDFObject;
+use d3yii2\d3files\D3FilesAsset;
 use yii\helpers\Url;
 
 /**
@@ -14,9 +13,11 @@ use yii\helpers\Url;
  * @var int $model_id
  * @var int $model_name
  * @var bool $readOnly
+ * @var bool $hideTitle
+ * @var array $_params_
  */
 
-\d3yii2\d3files\D3FilesAsset::register($this);
+D3FilesAsset::register($this);
 
 $uploadUrl = Url::to([$urlPrefix . 'd3filesupload', 'id' => $model_id]);
 ?>
@@ -31,7 +32,7 @@ $uploadUrl = Url::to([$urlPrefix . 'd3filesupload', 'id' => $model_id]);
                  <div class="pull-left">
                     <h3 class="panel-title text-left">
                         <span class="<?php echo $icon; ?>"></span>
-                        <?= $title; ?>
+                        <?= $title?>
                     </h3>
                 </div>
                 <?php

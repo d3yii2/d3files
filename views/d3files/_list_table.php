@@ -8,6 +8,8 @@
  * @var string $urlPrefix
  * @var bool $readOnly
  * @var int $modelId
+ * @var string $previewButton
+ * @var array $previewAttrs
  */
 
 use yii\helpers\Html;
@@ -28,29 +30,12 @@ use yii\helpers\Url;
                             'class' => 'text-primary',
                         ])
                 ?></td><td class="col-xs-1"><?php
+                    if (isset($file['previewAttrs'])) {
+                        echo $this->render($previewButton, ['icon' => $icon, 'previewAttrs' => $file['previewAttrs']]);
+                     }
                 if ($actionColumn && is_callable($actionColumn)) {
                     ?><?$actionColumn($file)?><?php
                 }
-                /**
-                 * shis jaasakaarto
-                 */
-//                $ext = strtolower(pathinfo($file['file_name'], PATHINFO_EXTENSION));
-//                if (in_array($ext, $viewByExtensions, true)) {
-//
-//                    $attrs = [
-//                        'text' => Yii::t('d3files', 'Preview atachment'),
-//                        'file' => $file,
-//                        'fileList' => $fileList,
-//                        'urlPrefix' => $urlPrefix,
-//                        'viewByExtensions' => $viewByExtensions,
-//                        'icon' => $icon,
-//                        'modelId' => $modelId,
-//                    ];
-//
-//                    $view = D3FilesWidget::VIEW_INLINE_BUTTON;
-//
-//                    echo $this->render($view, $attrs);
-//                }
                 ?></td><td class="text-center col-xs-1"><?php
                     if (!$readOnly) {
                         echo Html::a(

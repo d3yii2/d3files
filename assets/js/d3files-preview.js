@@ -2,24 +2,29 @@
     "use strict";
 
     $.D3FilesPreview = function () {
-        this.files = {};
         this.handlers = {
-            previewButton: $('.d3files-preview-button'),
+            previewButton: $('.d3files-preview-widget-load'),
             //previewDropdown: $('.d3files-preview-dropdown'),
             prevButton: $('.d3files-preview-prev-button'),
             nextButton: $('.d3files-preview-next-button')
         };
         this.modalContent = $('#th-modal .th-modal-content');
         this.modalMessages = $('#th-modal .th-modal-messages');
-        this.rows = [];
-        this.checkedRowIds = [];
-        this.rowId = null;
+        this.filesList = [];
+        this.selectedRows = [];
         this.modelFiles = null;
         this.prevFile = null;
         this.nextFile = null;
         this.prevNextBySelection = true;
         this.pdfOptions = {};
-        //console.log(this);
+        this.logErrorPrefix = 'D3FilesPreview error: ';
+
+        this.logWarningPrefix = 'D3FilesPreview warning: ';
+        this.previewButtonDataName = 'd3files-preview';
+        this.viewByExtension = 'pdf';
+        this.activeModel = null;
+        this.activeModelIndex = null;
+        this.activeFile = null;
     };
 
     //assigning an object literal to the prototype is a shorter syntax
@@ -30,144 +35,263 @@
         },
         setPdfObject: function(o) {
             if ('undefined' === typeof D3PDF) {
-                console.log('D3PDF is not defined. Missing pdfobject-custom.js ?');
+                console.log(this.logErrorPrefix + 'D3PDF is not defined. Missing pdfobject-custom.js ?');
                 return false;
             }
             D3PDF.construct(o);
         },
         reflow: function () {
-            this.updateRows();
+            this.updateFilesList();
 
             // Make class accesible into event
             var self = this;
 
             $(this.handlers.previewButton).on('click', function () {
-                self.modalMessages.empty();
-                self.handleView($(this));
+                self.preview($(this));
             });
             $(this.handlers.prevButton).on('click', function () {
-                self.handlePrev();
+                self.preview($(this));
             });
             $(this.handlers.nextButton).on('click', function () {
-                self.handleNext();
+                self.preview($(this));
             });
 
         },
-        handleView: function (e) {
-            //console.log(e);
-            var f = JSON.parse(e.attr('data-files-list'));
-            this.rowId = this.getActiveRowId(e.data('row-id'));
-            this.modelFiles = f.files;
-            this.checkedRowIds = this.getCheckedRowIds();
-            this.modalMessages.html('Selected: ' + this.checkedRowIds.length);
+        preview: function (e) {
+            this.modalMessages.empty();
 
-            //this.prevFile = this.getFilesListByRowId(files[0])
-            return true;
+            var d = this.getAttachmentData(e);
+
+            if ("undefined" === typeof d) {
+                console.log(this.logErrorPrefix + ' Cannot read attachment data. Element has no attribute: data-' + this.previewButtonDataName);
+                return false;
+            }
+            this.activeModel = d;
+
+            if ("undefined" === typeof this.activeModel.active) {
+                this.activeFile = this.getActiveFile();
+            } else {
+                this.activeFile = this.activeModel.files[this.activeModel.active];
+            }
+
+            if ("undefined" === typeof this.activeFile) {
+                console.log(this.logErrorPrefix + ' No active file by key: ' + this.activeModel.active);
+                return false;
+            }
+
+            //this.modelFiles = this.getModelFiles(); //JSON.parse(this.activeModel.files);
+            this.selectedRows = this.getSelectedRows();
+            this.modalMessages.html('Selected: ' + this.selectedRows.length);
+            this.loadPreview(this.activeFile.src);
+            this.initPrevNextButtons();
         },
-        getActiveRowId: function (modelId) {
-            var id = null;
-            $.each(this.rows, function (i, val) {
-                if (parseInt(modelId) === parseInt(val)) {
-                    id = val;
+        getActiveFile: function (e) {
+            if ("undefined" === typeof this.activeModel) {
+                return null;
+            }
+            if (0 === this.activeModel.length) {
+                return null;
+            }
+            var af = null,
+                fbe = this.getFileByExtension(this.activeModel, this.viewByExtension);
+            if (fbe) {
+                af = fbe;
+            } else {
+                var nf = this.getArrNextIndex(this.activeModel, 0);
+                af = this.activeModel[nf];
+            }
+            return af;
+        },
+        getFileByExtension: function (fl, e) {
+            var f = null,
+                self = this;
+            $.each(fl, function () {
+                var fe = self.getFileExtension(this.file_name);
+                if (e === fe) {
+                    f = this;
+                    return false;
                 }
             });
-            return id;
+            return f;
         },
-        handlePrev: function () {
-            var id = this.getPrevRowIdBySelection();
-            if (!id) {
-                id = this.getPrevInArrayByKey(this.rows, this.rowId);
-            }
-            if (!id) {
-                this.modalMessages.html('No more attachments');
-                return;
-            }
-            this.loadPreview(id);
+        getAttachmentData: function (e) {
+            return e.data(this.previewButtonDataName);
         },
-        handleNext: function () {
-            var id = this.getNextRowIdBySelection();
-
-            if (!id) {
-                id = this.getNextInArrayByKey(this.rows, this.rowId);
-            }
-            if (!id) {
-                this.modalMessages.html('No more attachments');
-                return;
-            }
-            this.loadPreview(id);
+        loadFile: function (f) {
         },
-        loadPreview: function (rowId) {
-            var link = $('#d3files-preview-button-' + rowId),
-                url = link.data('src'),
-                modelFiles = link.data('files-list');
-            D3PDF.embed(url);
-            this.rowId = rowId;
+        loadPreview: function (url) {
+            D3PDF.trigger (url);
         },
-        getPrevRowIdBySelection: function () {
-            var rows = this.getCheckedRowIds();
-
-            if (rows.length === 0) {
+        getPrevModel: function () {
+            var f = this.getPrevModelBySelection();
+            if (!f) {
+                var i = this.getArrPrevIndex(this.filesList, this.activeModel.modelId);
+                return this.filesList[i];
+            }
+            return null;
+        },
+        getNextModel: function () {
+            var f = this.getNextModelBySelection();
+            if (!f) {
+                var mi = this.getModelIndex(this.activeModel),
+                    id = parseInt(this.getArrNextItemIndex(this.filesList, mi));
+                return this.filesList[id];
+            }
+            return null;
+        },
+        getModelIndex: function (m) {
+            var index = null;
+            $.each(this.filesList, function (i, item) {
+                if (parseInt(m.modelId) === parseInt(item.modelId)) {
+                    index = i;
+                    return false;
+                }
+            });
+            return index;
+        },
+        getPrevModelBySelection: function () {
+            var s = this.getSelectedRows();
+            if (s.length === 0) {
                 return null;
             }
-
-            var i = this.getPrevInArrayByKey(rows, this.rowId);
-            return i;
+            var fl = this.getFilesListFromSelected(s),
+                i = this.getArrPrevIndex(fl, this.activeModel.modelId);
+            return this.filesList[i];
         },
-        getNextRowIdBySelection: function () {
-            var rows = this.getCheckedRowIds();
-
-            if (rows.length === 0) {
+        getFilesListFromSelected: function(s) {
+            var l = [];
+            $(s).each(function () {
+                l.push($(this).val());
+            });
+        },
+        getNextModelBySelection: function () {
+            var s = this.getSelectedRows();
+            if (s.length === 0) {
                 return null;
             }
-
-            var i = this.getNextInArrayByKey(rows, this.rowId);
-            return i;
+            i = this.getArrNextIndex(fl, this.activeModel.modelId);
+            return this.filesList[i];
         },
-        getPrevInArrayByKey: function (arr, number) {
+        getArrPrevItemIndex: function (arr, index) {
             if (arr.length === 0) {
                 return null;
             }
-            var i = arr.indexOf(number);
-            i--;
-            return arr[i];
+            var k = index-1;
+            if (0 > k) {
+                return null;
+            }
+            var f = -1 === arr[k] ? null : arr[k];
+            return f;
         },
-        getNextInArrayByKey: function (arr, number) {
-            var i = arr.indexOf(number);
-            i++;
-            if (i >= arr.length)
-                i = 0;
-
-            return arr[i];
-        },
-        updateRows: function () {
-            var ids = this.getAllRowIds();
-            this.setRows(ids);
-        },
-        setRows: function (r) {
-            this.rows = r;
-        },
-        getRows: function () {
-            return this.rows;
-        },
-        getFilesListByRowId: function (id) {
-            var files = $('#d3files-preview-button-' + id).data('files-list');
-            return files;
-        },
-        /* Get the array of row ids by selected checkboxes */
-        getCheckedRowIds: function () {
-            var selected = [];
-            $('#ThGridViewTable tbody input[type="checkbox"]:checked').each(function () {
-                selected.push($(this).val());
+        getArrNextItemIndex: function (arr, index) {
+            if (arr.length === 0) {
+                return null;
+            }
+            var lastI = null,
+                nextI = null;
+            $.each(arr, function (id, item) {
+                if (parseInt(id) === index) {
+                    lastI = id;
+                } else if (lastI) {
+                    nextI = id;
+                    return false;
+                }
             });
-            return selected;
+            return nextI;
         },
-        /* Get the array of row ids */
-        getAllRowIds: function () {
-            var r = [];
-            $('#ThGridViewTable tbody input[type="checkbox"]').each(function () {
-                r.push($(this).val());
+        getArrPrevIndex: function (arr, index) {
+            if (arr.length === 0) {
+                return null;
+            }
+            var k = index-1;
+            if (0 > k) {
+                return null;
+            }
+            var f = -1 === arr[k] ? null : arr[k];
+            return f;
+        },
+        getArrNextIndex: function (arr, index) {
+            if (arr.length === 0) {
+                return null;
+            }
+            var k = index + 1;
+            if (k > arr.length) {
+                return null;
+            }
+            var f = -1 === arr[k] ? null : arr[k];
+            return f;
+        },
+        updateFilesList: function () {
+            this.filesList = this.buildFilesList();
+        },
+        setFilesList: function (l) {
+            this.filesList = l;
+        },
+        getFilesList: function () {
+            return this.filesList;
+        },
+        getModelFilesList: function (id) {
+            var f = $('#d3files-preview-button-' + id).data('d3files-files');
+            return f;
+        },
+        /* Get the array of the files from selected rows */
+        getSelectedRows: function () {
+            var s = [];
+            $('#ThGridViewTable tbody input[type="checkbox"]:checked').each(function () {
+                s.push($(this).val());
+            });
+            return s;
+        },
+        /* Build the filesList */
+        buildFilesList: function () {
+            var r = [],
+                self = this;
+            $('*[data-' + this.previewButtonDataName + ']').each(function () {
+                var d = self.getAttachmentData($(this));
+                if (d) {
+                    r.push(d);
+                }
             });
             return r;
+        },
+        getModelViewFilesByExt: function(f) {
+            var fe = [];
+            f.each(function () {
+                var fe = this.getFileExtension($(this).file_name);
+                if (this.viewByExtension === fe) {
+                    fe.push();
+                }
+            });
+            return fe;
+        },
+        getFileExtension: function(f) {
+            var e = (f.lastIndexOf('.') < 1) ?   null : f.split('.').slice(-1);
+            return "undefined" === typeof e[0] ? null :e[0];
+        },
+        initPrevNextButtons: function() {
+            var nf = this.getNextModel();
+            if (!nf) {
+                ///this.modalMessages.html('No more attachments');
+                this.handlers.nextButton.hide();
+            } else {
+                this.setLoadButtonAttrs(this.handlers.nextButton, nf);
+                this.handlers.nextButton.show();
+            }
+            var pf = this.getPrevModel();
+            if (!pf) {
+                //this.modalMessages.html('No more attachments');
+                this.handlers.prevButton.hide();
+            } else {
+                this.setLoadButtonAttrs(this.handlers.prevButton, pf);
+                this.handlers.prevButton.show();
+            }
+        },
+        setLoadButtonAttrs: function(b, f) {
+            //f.active =
+            b.attr('data-d3files-preview', JSON.stringify(f));
+            /*if ("undefined" !== f.fileTitle) {
+                b.attr('title', f.fileTitle);
+            }*/
         }
     };
     var d3fp = new $.D3FilesPreview();

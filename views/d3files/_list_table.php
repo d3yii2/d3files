@@ -8,9 +8,10 @@
  * @var string $urlPrefix
  * @var bool $readOnly
  * @var int $modelId
+ * @var string $previewButton
+ * @var array $previewAttrs
  */
 
-use d3yii2\d3files\widgets\D3FilesWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -37,8 +38,8 @@ use yii\helpers\Url;
                 </td>
                 <td class="col-xs-1">
                     <?php
-                    if (isset($previewButton)) {
-                        echo $this->render($previewButton, $_params_);
+                    if (isset($file['previewAttrs'])) {
+                        echo $this->render($previewButton, ['icon' => $icon, 'previewAttrs' => $file['previewAttrs']]);
                      }?>
                 </td>
                 <?php

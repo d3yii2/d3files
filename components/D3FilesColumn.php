@@ -97,13 +97,15 @@ class D3FilesColumn extends DataColumn
 
             $search = Yii::$app->request->get('RkInvoiceSearch');
 
-            $options = array_merge(
-                [
-                    'model' => $model,
-                    'fileList' => $modelFiles,
-                ],
-                $this->previewOptions
-            );
+        $options = array_merge(
+            [
+                'model' => $model,
+                'fileList' => $modelFiles,
+                'showPrevNextButtons' => true,
+                'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,
+            ],
+            $this->previewOptions
+        );
 
             if (!empty($search['attachment_type'])) {
                 $options['viewByExtensions'] = [$search['attachment_type']];

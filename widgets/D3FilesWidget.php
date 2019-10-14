@@ -66,7 +66,6 @@ class D3FilesWidget extends Widget
     public $actionColumn;
     public $urlPrefix = '/d3files/d3files/';
 
-    public const VIEW_DROPDOWN_LIST = 'dropdown-list';
     public const VIEW_FILES_LIST = 'files-list';
 
     /**

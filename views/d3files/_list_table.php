@@ -8,10 +8,8 @@
  * @var string $urlPrefix
  * @var bool $readOnly
  * @var int $modelId
- * @var array $_params_
  */
 
-use d3yii2\d3files\widgets\D3FilesWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -29,9 +27,6 @@ use yii\helpers\Url;
                             'data-toggle' => 'tooltip',
                             'class' => 'text-primary',
                         ]
-                    ) ?></td><td class="col-xs-1"><?php
-                    if (isset($previewButton)) {
-                        echo $this->render($previewButton, $_params_);
                      }?>
                 </td><td class="col-xs-1">
                 <?php

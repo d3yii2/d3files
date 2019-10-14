@@ -1,18 +1,10 @@
 <?php
 
-use d3yii2\d3files\widgets\D3FilesPreviewWidget;
-use d3yii2\d3files\widgets\D3FilesWidget;
 use yii\helpers\Html;
 
 /**
  * @var string $icon
- * @var array $fileList
- * @var string $urlPrefix
- * @var array $file
- * @var int $modelId
+ * @var array $previewAttrs
  */
 
-if($file = D3FilesWidget::getFirstFileHavingExt($fileList, 'pdf')) {
-    $attrs = D3FilesPreviewWidget::getPreviewModalButtonAttributes($modelId, $file, $fileList, $urlPrefix);
-    echo Html::a('<span class="' . $icon . '"></span>', 'javascript:void(0)', $attrs);
-}
+echo  Html::a('<span class="' . $icon . '"></span>', 'javascript:void(0)', $previewAttrs);

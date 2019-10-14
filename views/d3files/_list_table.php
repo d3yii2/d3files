@@ -26,10 +26,8 @@ use yii\helpers\Url;
                             'data-placement' => 'top',
                             'data-toggle' => 'tooltip',
                             'class' => 'text-primary',
-                        ]
-                     }?>
-                </td><td class="col-xs-1">
-                <?php
+                        ])
+                ?></td><td class="col-xs-1"><?php
                 if ($actionColumn && is_callable($actionColumn)) {
                     ?><?$actionColumn($file)?><?php
                 }

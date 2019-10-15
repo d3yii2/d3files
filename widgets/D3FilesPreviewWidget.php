@@ -10,6 +10,7 @@ use eaBlankonThema\widget\ThButton;
 use eaBlankonThema\widget\ThModal;
 use Exception;
 use yii\db\ActiveRecord;
+use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use Yii;
@@ -198,11 +199,23 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public function getModalToolbarContent(): string
     {
+        $content = '';
+
         if ($this->showPrevNextButtons) {
-            return $this->getPrevNextFileButtons();
+            $content .= $this->getPrevNextFileButtons();
         }
 
-        return '';
+        //$content .= $this->getFilesDropdown();
+
+        return $content;
+    }
+
+    public function getFilesDropdown(): string
+    {
+        return '<span class="pull-right">
+                <label for="getFilesDropdown">Files:</label>'
+            . Html::dropDownList('getFilesDropdown', false, [], ['class' => 'd3files-preview-dropdown'])
+            . '</span>';
     }
 
     /**

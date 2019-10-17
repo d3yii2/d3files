@@ -164,6 +164,20 @@ class D3FilesPreviewWidget extends D3FilesWidget
             Yii::$app->view->setPageFooter($pageFooterHtml);
         }
 
+        Yii::$app->getView()->registerJsVar(
+            'D3FilesPreviewJsVars',
+            ['assetUrl' => $this->getAssetsUrl()]
+        );
+    }
+
+    /**
+     * @return string
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getAssetsUrl(): string
+    {
+        $bundleWebPath = Yii::$app->getAssetManager()->getBundle(D3FilesPreviewAsset::class)->baseUrl;
+        return $bundleWebPath;
     }
 
     /**

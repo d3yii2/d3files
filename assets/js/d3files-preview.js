@@ -1,6 +1,6 @@
 /*jslint browser */
-/*globals D3PDF, console, jQuery*/
-/*global D3PDF, console, jQuery*/
+/*globals D3PDF, console, jQuery, D3FilesPreviewJsVars*/
+/*global D3PDF, console, jQuery, D3FilesPreviewJsVars*/
 /*jshint esversion: 6 */
 /**
  * @param {{file_name:string}} f
@@ -371,10 +371,11 @@
                 self = this;
             $.each(m.files, function (i, f) {
                 let li = $('<li style="display: inline-block"></li>'),
+                    icon = 'pdf' === self.getFileExtension(f.file_name) ? 'pdf' : 'img',
                     a = $(
                         '<a href="javascript:void(0)" class="d3files-preview-widget-load" title="' + f.file_name + '">' +
-                        '<span class="glyphicon glyphicon-eye-open" style="width:60px;height:60px"></span>' +
-                        '</a>'
+                        '<img src="' + D3FilesPreviewJsVars.assetUrl + '/img/' + icon + '-icon.png"  style="width:40px;height:40px"><br>' +
+                '</a>'
                     );
                 self.setLoadButtonAttrs(a, m);
                 a.on('click', function () {

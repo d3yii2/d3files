@@ -15,7 +15,9 @@
             prevButton: $('.d3files-preview-prev-button'),
             nextButton: $('.d3files-preview-next-button'),
             modalContent: $('#th-modal .th-modal-content'),
-            modalMessages: $('#th-modal .th-modal-messages')
+            modalMessages: $('#th-modal .th-modal-messages'),
+            imageContent: $('.d3preview-image-content'),
+            filesListContent: $('.d3preview-model-files')
         };
         this.filesList = [];
         this.selectedRows = [];
@@ -53,9 +55,7 @@
         initHandlers: function () {
             // Make class accesible into event
             let self = this;
-            $(this.handlers.previewButton).on('click', function () {
-                self.preview($(this));
-            });
+            self.initPreviewButtonHandler();
             $(this.handlers.prevButton).on('click', function () {
                 self.preview($(this));
             });
@@ -63,20 +63,23 @@
                 self.preview($(this));
             });
         },
+        initPreviewButtonHandler: function () {
+            let self = this;
+            $(this.handlers.previewButton).on('click', function () {
+                self.preview($(this));
+            });
+        },
         preview: function (e) {
             this.handlers.modalMessages.empty();
 
             let m = this.getAttachmentData(e);
-
-            if ("undefined" === typeof m) {
-                console.log(this.logErrorPrefix + ' Cannot read attachment data. Element has no attribute: data-' + this.previewButtonDataName);
-                return false;
-            }
             
             //this.modelFiles = this.getModelFiles(); //JSON.parse(m.files);
             this.selectedRows = this.getSelectedRows();
-            this.handlers.modalMessages.html('Selected: ' + this.selectedRows.length);
-            
+            if (0 < this.selectedRows.length) {
+                this.handlers.modalMessages.html('Selected: ' + this.selectedRows.length);
+            }
+
             //let ma = this.getNextActiveFile(m);
             /*if ("undefined" === typeof m.active) {
                 console.log(this.logErrorPrefix + ' No active file by key: ' + m.active);
@@ -91,10 +94,32 @@
             if ("undefined" === typeof m.active) {
                 ma = this.getNextActiveFile(m);
             } else {
-                ma = m.files[m.active];
+                ma = this.getFileById(m.active, m.files);
             }
-            this.loadPreview(ma.src);
-            this.activeFile = ma;
+            if (!ma) {
+                console.log(this.logErrorPrefix + 'Cannot get active file from model');
+                console.log(m);
+                return false;
+            }
+
+            this.loadFile(ma);
+            this.renderModelFiles(m);
+        },
+        getFileById: function (id, files) {
+            if ("undefined" === typeof id) {
+                return null;
+            }
+            if (0 === files.length) {
+                return null;
+            }
+            let af = null;
+            $.each(files, function (i, f) {
+                if (f.id === id) {
+                    af = f;
+                    return false;
+                }
+            });
+            return af;
         },
         getNextActiveFile: function (m) {
             if ("undefined" === typeof m) {
@@ -126,10 +151,44 @@
             return fe;
         },
         getAttachmentData: function (e) {
-            return e.data(this.previewButtonDataName);
+            let d = e.data(this.previewButtonDataName);
+            if ("undefined" === typeof d) {
+                console.log(this.logErrorPrefix + 'missing data attribute: ' + this.previewButtonDataName + ' in element');
+                console.log(e);
+                return false;
+            }
+
+            //let pd = JSON.parse(decodeURIComponent(d));
+            return d; //pd;
         },
-        loadPreview: function (url) {
-            D3PDF.trigger (url);
+        loadFile: function (f) {
+            let ext = this.getFileExtension(f.file_name);
+            if ("pdf" === ext) {
+                this.handlers.imageContent.html('').hide();
+                this.loadPDF(f);
+                this.activeFile = f;
+                return true;
+            }
+            if ("png" === ext || "jpg" === ext|| "jpeg" === ext) {
+                this.loadImage(f, this.handlers.modalContent);
+                this.activeFile = f;
+                return true;
+            }
+            console.log(this.logErrorPrefix + 'Unsupported file type for load: ' + ext);
+            return false;
+        },
+        loadPDF: function (f) {
+            D3PDF.trigger (f.src);
+        },
+        loadImage: function (f) {
+            this.handlers.imageContent.html('').show();
+            let img = $('<img>');
+            img.attr('src', f.src);
+            img.attr('alt', f.file_name);
+            img.attr('title', f.file_name);
+            img.css('max-width', '400px');
+            img.css('max-height', '400px');
+            this.handlers.imageContent.append(img);
         },
         getPrevModel: function (m) {
             let f = this.getPrevModelBySelection();
@@ -281,9 +340,8 @@
             });
             return wf;
         },
-        getFileExtension: function(f) {
-            let e = (f.lastIndexOf('.') < 1) ?   null : f.split('.').slice(-1);
-            return "undefined" === typeof e[0] ? null :e[0];
+        getFileExtension: function(name) {
+            return name.split(/\#|\?/)[0].split('.').pop().trim();
         },
         initFilesListDropdown: function(m) {
             if ("undefined" === m.files) {
@@ -297,6 +355,37 @@
                     $('<option></option>').val(i).html(f.file_name)
                 );
             });
+        },
+        objectHasOneItem: function(o) {
+            return 1 === $.map(o, function(n, i) { return i; }).length;
+        },
+        renderModelFiles: function(m) {
+            this.handlers.filesListContent.html('');
+
+            //Just ignore if only one file there
+            if (this.objectHasOneItem(m.files)) {
+                return true;
+            }
+
+            let ul = $("<ul style='list-style-type: none'></ul>"),
+                self = this;
+            $.each(m.files, function (i, f) {
+                let li = $('<li style="display: inline-block"></li>'),
+                    a = $(
+                        '<a href="javascript:void(0)" class="d3files-preview-widget-load" title="' + f.file_name + '">' +
+                        '<span class="glyphicon glyphicon-eye-open" style="width:60px;height:60px"></span>' +
+                        '</a>'
+                    );
+                self.setLoadButtonAttrs(a, m);
+                a.on('click', function () {
+                    self.loadFile(f);
+                });
+                li.append(a);
+                ul.append(li);
+            });
+            this.handlers.filesListContent.html(ul);
+
+            this.initPreviewButtonHandler();
         },
         initPrevNextButtons: function(m) {
             let nm = this.getNextModel(m);

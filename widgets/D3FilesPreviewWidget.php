@@ -33,7 +33,8 @@ use Yii;
 class D3FilesPreviewWidget extends D3FilesWidget
 {
     public $icon = 'glyphicon glyphicon-eye-open';
-    public $viewByExtensions = ['pdf'];
+    public $viewByExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
+    public $viewByFancyBoxExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
     public $viewExtension = 'pdf';
     public $currentFile;
     public $showPrevNext = false;
@@ -45,8 +46,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public $viewType = self::VIEW_TYPE_MODAL;
     public $buttonView = self::VIEW_MODAL_BUTTON;
     public $contentTargetSelector = self::EMBED_CONTENT_CLASS;
-
-    private $previewData = [];
 
     public const VIEW_DROPDOWN_LIST = 'dropdown-list';
     public const VIEW_MODAL_BUTTON = '_modal_button';
@@ -87,37 +86,19 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 $this->pdfObjectOptions = ['wrapperHtmlOptions' => ['style' => 'height:1200px']];
             }
 
-            // Check for PDF and AJAX loaded attachments to  assets
-            foreach ($this->fileList as $i => $file) {
-                $ext = self::getFileExtension($file);
+            // Add the data attributes for every file
+            $fileList = $this->rebuildFilesList();
 
-                if (!in_array($ext, $this->viewByExtensions, true)) {
-                    continue;
-                }
-
-                $fileUrl = Url::to(
-                    [
-                        $this->urlPrefix . 'd3filesopen',
-                        'id' => $file['file_model_id']
-                    ],
-                    true
-                );
-
-                $file['content-target'] = $this->contentTargetSelector;
-                $file['src'] = $fileUrl;
-
+            // Check for PDF and AJAX loaded attachments to  assets and assign preview attributes
+            foreach ($fileList as $i => $file) {
                 if (self::VIEW_TYPE_NONE !== $this->view) {
                     $params['previewButton'] = $this->buttonView;
-
-                    $this->previewData[$file['id']] = $file;
-
-                    $file['previewAttrs'] = self::VIEW_INLINE_BUTTON === $this->buttonView
-                        ? self::getPreviewInlineButtonAttributes($this->model, $file, $this->previewData)
-                        : self::getPreviewModalButtonAttributes($this->model, $file, $this->previewData);
+                    $this->fileList[$i]['previewAttrs'] = self::VIEW_INLINE_BUTTON === $this->buttonView
+                        ? self::getPreviewInlineButtonAttributes($this->model, $file, $fileList)
+                        : self::getPreviewModalButtonAttributes($this->model, $file, $fileList);
                 }
 
-                $this->fileList[$i] = $file;
-
+                $ext = self::getFileExtension($file);
                 if ('pdf' === $ext) {
                     $hasPdf = true;
                 } else {
@@ -186,6 +167,34 @@ class D3FilesPreviewWidget extends D3FilesWidget
     }
 
     /**
+     * Rebuild files list from parent widget setting additional params for the files
+     * If the File have extension not in the $this->viewByExtensions list it's just excluded
+     * @return array
+     */
+    public function rebuildFilesList(): array
+    {
+        $fl = [];
+        foreach ($this->fileList as $i => $file) {
+            $ext = self::getFileExtension($file);
+
+            if (!in_array($ext, $this->viewByExtensions, true)) {
+                continue;
+            }
+            $fileUrl = Url::to(
+                [
+                    $this->urlPrefix . 'd3filesopen',
+                    'id' => $file['file_model_id']
+                ],
+                true
+            );
+            $file['content-target'] = $this->contentTargetSelector;
+            $file['src'] = $fileUrl;
+            $fl[$i] = $file;
+        }
+        return $fl;
+    }
+
+    /**
      * @return string|null
      */
     public function getModalTitle(): ?string
@@ -204,6 +213,13 @@ class D3FilesPreviewWidget extends D3FilesWidget
         if ($this->showPrevNextButtons) {
             $content .= $this->getPrevNextFileButtons();
         }
+
+        $content .= '
+            <div class="pull-left">
+                <span class="d3preview-model-files"></span>
+           </div>
+           <div class="d3preview-image-content" style="display: none"></div>
+           ';
 
         //$content .= $this->getFilesDropdown();
 

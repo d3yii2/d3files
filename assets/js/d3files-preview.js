@@ -19,6 +19,7 @@
             imageContent: $('.d3preview-image-content'),
             filesListContent: $('.d3preview-model-files')
         };
+        this.selectedElementsQuery = '#ThGridViewTable tbody input[type="checkbox"]:checked';
         this.filesList = [];
         this.selectedRows = [];
         this.modelFiles = null;
@@ -35,8 +36,6 @@
         this.activeFile = null;
     };
 
-    //assigning an object literal to the prototype is a shorter syntax
-    //than assigning one property at a time
     $.D3FilesPreview.prototype = {
         setOption: function(prop, val) {
             this[prop] = val;
@@ -55,16 +54,12 @@
         initHandlers: function () {
             // Make class accesible into event
             let self = this;
-            self.initPreviewButtonHandler();
             $(this.handlers.prevButton).on('click', function () {
                 self.preview($(this));
             });
             $(this.handlers.nextButton).on('click', function () {
                 self.preview($(this));
             });
-        },
-        initPreviewButtonHandler: function () {
-            let self = this;
             $(this.handlers.previewButton).on('click', function () {
                 self.preview($(this));
             });
@@ -72,38 +67,26 @@
         preview: function (e) {
             this.handlers.modalMessages.empty();
 
-            let m = this.getAttachmentData(e);
-            
-            //this.modelFiles = this.getModelFiles(); //JSON.parse(m.files);
-            this.selectedRows = this.getSelectedRows();
-            if (0 < this.selectedRows.length) {
-                this.handlers.modalMessages.html('Selected: ' + this.selectedRows.length);
+            try {
+                let m = this.getAttachmentData(e);
+                this.selectedRows = this.getSelectedRows();
+                if (0 < this.selectedRows.length) {
+                    this.handlers.modalMessages.html('Selected: ' + this.selectedRows.length);
+                }
+                this.activeModel = m;
+                let ma = null;
+                    ma = "undefined" === typeof m.active ? this.getNextActiveFile(m) : this.getFileById(m.active, m.files);
+
+                if (!ma) {
+                    throw new Error('Cannot get active file from model');
+                }
+
+                this.loadFile(ma);
+                this.renderModelFiles(m);
+                this.initPrevNextButtons(m, this.filesList);
+            } catch (err) {
+                console.log(this.logErrorPrefix + "preview() Catch got: " + err);
             }
-
-            //let ma = this.getNextActiveFile(m);
-            /*if ("undefined" === typeof m.active) {
-                console.log(this.logErrorPrefix + ' No active file by key: ' + m.active);
-                return false;
-            }*/
-
-            this.initPrevNextButtons(m);
-            this.initFilesListDropdown(m);
-            this.activeModel = m;
-
-            let ma = null;
-            if ("undefined" === typeof m.active) {
-                ma = this.getNextActiveFile(m);
-            } else {
-                ma = this.getFileById(m.active, m.files);
-            }
-            if (!ma) {
-                console.log(this.logErrorPrefix + 'Cannot get active file from model');
-                console.log(m);
-                return false;
-            }
-
-            this.loadFile(ma);
-            this.renderModelFiles(m);
         },
         getFileById: function (id, files) {
             if ("undefined" === typeof id) {
@@ -122,8 +105,9 @@
             return af;
         },
         getNextActiveFile: function (m) {
-            if ("undefined" === typeof m) {
-                return null;
+            if ("undefined" === typeof m.files) {
+                console.log(m);
+                throw new Error('getNextActiveFile: missing files property in model:');
             }
             if (0 === m.files.length) {
                 return null;
@@ -138,10 +122,10 @@
             }
             return af;
         },
-        getFileByExtension: function (fl, e) {
+        getFileByExtension: function (ml, e) {
             let fe = null,
                 self = this;
-            $.each(fl, function (f) {
+            $.each(ml, function (f) {
                 let ext = self.getFileExtension(f.file_name);
                 if (e === ext) {
                     fe = f;
@@ -153,29 +137,28 @@
         getAttachmentData: function (e) {
             let d = e.data(this.previewButtonDataName);
             if ("undefined" === typeof d) {
-                console.log(this.logErrorPrefix + 'missing data attribute: ' + this.previewButtonDataName + ' in element');
-                console.log(e);
-                return false;
+                throw new TypeError(this.logErrorPrefix + 'missing data attribute: ' + this.previewButtonDataName + ' in element');
             }
-
-            //let pd = JSON.parse(decodeURIComponent(d));
-            return d; //pd;
+            return d;
         },
         loadFile: function (f) {
             let ext = this.getFileExtension(f.file_name);
             if ("pdf" === ext) {
-                this.handlers.imageContent.html('').hide();
-                this.loadPDF(f);
-                this.activeFile = f;
-                return true;
+                try {
+                    this.handlers.imageContent.html('').hide();
+                    this.loadPDF(f);
+                    this.activeFile = f;
+                    return true;
+                } catch (err) {
+                    throw new Error('loadFile got catch: ' + err);
+                }
             }
             if ("png" === ext || "jpg" === ext|| "jpeg" === ext) {
                 this.loadImage(f, this.handlers.modalContent);
                 this.activeFile = f;
                 return true;
             }
-            console.log(this.logErrorPrefix + 'Unsupported file type for load: ' + ext);
-            return false;
+            throw new Error('Unsupported file type for load: ' + ext);
         },
         loadPDF: function (f) {
             D3PDF.trigger (f.src);
@@ -190,41 +173,48 @@
             img.css('max-height', '400px');
             this.handlers.imageContent.append(img);
         },
-        getPrevModel: function (m) {
-            let f = this.getPrevModelBySelection();
-            if (!f) {
-                let mi = this.getModelIndex(m),
-                    id = parseInt(this.getArrPrevIndex(this.filesList, mi));
-                return this.filesList[id];
+        getPrevModel: function (m, ml) {
+            if ("object" !== typeof m) {
+                throw new TypeError('getPrevModel m argument is not an object');
             }
-            return null;
-        },
-        getNextModel: function (m) {
-            let f = this.getNextModelBySelection();
-            if (!f) {
-                let mi = this.getModelIndex(m),
-                    id = parseInt(this.getArrNextIndex(this.filesList, mi));
-                return this.filesList[id];
+            if ("object" !== typeof ml) {
+                throw new TypeError('getPrevModel ml argument is not an object');
             }
-            return null;
+            let mi = this.getModelIndex(m.modelId),
+                id = parseInt(this.getArrPrevIndex(ml, mi));
+            return ml[id];
         },
-        getModelIndex: function (m) {
+        getNextModel: function (m, ml) {
+            if ("object" !== typeof m) {
+                throw new TypeError('getNextModel m argument is not an object');
+            }
+            if ("object" !== typeof ml) {
+                throw new TypeError('getNextModel ml argument is not an object');
+            }
+            let mi = this.getModelIndex(m.modelId),
+                id = parseInt(this.getArrNextIndex(ml, mi));
+            return ml[id];
+        },
+        getModelIndex: function (modelId) {
             let index = null;
             $.each(this.filesList, function (i, item) {
-                if (parseInt(m.modelId) === parseInt(item.modelId)) {
+                if ("undefined" === typeof item.modelId) {
+                    throw new Error('getModelIndex Error: undefined m.modelId');
+                }
+                if (parseInt(modelId) === parseInt(item.modelId)) {
                     index = i;
                     return false;
                 }
             });
             return index;
         },
-        getPrevModelBySelection: function () {
+        getPrevModelBySelection: function (currId) {
             let s = this.getSelectedRows();
             if (s.length === 0) {
                 return null;
             }
-            let fl = this.getFilesListFromSelected(s),
-                i = this.getArrPrevIndex(fl, this.activeModel.modelId);
+            let ml = this.getFilesListFromSelected(s),
+                i = this.getArrPrevIndex(ml, currId);
             return this.filesList[i];
         },
         getFilesListFromSelected: function(s) {
@@ -234,41 +224,20 @@
             });
             return l;
         },
-        getNextModelBySelection: function () {
+        getNextModelBySelection: function (currId) {
             let s = this.getSelectedRows();
             if (s.length === 0) {
                 return null;
             }
-            let i = this.getArrNextIndex(s, this.activeModel.modelId);
+            let i = this.getArrNextIndex(s, currId);
+            // Just take first selected if current row is not
+            if (!i) {
+                let mId = s[0],
+                    mi = this.getModelIndex(mId);
+                return this.filesList[mi];
+            }
             return this.filesList[i];
         },
-        /*getArrPrevItemIndex: function (arr, index) {
-            if (arr.length === 0) {
-                return null;
-            }
-            let k = index-1;
-            if (0 > k) {
-                return null;
-            }
-            let i = -1 === arr[k] ? null : k;
-            return i;
-        },*/
-        /*getArrNextItemIndex: function (arr, index) {
-            if (arr.length === 0) {
-                return null;
-            }
-            let lastI = null,
-                nextI = null;
-            $.each(arr, function (id, item) {
-                if (parseInt(id) === index) {
-                    lastI = id;
-                } else if (lastI) {
-                    nextI = id;
-                    return false;
-                }
-            });
-            return nextI;
-        },*/
         getArrPrevIndex: function (arr, index) {
             if (arr.length === 0) {
                 return null;
@@ -309,8 +278,13 @@
         },
         /* Get the array of the files from selected rows */
         getSelectedRows: function () {
-            let s = [];
-            $('#ThGridViewTable tbody input[type="checkbox"]:checked').each(function () {
+            let s = [],
+                rows = $(this.selectedElementsQuery);
+            // For testing
+            /*if (!rows.length) {
+                throw new Error('Selected elements not found by: ' + this.selectedElementsQuery);
+            }*/
+            rows.each(function () {
                 s.push($(this).val());
             });
             return s;
@@ -385,29 +359,29 @@
                 ul.append(li);
             });
             this.handlers.filesListContent.html(ul);
-
-            this.initPreviewButtonHandler();
         },
-        initPrevNextButtons: function(m) {
-            let nm = this.getNextModel(m);
-            if (!nm) {
-                ///this.handlers.modalMessages.html('No more attachments');
+        initPrevNextButtons: function(m, ml) {
+            try {
                 this.handlers.nextButton.hide();
-            } else {
-                this.setLoadButtonAttrs(this.handlers.nextButton, nm);
-                this.handlers.nextButton.show();
-            }
-            let pm = this.getPrevModel(m);
-            if (!pm) {
-                //this.handlers.modalMessages.html('No more attachments');
                 this.handlers.prevButton.hide();
-            } else {
-                this.setLoadButtonAttrs(this.handlers.prevButton, pm);
-                this.handlers.prevButton.show();
+
+                let nms = this.getNextModelBySelection(m.modelId),
+                    nm = nms || this.getNextModel(m, ml);
+                if (nm) {
+                    this.setLoadButtonAttrs(this.handlers.nextButton, nm);
+                    this.handlers.nextButton.show();
+                }
+                let pm = this.getPrevModel(m, ml);
+                if (pm) {
+                    this.setLoadButtonAttrs(this.handlers.prevButton, pm);
+                    this.handlers.prevButton.show();
+                }
+            } catch (e) {
+                throw new Error( "initPrevNextButtons Catch got: " + e);
             }
         },
         setLoadButtonAttrs: function(b, f) {
-            b.attr('data-' + this.previewButtonDataName, JSON.stringify(f));
+            b.data(this.previewButtonDataName, f);
         }
     };
     let d3fp = new $.D3FilesPreview();

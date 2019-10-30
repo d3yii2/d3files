@@ -39,7 +39,7 @@ class D3FilesWidget extends Widget
     public $title;
     public $icon = 'glyphicon glyphicon-paperclip';
     public $hideTitle = false;
-    public $readOnly = true;
+    public $readOnly = false;
     // File handling controller route. If empty, then use actual controller
     public $controllerRoute = '';
 

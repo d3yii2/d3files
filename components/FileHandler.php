@@ -1,12 +1,15 @@
 <?php
 namespace d3yii2\d3files\components;
 
+use ReflectionClass;
 use Yii;
+use yii\base\Exception;
 use yii\base\InvalidArgumentException;
 use yii\helpers\FileHelper;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\UploadedFile;
+use function dirname;
 
 class FileHandler
 {
@@ -55,7 +58,7 @@ class FileHandler
     protected static function getAllowedFileTypes(array $options = []): string
     {
         // Check for model defined attachment types first
-        $model = new \ReflectionClass($options['model_name']);
+        $model = new ReflectionClass($options['model_name']);
         $modelFileTypes = $model->getConstant('D3FILES_ALLOWED_EXT_REGEXP');
         if ($modelFileTypes) {
             return $modelFileTypes;
@@ -83,7 +86,7 @@ class FileHandler
      * copy posted file to upload directory
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function upload()
     {
@@ -93,7 +96,7 @@ class FileHandler
         }
 
         $filePath = $this->getFilePath();
-        $dir = \dirname($filePath);
+        $dir = dirname($filePath);
         FileHelper::createDirectory($dir);
         if (!move_uploaded_file($_FILES['upload_file']['tmp_name'], $filePath)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
@@ -109,12 +112,12 @@ class FileHandler
      * @param UploadedFile $uploadedFile
      * @return bool
      * @throws NotFoundHttpException
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function uploadYii2UloadFile(UploadedFile $uploadedFile)
     {
         $filePath = $this->getFilePath();
-        FileHelper::createDirectory(\dirname($filePath));
+        FileHelper::createDirectory(dirname($filePath));
         if (!$uploadedFile->saveAs($filePath)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
@@ -144,12 +147,12 @@ class FileHandler
      * save file. Alternative for method  upload()
      * @param $fileContent
      * @return bool
-     * @throws \yii\base\Exception
+     * @throws Exception
      */
     public function save(&$fileContent)
     {
         $filePath = $this->getFilePath();
-        FileHelper::createDirectory(\dirname($filePath));
+        FileHelper::createDirectory(dirname($filePath));
         file_put_contents($filePath, $fileContent);
         
         return true;
@@ -218,7 +221,13 @@ class FileHandler
         exit;
 
     }
-    
+
+    public function setModelId($id)
+    {
+        $this->options['model_id'] = $id;
+    }
+
+
     protected static function createSaveFileName($d3files_id, $file_name)
     {
         return $d3files_id . '.' . pathinfo($file_name)['extension'];

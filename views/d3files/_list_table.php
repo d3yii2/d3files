@@ -21,7 +21,8 @@ use yii\helpers\Url;
                         '<i class="fa fa-cloud-download text-primary"></i> ' . $file['file_name'],
                         Url::to([
                             $urlPrefix . 'd3filesdownload',
-                            'id' => $file['file_model_id']
+                            'id' => $file['file_model_id'],
+                            'model_name' => $model_name
                         ]),
                         [
                             'data-title' => Yii::t('d3files', 'Download'),
@@ -40,7 +41,11 @@ use yii\helpers\Url;
                     if (!$readOnly) {
                         echo Html::a(
                             '<span class="glyphicon glyphicon-trash"></span>',
-                            [$urlPrefix . 'd3filesdelete', 'id' => $file['file_model_id']],
+                            [
+                                $urlPrefix . 'd3filesdelete',
+                                'id' => $file['file_model_id'],
+                                'model_name' => $model_name
+                            ],
                             [
                                 'data-title' => Yii::t('d3files', 'Delete'),
                                 'data-placement' => 'top',

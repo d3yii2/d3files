@@ -75,6 +75,7 @@ Allow upload, download, delete files for model record.
     ) ?>
 ```
 
+
 ### D3FilesPreviewWidget
 Extends D3FilesWidget with file preview.
 ```php
@@ -103,6 +104,21 @@ Main layout should have footer code:
  if ($footer = $this->getPageFooter()): ?>
        <?= $footer ?>
 <?php endif; ?>
+=======
+### Widget
+
+Allow upload, download, delete files for model record.
+
+```php
+    <?= d3yii2\d3files\widgets\D3FilesPreviewWidget::widget(
+        [
+            'model'     => $model,
+            'model_id'  => $model->id,
+            'title'     => 'Widget Title',
+            'readOnly'  => false,
+        ]
+    ) ?>
+
 ```
 
 ### Access control
@@ -136,6 +152,7 @@ For implementing access control add separate actions for upload, download and de
                         'allow' => true,
                         'actions' => [
                             'd3filesdownload',
+                            'd3filesopen', //d3filesopen
                             'd3filesupload',
                             'd3filesdelete',
                         ],
@@ -169,6 +186,12 @@ For implementing access control add separate actions for upload, download and de
                 'class' => 'd3yii2\d3files\components\DeleteAction',
                 'modelName' => RkInvoice::className(),
             ],
+            // for D3FilesPreviewWidget
+            'd3filesopen' => [
+                'class' => 'd3yii2\d3files\components\DownloadAction',
+                'modelName' => RkInvoice::class,
+                'downloadType' => 'open'
+            ],            
             
         ];
     }

@@ -157,7 +157,7 @@ if($viewType) {
 }
 
 ?>
-<div class="d3files-widget">
+<div id="d3files-widget-<?= $model_id ?>" class="d3files-widget">
 <table class="table table-striped table-bordered" style="margin-bottom: 0; border-bottom: 0;">
     <?php
     if (!$hideTitle) {
@@ -177,7 +177,7 @@ if($viewType) {
     ?>
     <tr style="border-bottom: 0;">
         <td style="padding: 0; border-bottom: 0;">
-            <div class="d3files-drop-zone" title="<?php echo Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically'); ?>" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
+            <div id="d3files-drop-zone-<?= $model_id ?>" class="d3files-drop-zone" title="<?php echo Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically'); ?>" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
                 <span class="glyphicon glyphicon-cloud-upload"></span>
                 <?php echo Yii::t('d3files', 'Drag&Drop file here'); ?>
             </div>

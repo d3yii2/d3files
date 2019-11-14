@@ -32,7 +32,7 @@ use Yii;
  */
 class D3FilesPreviewWidget extends D3FilesWidget
 {
-    public $icon = 'glyphicon glyphicon-eye-open';
+    public $icon = self::DEFAULT_ICON;
     public $viewByExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
     public $viewByFancyBoxExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
     public $viewExtension = 'pdf';
@@ -46,6 +46,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public $viewType = self::VIEW_TYPE_MODAL;
     public $buttonView = self::VIEW_MODAL_BUTTON;
     public $contentTargetSelector = self::EMBED_CONTENT_CLASS;
+
+    public const DEFAULT_ICON = 'glyphicon glyphicon-eye-open';
 
     public const VIEW_DROPDOWN_LIST = 'dropdown-list';
     public const VIEW_MODAL_BUTTON = '_modal_button';
@@ -262,6 +264,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
             'showPrevNext' => $this->showPrevNext,
             'viewType' => $this->viewType,
             'previewButton' => $this->buttonView,
+            'hasPreview' => true,
         ];
 
         // If the button partial view called directly

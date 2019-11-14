@@ -75,6 +75,36 @@ Allow upload, download, delete files for model record.
     ) ?>
 ```
 
+
+### D3FilesPreviewWidget
+Extends D3FilesWidget with file preview.
+```php
+    <?= d3yii2\d3files\widgets\D3FilesPreviewWidget::widget(
+        [
+            'model' => $model,
+            'model_id' => $model->id,
+            'title' => 'Preview Widget Title',
+            'readOnly'  => false,
+        ]
+    )
+    ?>
+```
+File types are determined automatically to load PDF or images inside modal dialog window.
+
+###
+Dependencies:
+
+eaBlankonThema\widget\ThModal
+
+d3system\yii2\web\D3SystemView
+
+Main layout should have footer code:
+```php
+<?php
+ if ($footer = $this->getPageFooter()): ?>
+       <?= $footer ?>
+<?php endif; ?>
+=======
 ### Widget
 
 Allow upload, download, delete files for model record.
@@ -88,6 +118,7 @@ Allow upload, download, delete files for model record.
             'readOnly'  => false,
         ]
     ) ?>
+
 ```
 
 ### Access control
@@ -189,6 +220,24 @@ d3yii2\d3files\widgets\D3FilesPreviewWidget::widget([
     'defaultExtension' => 'pdf', // Optional (PDF by default),
     'viewExtensions' => ['pdf']  // Optional.- (['pdf', 'png', 'jpg', 'jpeg'] by default)
 ])
+```
+
+For the PDF files server should support iframes. If the files are not loading
+check for the x-frame-options in the respose headers. 
+In case: 
+```php
+x-frame-options: deny
+``` 
+You can set set in webserver configuration:
+```php
+X-Frame-Options:SAMEORIGIN
+```
+Or one of the directives in .htaccess
+```php
+X-Frame-Options: sameorigin
+```
+```php
+X-Frame-Options: "allow-from https://example.com/"
 ```
 
 ### Active Form

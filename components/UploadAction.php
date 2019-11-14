@@ -21,29 +21,35 @@ class UploadAction extends Action
 {
 
     /**
-     * @var string parent model name (with namespace)
+     * @var string|string[] parent model name (with namespace)
      * $_POST['model_name'] is used if controller actions are not disabled
      */
     public $modelName;
 
-    public function run($id)
+    public function run(int $id): string
     {
         // $id here is id for model to which will be attached attachments
 
         Yii::$app->response->format = Response::FORMAT_JSON;
 
+        $postModelName = Yii::$app->request->post('model_name');
+
+        if(!Yii::$app->getModule('d3files')->disableController){
+            if (is_array($this->modelName) && !in_array($postModelName, $this->modelName, true)) {
+                throw new HttpException(422, 'Can not upload file for requested model');
+            }
+
+            if (!is_array($this->modelName) && $postModelName !== $this->modelName) {
+                throw new HttpException(422, 'Can not upload file for requested model');
+            }
+        }
+
         if (!isset($_FILES['upload_file'])) {
             throw new NotFoundHttpException(Yii::t('d3files', 'File not uploaded.'));
         }
 
-        // If controller actions are not disabled, use $_POST['model_name']
-        if (!Yii::$app->getModule('d3files')->disableController) {
-            $this->modelName = Yii::$app->request->post('model_name');
-        }
+        $this->modelName = $postModelName;
 
-        if (empty($this->modelName)) {
-            throw new HttpException(422, Yii::t('d3files', 'mandatory POST parameter modelName is not set'));
-        }
 
         // Check access rights to the record the file is attached to
         D3files::performReadValidation($this->modelName, $id);

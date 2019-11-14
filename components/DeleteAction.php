@@ -3,6 +3,7 @@ namespace d3yii2\d3files\components;
 
 use Yii;
 use yii\base\Action;
+use yii\web\HttpException;
 use yii\web\Response;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
@@ -20,9 +21,22 @@ class DeleteAction extends Action
     
     public $modelName;
     
-    public function run($id)
+    public function run(int $id, string $model_name): string
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if(!Yii::$app->getModule('d3files')->disableController){
+            if (is_array($this->modelName) && !in_array($model_name, $this->modelName, true)) {
+                throw new HttpException(422, 'Can not upload file for requested model');
+            }
+
+            if (!is_array($this->modelName) && $model_name !== $this->modelName) {
+                throw new HttpException(422, 'Can not upload file for requested model');
+            }
+        }
+
+        $this->modelName = $model_name;
+
 
         if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0])) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
@@ -32,15 +46,6 @@ class DeleteAction extends Action
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
-        /**
-         * validate model name
-         */
-        if (Yii::$app->getModule('d3files')->disableController) {
-            if ($fileModelName->name !== $this->modelName) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
-            }            
-        }        
-        
         // Check access rights to the record the file is attached to
         D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
 

@@ -2,7 +2,7 @@ $(function(){
 
     function showError(data, el)
     {
-        $('.d3files-alert').remove();
+        el.find('.d3files-alert').remove();
 
         var html = '<div class="d3files-alert alert alert-danger alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
         html += '<button type="button" class="close" data-dismiss="alert" aria-label="' + D3FilesVars.i18n.aria_label + '"><span aria-hidden="true">&times;</span></button>';
@@ -15,9 +15,24 @@ $(function(){
         el.prepend(html);
     }
 
+    function showSuccess(msg, el)
+    {
+        el.find('.d3files-alert').remove();
+
+        var html = '<div class="d3files-alert alert alert-success alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
+        html += '<button type="button" class="close" data-dismiss="alert" aria-label="' + D3FilesVars.i18n.aria_label + '"><span aria-hidden="true">&times;</span></button>';
+        html += '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> ';
+        html += msg;
+        html += '</div>';
+
+        el.prepend(html);
+    }
+
     $(document).on('click', '.d3files-delete', function(e) {
 
-        $('.d3files-alert').remove();
+        var el = $(this).closest('.d3files-widget');
+
+        el.find('.d3files-alert').remove();
 
         if (!confirm(D3FilesVars.i18n.confirm)) {
             return false;
@@ -26,7 +41,6 @@ $(function(){
         var url = $(this).attr('href');
         var tbl = $(this).closest('table');
         var row = $(this).closest('tr');
-        var el  = $(this).closest('.d3files-widget');
 
         $.ajax({
             url:     url,
@@ -37,6 +51,7 @@ $(function(){
                 if (!tbl.find('tr').length) {
                     addEmptyRow();
                 }
+                showSuccess(data, el);
             },
             error: function(xhr) {
                 showError(xhr.responseJSON, el);
@@ -57,11 +72,17 @@ $(function(){
     });
 
     function uploadFile(file, el) {
-        $('.d3files-alert').remove();
 
-        var tbl = el.find('table.d3files-table');
+        el.find('.d3files-alert').remove();
 
-        var url = el.find('.d3file-input').attr('data-url');
+        var tbl = el.find('table.d3files-table'),
+            hasPreview = el.data('type'),
+            url = el.find('.d3file-input').attr('data-url');
+
+        if (hasPreview) {
+            url += '&preview=1';
+        }
+
         var xhr = new XMLHttpRequest();
         var fd  = new FormData();
         xhr.open('POST', url, true);
@@ -72,6 +93,7 @@ $(function(){
                 if (xhr.status == 200) {
                     tbl.find('div.empty').closest('tr').remove();
                     tbl.append(response);
+                    //showSuccess(response, el);
                 } else {
                     showError(response, el);
                 }

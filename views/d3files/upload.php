@@ -14,6 +14,13 @@ use yii\helpers\Html;
             ['title' => Yii::t('d3files', 'Download'),
         ]) ?>
     </td>
+    <?php if (isset($previewButton)): ?>
+    <td class="col-xs-1">
+        <?php if (isset($previewAttrs)): ?>
+            <?= $this->render($previewButton, ['icon' => $icon, 'previewAttrs' => $previewAttrs]) ?>
+        <?php endif; ?>
+    </td>
+    <?php endif; ?>
     <td class="text-center col-xs-1">
         <?= Html::a(
             '<span class="glyphicon glyphicon-trash"></span>',

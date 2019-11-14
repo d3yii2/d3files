@@ -1,12 +1,14 @@
 <?php
 namespace d3yii2\d3files\components;
 
+use d3yii2\d3files\widgets\D3FilesPreviewWidget;
 use Yii;
 use yii\base\Action;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
 use yii\db\Expression;
+use yii\helpers\Url;
 use yii\web\Response;
 use yii\web\NotFoundHttpException;
 use yii\web\HttpException;
@@ -90,6 +92,21 @@ class UploadAction extends Action
             'file_name' => $model->file_name,
             'file_model_id' => $modelM->id,
         ];
+
+        $hasPreview = Yii::$app->request->get('preview');
+
+        if ($hasPreview) {
+            $file = $renderParam;
+            $file['content-target'] = 'd3files-embed-content';
+            $file['src'] = Url::to(['d3filesopen', 'id' => $modelM->id], true);
+            $renderParam['icon'] = D3FilesPreviewWidget::DEFAULT_ICON;
+            $renderParam['previewButton'] = D3FilesPreviewWidget::VIEW_MODAL_BUTTON;
+            //$files = ModelD3Files::fileListForWidget($this->modelName, $model->id);
+            $files = [$file];
+            $fModel = new D3filesModel();
+            $fModel->id = $id;
+            //$renderParam['previewAttrs'] = D3FilesPreviewWidget::getPreviewModalButtonAttributes($fModel, $file, $files);
+        }
 
         return $this->controller->renderFile(
             Yii::$app->getModule('d3files')->getView('d3files/upload'),

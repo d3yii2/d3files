@@ -20,9 +20,11 @@ use yii\helpers\Url;
 D3FilesAsset::register($this);
 
 $uploadUrl = Url::to([$urlPrefix . 'd3filesupload', 'id' => $model_id]);
+
+$data = isset($hasPreview) ? 'data-type="preview"' : '';
 ?>
 
-<div class="panel d3files-widget">
+<div id="d3files-widget-<?= $model_id ?>" class="panel d3files-widget"<?= $data ?>>
     <div class="panel-heading">
     <?php
     if (!$hideTitle) {

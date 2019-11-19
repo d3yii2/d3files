@@ -199,7 +199,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
             $fileUrl = Url::to(
                 [
                     $this->urlPrefix . 'd3filesopen',
-                    'id' => $file['file_model_id']
+                    'id' => $file['file_model_id'],
+                    'model_name' => $this->model_name,
                 ],
                 true
             );

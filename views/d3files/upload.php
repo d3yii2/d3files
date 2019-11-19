@@ -2,8 +2,15 @@
 
 use yii\helpers\Html;
 
-/* @var $this yii\web\View */
-/* @var $model d3yii2\d3files\models\D3files */
+/**
+ * @var $this yii\web\View
+ * @var string $file_name
+ * @var int $file_model_id
+ * @var string $icon
+ * @var string $model_name
+ * @var string $previewButton
+ * @var array $previewAttrs
+ */
 
 ?>
 <tr data-key="<?= $id; ?>" class="d3files-row">
@@ -24,7 +31,7 @@ use yii\helpers\Html;
     <td class="text-center col-xs-1">
         <?= Html::a(
             '<span class="glyphicon glyphicon-trash"></span>',
-            ['d3filesdelete', 'id' => $file_model_id],
+            ['d3filesdelete', 'id' => $file_model_id, 'model_name' => $model_name],
             ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
         ) ?>
     </td>

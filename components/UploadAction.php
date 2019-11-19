@@ -97,6 +97,7 @@ class UploadAction extends Action
             'id' => $model->id,
             'file_name' => $model->file_name,
             'file_model_id' => $modelM->id,
+            'model_name' => $postModelName
         ];
 
         $hasPreview = Yii::$app->request->get('preview');

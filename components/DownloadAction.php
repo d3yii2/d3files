@@ -24,9 +24,12 @@ class DownloadAction extends Action
 
     public const THE_REQUESTED_FILE_DOES_NOT_EXIST = 'The requested file does not exist.';
 
-    public function run(int $id, string $model_name): void
+    public function run(int $id, string $model_name = ''): void
     {
 
+        if(!$model_name){
+            $model_name = $this->modelName;
+        }
         if(!Yii::$app->getModule('d3files')->disableController){
             if (is_array($this->modelName) && !in_array($model_name, $this->modelName, true)) {
                 throw new HttpException(422, 'Can not upload file for requested model');

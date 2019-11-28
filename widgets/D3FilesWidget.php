@@ -66,7 +66,12 @@ class D3FilesWidget extends Widget
     public $actionColumn;
     public $urlPrefix = '/d3files/d3files/';
 
+    public $uploadButtonPlacement = self::BUTTON_PLACEMENT_LEFT;
+
     public const VIEW_FILES_LIST = 'files-list';
+
+    public const BUTTON_PLACEMENT_LEFT = 'left';
+    public const BUTTON_PLACEMENT_RIGHT = 'right';
 
     /**
      * @throws \yii\db\Exception
@@ -140,6 +145,7 @@ class D3FilesWidget extends Widget
             'viewByExtensions' => $this->viewByExtensions,
             'actionColumn' => $this->actionColumn,
             'readOnly' => $this->readOnly,
+            'uploadButtonPlacement' => $this->uploadButtonPlacement,
         ];
     }
 

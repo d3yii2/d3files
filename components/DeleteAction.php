@@ -21,9 +21,13 @@ class DeleteAction extends Action
     
     public $modelName;
     
-    public function run(int $id, string $model_name): string
+    public function run(int $id, string $model_name = ''): string
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if(!$model_name){
+            $model_name = $this->modelName;
+        }
 
         if(!Yii::$app->getModule('d3files')->disableController){
             if (is_array($this->modelName) && !in_array($model_name, $this->modelName, true)) {

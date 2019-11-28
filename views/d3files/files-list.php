@@ -1,5 +1,6 @@
 <?php
 
+use d3yii2\d3files\widgets\D3FilesWidget;
 use d3yii2\d3files\D3FilesAsset;
 use yii\helpers\Url;
 
@@ -15,6 +16,7 @@ use yii\helpers\Url;
  * @var bool $readOnly
  * @var bool $hideTitle
  * @var array $_params_
+ * @var string $uploadButtonPlacement
  */
 
 D3FilesAsset::register($this);
@@ -22,6 +24,7 @@ D3FilesAsset::register($this);
 $uploadUrl = Url::to([$urlPrefix . 'd3filesupload', 'id' => $model_id]);
 
 $data = isset($hasPreview) ? 'data-type="preview"' : '';
+
 ?>
 
 <div id="d3files-widget-<?= $model_id ?>" class="panel d3files-widget"<?= $data ?>>
@@ -38,8 +41,12 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
                     </h3>
                 </div>
                 <?php
-                if (!$readOnly): ?>
-                <div class="pull-right" data-toggle="tooltip" data-title="<?php echo Yii::t('d3files', 'Upload file'); ?>">
+                if (!$readOnly):
+                    $uploadBtnClass = D3FilesWidget::BUTTON_PLACEMENT_LEFT === $uploadButtonPlacement
+                        ? 'pull-left'
+                        : 'pull-right';
+                    ?>
+                <div class="<?= $uploadBtnClass ?>" data-toggle="tooltip" data-title="<?php echo Yii::t('d3files', 'Upload file'); ?>">
                     <label class="d3files-upload-btn btn btn-success btn-xs" data-title="<?php echo Yii::t('d3files', 'Upload file'); ?>">
                         <input type="file" class="d3file-input" style="display: none;" data-url="<?php echo $uploadUrl; ?>"
                                name="<?php echo $model_name; ?>"/>

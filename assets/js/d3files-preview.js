@@ -10,7 +10,6 @@
 
     $.D3FilesPreview = function () {
         this.handlers = {
-            previewButton: $('.d3files-preview-widget-load'),
             previewDropdown: $('.d3files-preview-dropdown'),
             prevButton: $('.d3files-preview-prev-button'),
             nextButton: $('.d3files-preview-next-button'),
@@ -60,12 +59,13 @@
             $(this.handlers.nextButton).on('click', function () {
                 self.preview($(this));
             });
-            $(this.handlers.previewButton).on('click', function () {
+            $('table .d3files-preview-widget-load').on('click', function () {
                 self.preview($(this));
             });
         },
         preview: function (e) {
             this.handlers.modalMessages.empty();
+            this.handlers.modalContent.empty();
 
             try {
                 let m = this.getAttachmentData(e);
@@ -83,7 +83,9 @@
 
                 this.loadFile(ma);
                 this.renderModelFiles(m);
-                this.initPrevNextButtons(m, this.filesList);
+
+                let fl = 0 < this.selectedRows.length ? this.selectedRows : this.filesList;
+                this.initPrevNextButtons(m, fl);
             } catch (err) {
                 console.log(this.logErrorPrefix + "preview() Catch got: " + err);
             }
@@ -143,9 +145,10 @@
         },
         loadFile: function (f) {
             let ext = this.getFileExtension(f.file_name);
-            if ("pdf" === ext) {
+            if ("pdf" === ext || "PDF" === ext) {
                 try {
                     this.handlers.imageContent.html('').hide();
+                    this.setPdfObject(this.pdfOptions);
                     this.loadPDF(f);
                     this.activeFile = f;
                     return true;
@@ -386,4 +389,8 @@
     };
     let d3fp = new $.D3FilesPreview();
     d3fp.reflow();
+    $(document).on('pjax:success', function() {
+        d3fp.reflow();
+    });
+
 }(jQuery));

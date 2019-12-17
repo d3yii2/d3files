@@ -84,7 +84,7 @@
                 this.loadFile(ma);
                 this.renderModelFiles(m);
 
-                var fl = 0 < this.selectedRows.length ? this.selectedRows : this.filesList;
+                let fl = 0 < this.selectedRows.length ? this.selectedRows : this.filesList;
                 this.initPrevNextButtons(m, fl);
             } catch (err) {
                 console.log(this.logErrorPrefix + "preview() Catch got: " + err);

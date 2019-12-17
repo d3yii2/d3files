@@ -4,6 +4,7 @@ namespace d3yii2\d3files\components;
 
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\widgets\D3FilesPreviewWidget;
+use d3yii2\d3files\widgets\D3FilesWidget;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Exception;
@@ -86,7 +87,7 @@ class D3FilesColumn extends DataColumn
      * @return string
      * @throws \Exception
      */
-    public function renderDataCellContent($model, $key, $index): string
+    public function renderDataCellContent($model, $key, $index)
     {
         try {
             if (empty($this->recordsWithFiles[$model->id])) {
@@ -97,15 +98,15 @@ class D3FilesColumn extends DataColumn
 
             $search = Yii::$app->request->get('RkInvoiceSearch');
 
-        $options = array_merge(
-            [
-                'model' => $model,
-                'fileList' => $modelFiles,
-                'showPrevNextButtons' => true,
-                'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,
-            ],
-            $this->previewOptions
-        );
+            $options = array_merge(
+                [
+                    'model' => $model,
+                    'fileList' => $modelFiles,
+                    'showPrevNextButtons' => true,
+                    'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,
+                ],
+                $this->previewOptions
+            );
 
             if (!empty($search['attachment_type'])) {
                 $options['viewByExtensions'] = [$search['attachment_type']];

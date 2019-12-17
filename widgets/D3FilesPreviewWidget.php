@@ -31,6 +31,11 @@ use d3yii2\d3files\components\D3Files;
  * @var string VIEW_TYPE_MODAL
  * @var string VIEW_TYPE_INLINE
  * @var string EMBED_CONTENT_CLASS
+ *
+ * @property null|string $modalTitle
+ * @property string $filesDropdown
+ * @property string $modalToolbarContent
+ * @property string $assetsUrl
  */
 class D3FilesPreviewWidget extends D3FilesWidget
 {
@@ -87,22 +92,15 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
             if (self::VIEW_TYPE_MODAL !== $this->viewType) {
                 $this->buttonView = self::VIEW_INLINE_BUTTON;
-                $this->pdfObjectOptions = ['wrapperHtmlOptions' => ['style' => 'height:1200px']];
+                $this->pdfObjectOptions = [
+                    'wrapperHtmlOptions' => ['style' => 'height:1200px'],
+                    //'targetElementClass' => self::EMBED_CONTENT_CLASS,
+                ];
             }
 
-            // Add the data attributes for every file
-            $fileList = $this->rebuildFilesList();
-
             // Check for PDF and AJAX loaded attachments to  assets and assign preview attributes
-            foreach ($fileList as $i => $file) {
-                if (self::VIEW_TYPE_NONE !== $this->view) {
-                    $params['previewButton'] = $this->buttonView;
-                    $this->fileList[$i]['previewAttrs'] = self::VIEW_INLINE_BUTTON === $this->buttonView
-                        ? self::getPreviewInlineButtonAttributes($this->model, $file, $fileList)
-                        : self::getPreviewModalButtonAttributes($this->model, $file, $fileList);
-                }
-
-                $ext = self::getFileExtension($file);
+            foreach ($this->fileList as $i => $file) {
+                $ext = D3Files::getFileExtension($file);
                 if ('pdf' === $ext) {
                     $hasPdf = true;
                 } else {
@@ -124,6 +122,13 @@ class D3FilesPreviewWidget extends D3FilesWidget
         }
         $pageFooterHtml = null;
 
+        // Render the PdfObject content in the footer if the files have PDF extension
+        if ($hasPdf && !isset(Yii::$app->view->params['PdfObjectRendered'])) {
+            PDFObject::widget($this->pdfObjectOptions);
+            Yii::$app->view->params['PdfObjectRendered'] = true;
+        }
+
+
         // Ensure modal preview is enabled and the layout rendered once
         if (self::VIEW_TYPE_MODAL === $this->viewType && !isset(Yii::$app->view->params['ThModalRendered'])) {
 
@@ -135,6 +140,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
             // Make modal 80% height of the page
             $modalOptions['dialogHtmlOptions'] = ['style' => 'height:80%'];
+            $modalOptions['contentClass'] = PDFObject::CONTENT_CLASS;
 
             $modalOptions['title'] = $this->getModalTitle();
             $modalOptions['toolbarContent'] = $this->getModalToolbarContent();
@@ -142,11 +148,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
             // Avoid rendering the HTML multiple times by widget second calls
             Yii::$app->view->params['ThModalRendered'] = true;
 
-            // Render the PdfObject content iframe in the footer if the files have PDF extension
-            if ($hasPdf && !isset(Yii::$app->view->params['PdfObjectRendered'])) {
-                $this->pdfObjectOptions['showCloseButton'] = false;
-                $modalOptions['content'] = $this->getPdfContent($this->pdfObjectOptions);
-            }
             $pageFooterHtml .= $this->dialogWidgetClass::widget($modalOptions);
         } else if(self::VIEW_TYPE_INLINE === $this->viewType) {
 
@@ -174,6 +175,32 @@ class D3FilesPreviewWidget extends D3FilesWidget
         );
     }
 
+    public function initFilesList()
+    {
+        // Load the file list if has not been set in constructor
+        $fileList = is_array($this->fileList)
+            ? $this->fileList
+            : ModelD3Files::fileListForWidget($this->model_name, $this->model_id);
+
+        $fl = [];
+        foreach ($fileList as $i => $file) {
+            if (!D3Files::hasViewExtension([$file], $this->viewByExtensions)) {
+                continue;
+            }
+            $file['content-target'] = $this->contentTargetSelector;
+            $file['src'] = Url::to(
+                [
+                    $this->urlPrefix . 'd3filesopen',
+                    'id' => $file['file_model_id'],
+                    'model_name' => $this->model_name,
+                ],
+                true
+            );
+            $fl[$i] = $file;
+        }
+        $this->fileList = $fl;
+    }
+
     /**
      * @return string
      * @throws \yii\base\InvalidConfigException
@@ -182,35 +209,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
     {
         $bundleWebPath = Yii::$app->getAssetManager()->getBundle(D3FilesPreviewAsset::class)->baseUrl;
         return $bundleWebPath;
-    }
-
-    /**
-     * Rebuild files list from parent widget setting additional params for the files
-     * If the File have extension not in the $this->viewByExtensions list it's just excluded
-     * @return array
-     */
-    public function rebuildFilesList(): array
-    {
-        $fl = [];
-        foreach ($this->fileList as $i => $file) {
-            $ext = self::getFileExtension($file);
-
-            if (!in_array($ext, $this->viewByExtensions, true)) {
-                continue;
-            }
-            $fileUrl = Url::to(
-                [
-                    $this->urlPrefix . 'd3filesopen',
-                    'id' => $file['file_model_id'],
-                    'model_name' => $this->model_name,
-                ],
-                true
-            );
-            $file['content-target'] = $this->contentTargetSelector;
-            $file['src'] = $fileUrl;
-            $fl[$i] = $file;
-        }
-        return $fl;
     }
 
     /**
@@ -240,8 +238,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
            <div class="d3preview-image-content" style="display: none"></div>
            ';
 
-        //$content .= $this->getFilesDropdown();
-
         return $content;
     }
 
@@ -254,12 +250,23 @@ class D3FilesPreviewWidget extends D3FilesWidget
     }
 
     /**
-     * @return array
-     * @throws Exception
+     * @return array|null
      */
-    public function getViewParams(): array
+    public function getViewParams(): ?array
     {
-        $file = self::getFirstFileHavingExt($this->fileList, $this->viewExtension);
+        $file = D3Files::getFirstFileHavingExt($this->fileList, $this->viewExtension);
+
+        if (!$file) {
+            return null;
+        }
+
+        if (self::VIEW_FILES_LIST !== $this->viewType && ! D3Files::hasViewExtension([$file], $this->viewByExtensions)) {
+            return null;
+        }
+
+        $previewAttrs = self::VIEW_TYPE_MODAL === $this->viewType
+            ? self::getPreviewModalButtonAttributes($this->model, $file, $this->fileList)
+            : self::getPreviewInlineButtonAttributes($this->model, $file, $this->fileList);
 
         $params = [
             'file' => $file,
@@ -267,13 +274,9 @@ class D3FilesPreviewWidget extends D3FilesWidget
             'showPrevNext' => $this->showPrevNext,
             'viewType' => $this->viewType,
             'previewButton' => $this->buttonView,
+            'previewButtonAttrs' => $previewAttrs,
             'hasPreview' => true,
         ];
-
-        // If the button partial view called directly
-        if (isset($file['previewAttrs'])) {
-            $params['previewAttrs'] = $file['previewAttrs'];
-        }
 
         $params = array_merge(
             parent::getViewParams(),
@@ -300,12 +303,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 ]
             ),
         ];
-
-        /*$ext = parent::getFileExtension($file);
-
-        if ('pdf' !== $ext) {
-            $attrs['data-type'] = 'ajaxbox';
-        }*/
 
         return $attrs;
     }
@@ -352,9 +349,9 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public function getPdfContent(array $options = []): string
     {
-        $pdfOptions = array_merge($this->pdfObjectOptions, $options);
+        $pdfObjectOptions = array_merge($this->pdfObjectOptions, $options);
 
-        return PDFObject::widget($pdfOptions);
+        return PDFObject::widget($pdfObjectOptions);
     }
 
     /**
@@ -365,24 +362,11 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public function getPrevNextFileButtons(?array $data = [], ?array $currentFile = null): string
     {
-
-        $attrs = [
-            'type' => ThButton::TYPE_SUCCESS,
-            'label' => Yii::t('d3files', 'Previous Attachment'),
-            'htmlOptions' => ['class' => 'd3files-preview-prev-button']
-        ];
-
-        //@FIXME - ThButton nevar padot css klasi (htmlOptions tiek pārrakstīts)
-        //$buttons = ThButton::widget($attrs);
         $buttons = '<a id="w80" class="btn btn-success d3files-preview-prev-button">' . Yii::t('d3files',
                 'Previous Attachment') . '</a>';
 
-        //$attrs['label'] = Yii::t('d3files', 'Next Attachment');
-        //$attrs['htmlOptions']['class'] = 'd3files-preview-next-button';
-
         $buttons .= '<a id="w80" class="btn btn-success d3files-preview-next-button">' . Yii::t('d3files',
                 'Next Attachment') . '</a>';
-        //$buttons .= ' ' . ThButton::widget($attrs);
 
         return $buttons;
     }

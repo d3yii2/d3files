@@ -9,7 +9,7 @@
  * @var bool $readOnly
  * @var int $modelId
  * @var string $previewButton
- * @var array $previewAttrs
+ * @var array $previewButtonAttrs
  */
 
 use yii\helpers\Html;
@@ -31,8 +31,8 @@ use yii\helpers\Url;
                             'class' => 'text-primary',
                         ])
                 ?></td><td class="col-xs-1"><?php
-                    if (isset($file['previewAttrs'])) {
-                        echo $this->render($previewButton, ['icon' => $icon, 'previewAttrs' => $file['previewAttrs']]);
+                    if (isset($previewButton)) {
+                        echo $this->render($previewButton, ['icon' => $icon, 'previewButtonAttrs' => $previewButtonAttrs]);
                      }
                 if ($actionColumn && is_callable($actionColumn)) {
                     ?><?$actionColumn($file)?><?php

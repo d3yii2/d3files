@@ -4,6 +4,7 @@ namespace d3yii2\d3files\widgets;
 
 use d3system\exceptions\D3Exception;
 use d3yii2\d3files\D3FilesPreviewAsset;
+use d3yii2\d3files\models\D3files as ModelD3Files;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaBlankonThema\assetbundles\AjaxAsset;
 use eaBlankonThema\widget\ThButton;
@@ -14,6 +15,7 @@ use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use Yii;
+use d3yii2\d3files\components\D3Files;
 
 /**
  * Class D3FilesPreviewWidget

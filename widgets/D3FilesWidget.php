@@ -99,6 +99,15 @@ class D3FilesWidget extends Widget
             $this->model_id = $this->model->primaryKey;
         }
 
+        $this->initFilesList();
+
+        if (!$this->readOnly) {
+            $this->registerJsTranslations();
+        }
+    }
+
+    public function initFilesList()
+    {
         // Load the file list if has not been set in constructor
         if (!$this->fileList) {
             $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);
@@ -115,13 +124,22 @@ class D3FilesWidget extends Widget
             $this->title = Yii::t('d3files', 'Attachments');
         }
 
-        try {
-            return $this->render($this->view, $this->getViewParams());
-        }catch (Exception $exception){
-            Yii::error('D3FilesWidget:run Exception: ' . $exception->getMessage());
+        if (!$this->view) {
+            return '';
         }
 
-        return '';
+        try {
+            $viewParams = $this->getViewParams();
+
+            if (!$viewParams) {
+                return '';
+            }
+
+            return $this->render($this->view, $viewParams);
+        } catch (Exception $exception) {
+            Yii::error('D3FilesWidget:run Exception: ' . $exception->getMessage());
+            return Yii::t('d3files', 'Attachment error');
+        }
     }
 
     /**
@@ -129,8 +147,13 @@ class D3FilesWidget extends Widget
      * May be owerriden by D3FilesPreviewWidget
      * @return array
      */
-    public function getViewParams(): array
+    public function getViewParams(): ?array
     {
+        // There is no files allowed to view
+        if (!D3Files::hasViewExtension($this->fileList, $this->viewByExtensions)) {
+            return null;
+        }
+
         return [
             'model_name' => $this->model_name,
             'model_id' => $this->model_id,

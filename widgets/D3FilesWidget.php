@@ -150,7 +150,7 @@ class D3FilesWidget extends Widget
     public function getViewParams(): ?array
     {
         // There is no files allowed to view
-        if (!D3Files::hasViewExtension($this->fileList, $this->viewByExtensions)) {
+        if ($this->fileList && !D3Files::hasViewExtension($this->fileList, $this->viewByExtensions)) {
             return null;
         }
 

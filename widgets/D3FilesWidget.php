@@ -9,6 +9,7 @@ use Exception;
 use Yii;
 use yii\base\Widget;
 use yii\db\ActiveRecord;
+use yii\helpers\Json;
 
 /**
  * Class`D3FilesWidget`
@@ -75,7 +76,6 @@ class D3FilesWidget extends Widget
     public const BUTTON_PLACEMENT_RIGHT = 'right';
 
     /**
-     * @throws \yii\db\Exception
      * @throws Exception
      */
     public function init(): void
@@ -130,10 +130,6 @@ class D3FilesWidget extends Widget
 
         try {
             $viewParams = $this->getViewParams();
-
-            if (!$viewParams) {
-                return '';
-            }
 
             return $this->render($this->view, $viewParams);
         } catch (Exception $exception) {
@@ -190,9 +186,9 @@ class D3FilesWidget extends Widget
     }
 
 
-    public function registerJsTranslations()
+    public function registerJsTranslations(): void
     {
-        $i18n = \yii\helpers\Json::encode([
+        $i18n = Json::encode([
             'aria_label' => Yii::t('d3files', 'Close'),
             'confirm' => Yii::t('d3files', 'Are you sure you want to delete this item?'),
             'no_results' => Yii::t('d3files', 'No results found.'),

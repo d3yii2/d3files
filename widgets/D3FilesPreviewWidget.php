@@ -7,9 +7,9 @@ use d3yii2\d3files\D3FilesPreviewAsset;
 use d3yii2\d3files\models\D3files as ModelD3Files;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaBlankonThema\assetbundles\AjaxAsset;
-use eaBlankonThema\widget\ThButton;
 use eaBlankonThema\widget\ThModal;
 use Exception;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -149,10 +149,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
             Yii::$app->view->params['ThModalRendered'] = true;
 
             $pageFooterHtml .= $this->dialogWidgetClass::widget($modalOptions);
-        } else if(self::VIEW_TYPE_INLINE === $this->viewType) {
-
-            // Render the PdfObject content iframe in the footer if the files have PDF extension
-            if ($hasPdf) {
+        } else // Render the PdfObject content iframe in the footer if the files have PDF extension
+            if((self::VIEW_TYPE_INLINE === $this->viewType) && $hasPdf) {
 
                 $this->pdfObjectOptions = array_merge(
                     [
@@ -163,7 +161,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 );
                 echo $this->getPdfContent();
             }
-        }
 
         if ($pageFooterHtml) {
             Yii::$app->view->setPageFooter($pageFooterHtml);
@@ -203,12 +200,11 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     /**
      * @return string
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function getAssetsUrl(): string
     {
-        $bundleWebPath = Yii::$app->getAssetManager()->getBundle(D3FilesPreviewAsset::class)->baseUrl;
-        return $bundleWebPath;
+        return Yii::$app->getAssetManager()->getBundle(D3FilesPreviewAsset::class)->baseUrl;
     }
 
     /**
@@ -254,20 +250,12 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public function getViewParams(): ?array
     {
-        $file = D3Files::getFirstFileHavingExt($this->fileList, $this->viewExtension);
-
-        if (!$file) {
-            return null;
+        $previewAttrs = [];
+        if($file = D3Files::getFirstFileHavingExt($this->fileList, $this->viewExtension)) {
+            $previewAttrs = self::VIEW_TYPE_MODAL === $this->viewType
+                ? self::getPreviewModalButtonAttributes($this->model, $file, $this->fileList)
+                : self::getPreviewInlineButtonAttributes($this->model, $file, $this->fileList);
         }
-
-        if (self::VIEW_FILES_LIST !== $this->viewType && ! D3Files::hasViewExtension([$file], $this->viewByExtensions)) {
-            return null;
-        }
-
-        $previewAttrs = self::VIEW_TYPE_MODAL === $this->viewType
-            ? self::getPreviewModalButtonAttributes($this->model, $file, $this->fileList)
-            : self::getPreviewInlineButtonAttributes($this->model, $file, $this->fileList);
-
         $params = [
             'file' => $file,
             'modelId' => $this->model_id,
@@ -294,7 +282,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public static function getPreviewButtonDataAttributes(ActiveRecord $model, array $file, array $files): array
     {
-        $attrs = [
+        return [
             'data-d3files-preview' => Json::encode(
                 [
                     'active' => $file['id'],
@@ -304,7 +292,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
             ),
         ];
 
-        return $attrs;
     }
 
     /**
@@ -315,13 +302,12 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public static function getPreviewInlineButtonAttributes(ActiveRecord $model, array $file, array $files = []): array
     {
-        $attrs = [
+        return [
             'class' => PDFObject::LOAD_BUTTON_CLASS,
             'data-src' => $file['src'],
             'content-target' => self::EMBED_CONTENT_CLASS,
         ];
 
-        return $attrs;
     }
 
     /**

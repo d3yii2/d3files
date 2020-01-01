@@ -133,7 +133,8 @@ class D3FilesWidget extends Widget
 
             return $this->render($this->view, $viewParams);
         } catch (Exception $exception) {
-            Yii::error('D3FilesWidget:run Exception: ' . $exception->getMessage());
+            Yii::error('D3FilesWidget:run Exception message: ' . PHP_EOL . $exception->getMessage());
+            Yii::error('D3FilesWidget:run Exception trace: ' . PHP_EOL . $exception->getTraceAsString());
             return Yii::t('d3files', 'Attachment error');
         }
     }
@@ -146,9 +147,9 @@ class D3FilesWidget extends Widget
     public function getViewParams(): ?array
     {
         // There is no files allowed to view
-        if ($this->fileList && !D3Files::hasViewExtension($this->fileList, $this->viewByExtensions)) {
-            return null;
-        }
+//        if ($this->fileList && !D3Files::hasViewExtension($this->fileList, $this->viewByExtensions)) {
+//            return null;
+//        }
 
         return [
             'model_name' => $this->model_name,

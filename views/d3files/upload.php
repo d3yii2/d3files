@@ -9,7 +9,8 @@ use yii\helpers\Html;
  * @var string $icon
  * @var string $model_name
  * @var string $previewButton
- * @var array $previewAttrs
+ * @var array $file
+ * @var array $fileList
  */
 
 ?>
@@ -23,9 +24,7 @@ use yii\helpers\Html;
     </td>
     <?php if (isset($previewButton)): ?>
     <td class="col-xs-1">
-        <?php if (isset($previewAttrs)): ?>
-            <?= $this->render($previewButton, ['icon' => $icon, 'previewAttrs' => $previewAttrs]) ?>
-        <?php endif; ?>
+        <?= $this->render($previewButton, ['icon' => $icon, 'file' => $file, 'fileList' => $fileList]) ?>
     </td>
     <?php endif; ?>
     <td class="text-center col-xs-1">

@@ -4,7 +4,6 @@ namespace d3yii2\d3files\widgets;
 
 use d3yii2\d3files\components\D3Files;
 use d3yii2\d3files\D3Files as D3FilesModule;
-use d3yii2\d3files\models\D3files as ModelD3Files;
 use Exception;
 use Yii;
 use yii\base\Widget;
@@ -110,7 +109,7 @@ class D3FilesWidget extends Widget
     {
         // Load the file list if has not been set in constructor
         if (!$this->fileList) {
-            $this->fileList = ModelD3Files::fileListForWidget($this->model_name, $this->model_id);
+            $this->fileList = D3Files::getModelFilesList($this->model_name, $this->model_id);
         }
     }
 
@@ -147,9 +146,9 @@ class D3FilesWidget extends Widget
     public function getViewParams(): ?array
     {
         // There is no files allowed to view
-//        if ($this->fileList && !D3Files::hasViewExtension($this->fileList, $this->viewByExtensions)) {
-//            return null;
-//        }
+        if ($this->fileList && !D3Files::hasViewExtension($this->fileList, $this->viewByExtensions)) {
+            return null;
+        }
 
         return [
             'model_name' => $this->model_name,
@@ -193,6 +192,7 @@ class D3FilesWidget extends Widget
             'aria_label' => Yii::t('d3files', 'Close'),
             'confirm' => Yii::t('d3files', 'Are you sure you want to delete this item?'),
             'no_results' => Yii::t('d3files', 'No results found.'),
+            'file_uploaded' => Yii::t('d3files', 'File uploaded successfully.'),
         ]);
         Yii::$app->getView()->registerJs('var D3FilesVars = {i18n: ' . $i18n . '};', Yii::$app->getView()::POS_HEAD);
     }

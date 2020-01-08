@@ -108,24 +108,34 @@ class UploadAction extends Action
             $hasPreview = Yii::$app->request->get('preview');
 
             if ($hasPreview) {
-                $renderParam['icon'] = D3FilesPreviewWidget::DEFAULT_ICON;
-                $renderParam['previewButton'] = D3FilesPreviewWidget::VIEW_MODAL_BUTTON;
-                $fModel = new D3filesModel();
-                $fModel->id = $id;
-                $urlParams = [
-                    'd3filesopen',
-                    'model_name' => $postModelName,
-                ];
+
                 $modelFileList = D3FilesComponent::getModelFilesList($postModelName, $modelM->model_id);
-                $previewFileList = D3FilesComponent::getPreviewFilesList(
-                    $modelFileList,
-                    ['pdf', 'png', 'jpg', 'jpeg'],
-                    $urlParams,
-                    D3FilesPreviewWidget::EMBED_CONTENT_CLASS
-                );
-                $renderParam['fileList'] = $previewFileList;
-                $uploadedFile = D3FilesComponent::getFileFromListById($previewFileList, (string) $model->id);
-                $renderParam['file'] = $uploadedFile ?? [];
+
+                $viewExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
+
+                if (D3FilesComponent::hasViewExtension([$renderParam], $viewExtensions)) {
+                    $fModel = new D3filesModel();
+                    $fModel->id = $id;
+                    $urlParams = [
+                        'd3filesopen',
+                        'model_name' => $postModelName,
+                    ];
+                    $previewFileList = D3FilesComponent::getPreviewFilesList(
+                        $modelFileList,
+                        $viewExtensions,
+                        $urlParams,
+                        D3FilesPreviewWidget::EMBED_CONTENT_CLASS
+                    );
+                    $uploadedFile = D3FilesComponent::getFileFromListById($previewFileList, (string) $model->id);
+                    $file = $uploadedFile ?? [];
+
+                    $renderParam['previewButtonContent'] = $this->controller->renderFile(
+                        $d3filesModule->getView('d3files/' . D3FilesPreviewWidget::VIEW_MODAL_BUTTON),
+                        ['icon' => D3FilesPreviewWidget::DEFAULT_ICON, 'file' => $file, 'fileList' => $previewFileList]
+                    );
+                } else {
+                    $renderParam['previewButtonContent'] = '';
+                }
             }
 
             return $this->controller->renderFile(

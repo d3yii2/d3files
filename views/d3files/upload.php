@@ -8,7 +8,7 @@ use yii\helpers\Html;
  * @var int $file_model_id
  * @var string $icon
  * @var string $model_name
- * @var string $previewButton
+ * @var string $previewButtonContent
  * @var array $file
  * @var array $fileList
  */
@@ -22,9 +22,9 @@ use yii\helpers\Html;
             ['title' => Yii::t('d3files', 'Download'),
         ]) ?>
     </td>
-    <?php if (isset($previewButton)): ?>
+    <?php if (isset($previewButtonContent)): ?>
     <td class="col-xs-1">
-        <?= $this->render($previewButton, ['icon' => $icon, 'file' => $file, 'fileList' => $fileList]) ?>
+        <?= $previewButtonContent ?>
     </td>
     <?php endif; ?>
     <td class="text-center col-xs-1">

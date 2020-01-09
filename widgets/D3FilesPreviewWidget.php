@@ -54,6 +54,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public $viewType = self::VIEW_TYPE_MODAL;
     public $buttonView = self::VIEW_MODAL_BUTTON;
     public $contentTargetSelector = self::EMBED_CONTENT_CLASS;
+    public $nextButtonLabel;
+    public $prevButtonLabel;
 
     public const DEFAULT_ICON = 'glyphicon glyphicon-eye-open';
 
@@ -330,11 +332,12 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public function getPrevNextFileButtons(?array $data = [], ?array $currentFile = null): string
     {
-        $buttons = '<a id="w80" class="btn btn-success d3files-preview-prev-button">' . Yii::t('d3files',
-                'Previous Attachment') . '</a>';
+        $prevButtonLabel = $this->prevButtonLabel ?? Yii::t('d3files', 'Previous Attachment');
+        $nextButtonLabel = $this->nextButtonLabel ?? Yii::t('d3files', 'Next Attachment');
 
-        $buttons .= '<a id="w80" class="btn btn-success d3files-preview-next-button">' . Yii::t('d3files',
-                'Next Attachment') . '</a>';
+        $buttons = '<a id="w80" class="btn btn-success d3files-preview-prev-button">' . $prevButtonLabel . '</a>';
+
+        $buttons .= '<a id="w80" class="btn btn-success d3files-preview-next-button">' . $nextButtonLabel . '</a>';
 
         return $buttons;
     }

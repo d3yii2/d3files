@@ -31,7 +31,8 @@ class D3FilesColumn extends DataColumn
     public $previewOptions = [];
     private $dataProviderIds = [];
     private $recordsWithFiles = [];
-
+    public $nextButtonLabel;
+    public $prevButtonLabel;
     /**
      * Set the initial properties on class init
      */
@@ -104,6 +105,8 @@ class D3FilesColumn extends DataColumn
                     'fileList' => $modelFiles,
                     'showPrevNextButtons' => true,
                     'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,
+                    'nextButtonLabel' => $this->nextButtonLabel,
+                    'prevButtonLabel' => $this->prevButtonLabel,
                 ],
                 $this->previewOptions
             );

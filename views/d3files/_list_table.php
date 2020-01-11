@@ -32,7 +32,7 @@ use yii\helpers\Url;
                         ])
                 ?></td><td class="col-xs-1"><?php
                     if (isset($previewButton)) {
-                        echo $this->render($previewButton, ['icon' => $icon, 'previewButtonAttrs' => $previewButtonAttrs]);
+                        echo $this->render($previewButton, ['icon' => $icon, 'file' => $file, 'fileList' => $fileList]);
                      }
                 if ($actionColumn && is_callable($actionColumn)) {
                     ?><?$actionColumn($file)?><?php

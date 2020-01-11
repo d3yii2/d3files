@@ -4,6 +4,7 @@ namespace d3yii2\d3files\components;
 use Yii;
 use yii\base\Component;
 use yii\helpers\Url;
+use d3yii2\d3files\models\D3files as ModelD3Files;
 
 /**
  * Class D3Files
@@ -73,4 +74,57 @@ class D3Files extends Component
         return $list;
     }
 
+    /**
+     * @param array $fileList
+     * @param array $viewExtensions
+     * @param array $urlParams
+     * @param string $contentTarget
+     * @return array
+     */
+    public static function getPreviewFilesList(array $fileList, array $viewExtensions, array $urlParams, string $contentTarget): array
+    {
+        $fl = [];
+        foreach ($fileList as $i => $file) {
+            if (!self::hasViewExtension([$file], $viewExtensions)) {
+                continue;
+            }
+            $file['content-target'] = $contentTarget;
+            $urlParams['id'] = $file['file_model_id'];
+            $file['src'] = Url::to($urlParams, true);
+            $fl[] = $file;
+        }
+
+        return $fl;
+    }
+
+    /**
+     * @param string $modelName
+     * @param string $modelId
+     * @return array
+     * @throws \yii\db\Exception
+     */
+    public static function getModelFilesList(string $modelName, string $modelId): array
+    {
+        $files = ModelD3Files::fileListForWidget($modelName, $modelId);
+
+        foreach ($files as $i => $f) {
+            $files[$i]['model_id'] = $modelId;
+        }
+        return $files;
+    }
+
+    /**
+     * @param array $list
+     * @param int $id
+     * @return array|null
+     */
+    public static function getFileFromListById(array $list, string $id): ?array
+    {
+        foreach ($list as $file) {
+            if ($id === $file['id']) {
+                return $file;
+            }
+        }
+        return null;
+    }
 }

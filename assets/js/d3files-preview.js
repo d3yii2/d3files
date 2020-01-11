@@ -26,6 +26,7 @@
         this.pdfOptions = {};
         this.previewButtonDataName = 'd3files-preview';
         this.viewByExtension = 'pdf';
+        this.prevNextButtons = false;
 
         this.logErrorPrefix = 'D3FilesPreview error: ';
         this.logWarningPrefix = 'D3FilesPreview warning: ';
@@ -53,12 +54,16 @@
         initHandlers: function () {
             // Make class accesible into event
             let self = this;
-            $(this.handlers.prevButton).on('click', function () {
-                self.preview($(this));
-            });
-            $(this.handlers.nextButton).on('click', function () {
-                self.preview($(this));
-            });
+
+            if (this.prevNextButtons) {
+                $(this.handlers.prevButton).on('click', function () {
+                    self.preview($(this));
+                });
+                $(this.handlers.nextButton).on('click', function () {
+                    self.preview($(this));
+                });
+            }
+
             $('table .d3files-preview-widget-load').on('click', function () {
                 self.preview($(this));
             });
@@ -74,8 +79,8 @@
                     this.handlers.modalMessages.html('Selected: ' + this.selectedRows.length);
                 }
                 this.activeModel = m;
-                let ma = null;
-                    ma = "undefined" === typeof m.active ? this.getNextActiveFile(m) : this.getFileById(m.active, m.files);
+                let fileId = e.data('file-id'),
+                    ma = "undefined" === typeof fileId ? this.getNextActiveFile(m) : this.getFileById(fileId, m.files);
 
                 if (!ma) {
                     throw new Error('Cannot get active file from model');
@@ -85,7 +90,10 @@
                 this.renderModelFiles(m);
 
                 let fl = 0 < this.selectedRows.length ? this.selectedRows : this.filesList;
-                this.initPrevNextButtons(m, fl);
+
+                if (this.prevNextButtons) {
+                    this.initPrevNextButtons(m, fl);
+                }
             } catch (err) {
                 console.log(this.logErrorPrefix + "preview() Catch got: " + err);
             }
@@ -99,7 +107,7 @@
             }
             let af = null;
             $.each(files, function (i, f) {
-                if (f.id === id) {
+                if (parseInt(f.id) === parseInt(id)) {
                     af = f;
                     return false;
                 }
@@ -127,10 +135,10 @@
         getFileByExtension: function (ml, e) {
             let fe = null,
                 self = this;
-            $.each(ml, function (f) {
-                let ext = self.getFileExtension(f.file_name);
+            $.each(ml, function () {
+                let ext = self.getFileExtension(this.file_name);
                 if (e === ext) {
-                    fe = f;
+                    fe = this;
                     return false;
                 }
             });
@@ -232,7 +240,7 @@
             if (s.length === 0) {
                 return null;
             }
-            let i = this.getArrNextIndex(s, currId);
+            let i = this.getArrIndexByVal(s, currId);
             // Just take first selected if current row is not
             if (!i) {
                 let mId = s[0],
@@ -240,6 +248,16 @@
                 return this.filesList[mi];
             }
             return this.filesList[i];
+        },
+        getArrIndexByVal: function (arr, val) {
+            let index = null;
+            $.each(arr, function (i, iv) {
+                if (parseInt(val) === parseInt(iv)) {
+                    index = i;
+                    return false;
+                }
+            });
+            return index;
         },
         getArrPrevIndex: function (arr, index) {
             if (arr.length === 0) {
@@ -387,10 +405,9 @@
             b.data(this.previewButtonDataName, f);
         }
     };
-    let d3fp = new $.D3FilesPreview();
-    d3fp.reflow();
     $(document).on('pjax:success', function() {
-        d3fp.reflow();
+        if ("undefined" !== typeof document.D3FP) {
+            document.D3FP.reflow();
+        }
     });
-
 }(jQuery));

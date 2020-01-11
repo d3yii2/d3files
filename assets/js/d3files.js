@@ -93,9 +93,12 @@ $(function(){
                 if (xhr.status == 200) {
                     tbl.find('div.empty').closest('tr').remove();
                     tbl.append(response);
-                    //showSuccess(response, el);
+                    showSuccess(D3FilesVars.i18n.file_uploaded, el);
+                    if ("undefined" !== typeof document.D3FP) {
+                        document.D3FP.reflow();
+                    }
                 } else {
-                    showError(response, el);
+                    showError(D3FilesVars.i18n.file_not_uploaded, el);
                 }
             }
         };

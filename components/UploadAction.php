@@ -7,8 +7,8 @@ use yii\base\Action;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
+use d3yii2\d3files\components\D3Files as D3FilesComponent;
 use yii\db\Expression;
-use yii\helpers\Url;
 use yii\web\Response;
 use yii\web\NotFoundHttpException;
 use yii\web\HttpException;
@@ -30,94 +30,124 @@ class UploadAction extends Action
 
     public function run(int $id): string
     {
-        // $id here is id for model to which will be attached attachments
+        try {
 
-        Yii::$app->response->format = Response::FORMAT_JSON;
+            // $id here is id for model to which will be attached attachments
 
-        $postModelName = Yii::$app->request->post('model_name');
+            Yii::$app->response->format = Response::FORMAT_JSON;
 
-        if(!Yii::$app->getModule('d3files')->disableController){
-            if (is_array($this->modelName) && !in_array($postModelName, $this->modelName, true)) {
-                throw new HttpException(422, 'Can not upload file for requested model');
+            $postModelName = Yii::$app->request->post('model_name');
+
+            /** @var \d3yii2\d3files\D3Files $d3filesModule */
+            $d3filesModule = Yii::$app->getModule('d3files');
+
+            if (!$d3filesModule->disableController) {
+                if (is_array($this->modelName) && !in_array($postModelName, $this->modelName, true)) {
+                    throw new HttpException(422, 'Can not upload file for requested model');
+                }
+
+                if (!is_array($this->modelName) && $postModelName !== $this->modelName) {
+                    throw new HttpException(422, 'Can not upload file for requested model');
+                }
             }
 
-            if (!is_array($this->modelName) && $postModelName !== $this->modelName) {
-                throw new HttpException(422, 'Can not upload file for requested model');
+            if (!isset($_FILES['upload_file'])) {
+                throw new NotFoundHttpException(Yii::t('d3files', 'File not uploaded.'));
             }
+
+            $this->modelName = $postModelName;
+
+
+            // Check access rights to the record the file is attached to
+            D3files::performReadValidation($this->modelName, $id);
+
+            $tmp_id = uniqid('d3f', false);
+
+            $fileHandler = new FileHandler(
+                [
+                    'model_name' => $this->modelName,
+                    'model_id' => $tmp_id,
+                    'file_name' => $_FILES['upload_file']['name'],
+                ]
+            );
+
+            $fileHandler->upload();
+
+            $model = new D3files();
+
+            $model->file_name = $_FILES['upload_file']['name'];
+            $model->add_datetime = new Expression('NOW()');
+            $model->user_id = Yii::$app->user->getId();
+
+            if ($model->save()) {
+
+                // Get or create model name id
+                $modelMN = new D3filesModelName();
+                $model_name_id = $modelMN->getByName($this->modelName, true);
+
+                $modelM = new D3filesModel();
+                $modelM->d3files_id = $model->id;
+                $modelM->is_file = 1;
+                $modelM->model_name_id = $model_name_id;
+                $modelM->model_id = $id;
+                $modelM->save();
+
+                $fileHandler->rename($model->id);
+            } else {
+                $fileHandler->remove();
+                throw new HttpException(500, Yii::t('d3files', 'Insert DB record failed'));
+            }
+
+            $renderParam = [
+                'id' => $model->id,
+                'file_name' => $model->file_name,
+                'file_model_id' => $modelM->id,
+                'model_name' => $postModelName,
+            ];
+
+            $hasPreview = Yii::$app->request->get('preview');
+
+            if ($hasPreview) {
+
+                $modelFileList = D3FilesComponent::getModelFilesList($postModelName, $modelM->model_id);
+
+                $viewExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
+
+                if (D3FilesComponent::hasViewExtension([$renderParam], $viewExtensions)) {
+                    $fModel = new D3filesModel();
+                    $fModel->id = $id;
+                    $urlParams = [
+                        'd3filesopen',
+                        'model_name' => $postModelName,
+                    ];
+                    $previewFileList = D3FilesComponent::getPreviewFilesList(
+                        $modelFileList,
+                        $viewExtensions,
+                        $urlParams,
+                        D3FilesPreviewWidget::EMBED_CONTENT_CLASS
+                    );
+                    $uploadedFile = D3FilesComponent::getFileFromListById($previewFileList, (string) $model->id);
+                    $file = $uploadedFile ?? [];
+
+                    $renderParam['previewButtonContent'] = $this->controller->renderFile(
+                        $d3filesModule->getView('d3files/' . D3FilesPreviewWidget::VIEW_MODAL_BUTTON),
+                        ['icon' => D3FilesPreviewWidget::DEFAULT_ICON, 'file' => $file, 'fileList' => $previewFileList]
+                    );
+                } else {
+                    $renderParam['previewButtonContent'] = '';
+                }
+            }
+
+            return $this->controller->renderFile(
+                $d3filesModule->getView('d3files/upload'),
+                $renderParam
+            );
+        } catch (HttpException | NotFoundHttpException $e) {
+            Yii::error($e->getMessage());
+            return $e->getMessage();
+        } catch (\Exception $e) {
+            Yii::error($e->getMessage());
+            return '';
         }
-
-        if (!isset($_FILES['upload_file'])) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'File not uploaded.'));
-        }
-
-        $this->modelName = $postModelName;
-
-
-        // Check access rights to the record the file is attached to
-        D3files::performReadValidation($this->modelName, $id);
-
-        $tmp_id = uniqid('d3f',false);
-
-        $fileHandler = new FileHandler(
-            [
-                'model_name' => $this->modelName,
-                'model_id'   => $tmp_id,
-                'file_name'  => $_FILES['upload_file']['name'],
-            ]
-        );
-
-        $fileHandler->upload();
-
-        $model = new D3files();
-
-        $model->file_name    = $_FILES['upload_file']['name'];
-        $model->add_datetime = new Expression('NOW()');
-        $model->user_id      = Yii::$app->user->getId();
-
-        if ($model->save()) {
-
-            // Get or create model name id
-            $modelMN = new D3filesModelName();
-            $model_name_id = $modelMN->getByName($this->modelName, true);
-
-            $modelM = new D3filesModel();
-            $modelM->d3files_id    = $model->id;
-            $modelM->is_file       = 1;
-            $modelM->model_name_id = $model_name_id;
-            $modelM->model_id      = $id;
-            $modelM->save();
-
-            $fileHandler->rename($model->id);
-        } else {
-            $fileHandler->remove();
-            throw new HttpException(500, Yii::t('d3files', 'Insert DB record failed'));
-        }
-
-        $renderParam = [
-            'id' => $model->id,
-            'file_name' => $model->file_name,
-            'file_model_id' => $modelM->id,
-            'model_name' => $postModelName
-        ];
-
-        $hasPreview = Yii::$app->request->get('preview');
-
-        if ($hasPreview) {
-            $file = $renderParam;
-            $file['content-target'] = 'd3files-embed-content';
-            $file['src'] = Url::to(['d3filesopen', 'id' => $modelM->id], true);
-            $renderParam['icon'] = D3FilesPreviewWidget::DEFAULT_ICON;
-            $renderParam['previewButton'] = D3FilesPreviewWidget::VIEW_MODAL_BUTTON;
-            //$files = ModelD3Files::fileListForWidget($this->modelName, $model->id);
-            $files = [$file];
-            $fModel = new D3filesModel();
-            $fModel->id = $id;
-            //$renderParam['previewAttrs'] = D3FilesPreviewWidget::getPreviewModalButtonAttributes($fModel, $file, $files);
-        }
-
-        return $this->controller->renderFile(
-            Yii::$app->getModule('d3files')->getView('d3files/upload'),
-            $renderParam
-        );
     }
 }

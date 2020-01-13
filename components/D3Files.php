@@ -41,14 +41,14 @@ class D3Files extends Component
 
     /**
      * @param array $files
-     * @param array $viewExtensions
+     * @param string $viewExtensions
      * @return bool
      */
-    public static function hasViewExtension(array $files, array $viewExtensions): bool
+    public static function hasViewExtension(array $files, string $viewExtensions): bool
     {
         foreach ($files as $f) {
             $ext = self::getFileExtension($f);
-            if (in_array($ext, $viewExtensions, true)) {
+            if (preg_match($viewExtensions, $ext)) {
                 return true;
                 break;
             }
@@ -76,12 +76,12 @@ class D3Files extends Component
 
     /**
      * @param array $fileList
-     * @param array $viewExtensions
+     * @param string $viewExtensions
      * @param array $urlParams
      * @param string $contentTarget
      * @return array
      */
-    public static function getPreviewFilesList(array $fileList, array $viewExtensions, array $urlParams, string $contentTarget): array
+    public static function getPreviewFilesList(array $fileList, string $viewExtensions, array $urlParams, string $contentTarget): array
     {
         $fl = [];
         foreach ($fileList as $i => $file) {
@@ -126,5 +126,24 @@ class D3Files extends Component
             }
         }
         return null;
+    }
+
+    /**
+     * @param null $modelName
+     * @return string
+     * @throws \ReflectionException
+     */
+    public static function getAllowedFileTypes($modelName = null): string
+    {
+        if ($modelName) {
+            // Check for model defined attachment types first
+            $model = new \ReflectionClass($modelName);
+            $modelFileTypes = $model->getConstant('D3FILES_ALLOWED_EXT_REGEXP');
+            if ($modelFileTypes) {
+                return $modelFileTypes;
+            }
+        }
+
+        return Yii::$app->getModule('d3files')->fileTypes ?? FileHandler::FILE_TYPES;
     }
 }

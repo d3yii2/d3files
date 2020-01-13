@@ -59,9 +59,9 @@ class D3FilesWidget extends Widget
      * Has been renamed since 0.9.18
      * Use $viewByExtensions instead
      */
-    public $viewByFancyBoxExtensions = ['pdf'];
+    public $viewByFancyBoxExtensions;
     //File extensions to show
-    public $viewByExtensions = ['pdf'];
+    public $viewByExtensions;
     public $fileList;
     // Implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php
     public $actionColumn;
@@ -79,6 +79,10 @@ class D3FilesWidget extends Widget
      */
     public function init(): void
     {
+        if (!$this->viewByExtensions) {
+            $this->viewByExtensions = D3Files::getAllowedFileTypes();
+        }
+
         D3FilesModule::registerTranslations();
 
         if (property_exists($this->model, 'd3filesControllerRoute')) {
@@ -129,7 +133,6 @@ class D3FilesWidget extends Widget
 
         try {
             $viewParams = $this->getViewParams();
-
             return $this->render($this->view, $viewParams);
         } catch (Exception $exception) {
             Yii::error('D3FilesWidget:run Exception message: ' . PHP_EOL . $exception->getMessage());
@@ -145,11 +148,6 @@ class D3FilesWidget extends Widget
      */
     public function getViewParams(): ?array
     {
-        // There is no files allowed to view
-        if ($this->fileList && !D3Files::hasViewExtension($this->fileList, $this->viewByExtensions)) {
-            return null;
-        }
-
         return [
             'model_name' => $this->model_name,
             'model_id' => $this->model_id,

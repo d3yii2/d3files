@@ -111,9 +111,9 @@ class UploadAction extends Action
 
                 $modelFileList = D3FilesComponent::getModelFilesList($postModelName, $modelM->model_id);
 
-                $viewExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
+                $previewExtensions = '/(gif|pdf|jpe?g|png)$/i';
 
-                if (D3FilesComponent::hasViewExtension([$renderParam], $viewExtensions)) {
+                if (D3FilesComponent::hasViewExtension([$renderParam], $previewExtensions)) {
                     $fModel = new D3filesModel();
                     $fModel->id = $id;
                     $urlParams = [
@@ -122,7 +122,7 @@ class UploadAction extends Action
                     ];
                     $previewFileList = D3FilesComponent::getPreviewFilesList(
                         $modelFileList,
-                        $viewExtensions,
+                        $previewExtensions,
                         $urlParams,
                         D3FilesPreviewWidget::EMBED_CONTENT_CLASS
                     );

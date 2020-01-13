@@ -14,9 +14,14 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use \d3yii2\d3files\components\D3Files;
 
 ?><div class="table-responsive"><table class="table d3files-table"><?php
         foreach ($fileList as $file) {
+            if (!D3Files::hasViewExtension([$file], $viewByExtensions)) {
+                continue;
+            }
+
             ?><tr><td class="col-xs-10"><?= Html::a(
                         '<i class="fa fa-cloud-download text-primary"></i> ' . $file['file_name'],
                         Url::to([

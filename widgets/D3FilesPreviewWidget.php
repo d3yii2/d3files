@@ -23,26 +23,28 @@ use yii\web\View;
  * @package d3yii2\d3files\widgets
  * Usage by model \d3yii2\d3files\widgets\D3FilesPreviewWidget::widget(['model' => $model])
  * Usage by fileList (attachments are joined already) \d3yii2\d3files\widgets\D3FilesPreviewWidget::widget(['fileList' => $fileList])
- * @var string $viewType
- * @var string $dialogWidgetClass
- * @var array $pdfObjectOptions
- * @var string VIEW_MODAL_BUTTON
- * @var string VIEW_INLINE_BUTTON
- * @var string VIEW_IFRAME
- * @var string VIEW_TYPE_MODAL
- * @var string VIEW_TYPE_INLINE
- * @var string EMBED_CONTENT_CLASS
- *
- * @property null|string $modalTitle
- * @property string $filesDropdown
- * @property string $modalToolbarContent
- * @property string $assetsUrl
  */
 class D3FilesPreviewWidget extends D3FilesWidget
 {
+    /**
+     * @var string $viewType
+     * @var string $dialogWidgetClass
+     * @var array $pdfObjectOptions
+     * @var string VIEW_MODAL_BUTTON
+     * @var string VIEW_INLINE_BUTTON
+     * @var string VIEW_IFRAME
+     * @var string VIEW_TYPE_MODAL
+     * @var string VIEW_TYPE_INLINE
+     * @var string EMBED_CONTENT_CLASS
+     *
+     * @property null|string $modalTitle
+     * @property string $filesDropdown
+     * @property string $modalToolbarContent
+     * @property string $assetsUrl
+     */
+
     public $icon = self::DEFAULT_ICON;
-    public $viewByExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
-    public $viewByFancyBoxExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
+    public $previewExtensions = '/(gif|pdf|jpe?g|png)$/i';
     public $viewExtension = 'pdf';
     public $currentFile;
     public $showPrevNext = false;
@@ -81,11 +83,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
         // Backward compatibility
         if ($this->viewByFancyBox) {
             $this->viewType = self::VIEW_TYPE_MODAL;
-        }
-
-        // Backward compatibility
-        if ($this->viewByFancyBoxExtensions) {
-            $this->viewByExtensions = $this->viewByFancyBoxExtensions;
         }
 
         $hasPdf = false;
@@ -192,7 +189,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
         ];
 
         // Rebuild the list adding some preview params to files
-        $this->fileList = D3Files::getPreviewFilesList($this->fileList, $this->viewByExtensions, $urlParams, $this->contentTargetSelector);
+        $this->fileList = D3Files::getPreviewFilesList($this->fileList, $this->previewExtensions, $urlParams, $this->contentTargetSelector);
 
         return $this->fileList;
     }

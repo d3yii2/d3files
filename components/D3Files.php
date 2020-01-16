@@ -1,8 +1,11 @@
 <?php
 namespace d3yii2\d3files\components;
 
+use ReflectionClass;
+use ReflectionException;
 use Yii;
 use yii\base\Component;
+use yii\db\Exception;
 use yii\helpers\Url;
 use d3yii2\d3files\models\D3files as ModelD3Files;
 
@@ -79,13 +82,20 @@ class D3Files extends Component
      * @param string $viewExtensions
      * @param array $urlParams
      * @param string $contentTarget
+     * @param bool $checkViewExtension
      * @return array
      */
-    public static function getPreviewFilesList(array $fileList, string $viewExtensions, array $urlParams, string $contentTarget): array
+    public static function getPreviewFilesList(
+        array $fileList,
+        string $viewExtensions,
+        array $urlParams,
+        string $contentTarget,
+        bool $checkViewExtension = true
+    ): array
     {
         $fl = [];
         foreach ($fileList as $i => $file) {
-            if (!self::hasViewExtension([$file], $viewExtensions)) {
+            if ($checkViewExtension && !self::hasViewExtension([$file], $viewExtensions)) {
                 continue;
             }
             $file['content-target'] = $contentTarget;
@@ -101,7 +111,7 @@ class D3Files extends Component
      * @param string $modelName
      * @param string $modelId
      * @return array
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     public static function getModelFilesList(string $modelName, string $modelId): array
     {
@@ -115,7 +125,7 @@ class D3Files extends Component
 
     /**
      * @param array $list
-     * @param int $id
+     * @param string $id
      * @return array|null
      */
     public static function getFileFromListById(array $list, string $id): ?array
@@ -131,13 +141,13 @@ class D3Files extends Component
     /**
      * @param null $modelName
      * @return string
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public static function getAllowedFileTypes($modelName = null): string
     {
         if ($modelName) {
             // Check for model defined attachment types first
-            $model = new \ReflectionClass($modelName);
+            $model = new ReflectionClass($modelName);
             $modelFileTypes = $model->getConstant('D3FILES_ALLOWED_EXT_REGEXP');
             if ($modelFileTypes) {
                 return $modelFileTypes;

@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /**
- * @var $this yii\web\View
+ * @var yii\web\View $this
  * @var string $file_name
  * @var int $file_model_id
  * @var string $icon
@@ -14,13 +14,13 @@ use yii\helpers\Html;
  */
 
 ?>
-<tr data-key="<?= $id; ?>" class="d3files-row">
+<tr data-key="<?= $id ?>" class="d3files-row">
     <td class="col-xs-11">
         <?= Html::a(
             $file_name,
             ['d3filesdownload', 'id' => $file_model_id],
-            ['title' => Yii::t('d3files', 'Download'),
-        ]) ?>
+            ['title' => Yii::t('d3files', 'Download')]
+        ) ?>
     </td>
     <?php if (isset($previewButtonContent)): ?>
     <td class="col-xs-1">

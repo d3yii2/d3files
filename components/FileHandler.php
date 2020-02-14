@@ -20,9 +20,9 @@ use function dirname;
  */
 class FileHandler
 {
-    
-    const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip|csv)$/i';
-    
+
+    public const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip|csv)$/i';
+
     protected $options;
 
     /**
@@ -71,7 +71,7 @@ class FileHandler
      * @param $model_name
      * @return string
      */
-    protected static function getUploadDirPath($model_name)
+    protected static function getUploadDirPath($model_name): string
     {
         $pos = strrpos($model_name, '\\');
         $modelShortName = false === $pos ? $model_name : substr($model_name, $pos + 1);
@@ -94,11 +94,7 @@ class FileHandler
             return $modelFileTypes;
         }
 
-        if (isset($options['file_types'])) {
-            return $options['file_types'];
-        }
-
-        return Yii::$app->getModule('d3files')->fileTypes ?? self::FILE_TYPES;
+        return $options['file_types'] ?? Yii::$app->getModule('d3files')->fileTypes ?? self::FILE_TYPES;
     }
 
     /**
@@ -107,7 +103,7 @@ class FileHandler
      * @throws NotFoundHttpException
      * @throws Exception
      */
-    public function upload()
+    public function upload(): bool
     {
         if (!isset($_FILES['upload_file'])) {
             throw new InvalidArgumentException(Yii::t('d3files', 'upload_file is not set'));
@@ -127,17 +123,13 @@ class FileHandler
      * get file path for saving uploaded file
      * @return string
      */
-    public function getFilePath()
+    public function getFilePath(): string
     {
-        if (isset($this->options['file_path'])) {
-            return $this->options['file_path'];
-        }
-
-        return $this->options['upload_dir'] . DIRECTORY_SEPARATOR
-            . self::createSaveFileName(
-                $this->options['model_id'],
-                $this->options['file_name']
-            );
+        return $this->options['file_path'] ?? ($this->options['upload_dir'] . DIRECTORY_SEPARATOR
+                . self::createSaveFileName(
+                    $this->options['model_id'],
+                    $this->options['file_name']
+                ));
     }
 
     /**
@@ -145,7 +137,7 @@ class FileHandler
      * @param $file_name
      * @return string
      */
-    protected static function createSaveFileName($d3files_id, $file_name)
+    protected static function createSaveFileName($d3files_id, $file_name): string
     {
         return $d3files_id . '.' . pathinfo($file_name)['extension'];
     }
@@ -157,7 +149,7 @@ class FileHandler
      * @throws NotFoundHttpException
      * @throws Exception
      */
-    public function uploadYii2UloadFile(UploadedFile $uploadedFile)
+    public function uploadYii2UloadFile(UploadedFile $uploadedFile): bool
     {
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
@@ -174,7 +166,7 @@ class FileHandler
      * @return bool
      * @throws Exception
      */
-    public function save(&$fileContent)
+    public function save(&$fileContent): bool
     {
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
@@ -187,7 +179,7 @@ class FileHandler
      * @param $new_id
      * @throws Exception
      */
-    public function rename($new_id)
+    public function rename($new_id): void
     {
         FileHelper::createDirectory($this->options['upload_dir']);
 
@@ -203,7 +195,7 @@ class FileHandler
     /**
      * @return bool
      */
-    public function remove()
+    public function remove(): bool
     {
         $oldName = $this->options['upload_dir'] . DIRECTORY_SEPARATOR
             . self::createSaveFileName(
@@ -217,7 +209,7 @@ class FileHandler
     /**
      * @throws NotFoundHttpException
      */
-    public function download()
+    public function download(): void
     {
         $file_path = $this->getFilePath();
 
@@ -238,7 +230,7 @@ class FileHandler
     /**
      * @throws NotFoundHttpException
      */
-    public function open()
+    public function open(): void
     {
         $file_path = $this->getFilePath();
 
@@ -259,7 +251,7 @@ class FileHandler
     /**
      * @param $id
      */
-    public function setModelId($id)
+    public function setModelId($id): void
     {
         $this->options['model_id'] = $id;
     }

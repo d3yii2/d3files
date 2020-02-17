@@ -2,6 +2,7 @@
 
 namespace d3yii2\d3files\components;
 
+use d3system\exceptions\D3Exception;
 use ReflectionClass;
 use ReflectionException;
 use Yii;
@@ -177,7 +178,7 @@ class FileHandler
 
     /**
      * @param $new_id
-     * @throws Exception
+     * @throws Exception|D3Exception
      */
     public function rename($new_id): void
     {
@@ -188,8 +189,10 @@ class FileHandler
                 $new_id,
                 $this->options['file_name']
             );
-
-        rename($this->getFilePath(), $newName);
+        $oldName = $this->getFilePath();
+        if (false === rename($oldName, $newName)) {
+            throw new D3Exception('Cannot rename file from: ' . $oldName . ' to: ' . $newName);
+        }
     }
 
     /**

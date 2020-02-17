@@ -189,8 +189,13 @@ class D3FilesPreviewWidget extends D3FilesWidget
         ];
 
         // Rebuild the list adding some preview params to files
-        $this->fileList = D3Files::getPreviewFilesList($this->fileList, $this->previewExtensions, $urlParams, $this->contentTargetSelector);
-
+        foreach ($this->fileList as $i => $file) {
+            if (D3Files::hasFileWithExtension([$file], $this->previewExtensions)) {
+                $urlParams['id'] = $file['file_model_id'];
+                $file['src'] = Url::to($urlParams, true);
+                $fl[] = $file;
+            }
+        }
         return $this->fileList;
     }
 
@@ -251,6 +256,15 @@ class D3FilesPreviewWidget extends D3FilesWidget
             'viewType' => $this->viewType,
             'previewButton' => $this->buttonView,
             'hasPreview' => true,
+            'previewExtensions' => $this->previewExtensions,
+            'previewFileList' => D3Files::getPreviewFilesList(
+                $this->fileList,
+                $this->previewExtensions,
+                [
+                    'd3filesopen',
+                    'model_name' => $this->model_name,
+                ]
+            ),
         ];
 
         if (self::VIEW_MODAL_BUTTON === $this->view || self::VIEW_INLINE_BUTTON === $this->view) {

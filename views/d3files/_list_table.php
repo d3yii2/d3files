@@ -21,7 +21,7 @@ use yii\helpers\Url;
 <div class="table-responsive">
     <table class="table d3files-table"><?php
     foreach ($fileList as $file) {
-        if (!D3Files::hasViewExtension([$file], $viewByExtensions)) {
+        if (!D3Files::hasFileWithExtension([$file], $viewByExtensions)) {
             continue;
         }
 
@@ -44,8 +44,8 @@ use yii\helpers\Url;
             ) ?>
         </td>
         <td class="col-xs-1"><?php
-        if (isset($previewButton)) {
-            echo $this->render($previewButton, compact('icon', 'file', 'fileList'));
+        if (isset($previewExtensions) && isset($previewFileList) && D3Files::fileHasExtension($file, $previewExtensions)) {
+            echo $this->render($previewButton, compact('icon', 'file', 'previewFileList'));
         }
         if ($actionColumn && is_callable($actionColumn)) {
             ?><?php $actionColumn($file);

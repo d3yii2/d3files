@@ -2,9 +2,9 @@
 
 namespace d3yii2\d3files\models;
 
-use d3system\exceptions\D3ActiveRecordException;
 use d3system\exceptions\D3Exception;
 use d3yii2\d3files\components\FileHandler;
+use ReflectionException;
 use RuntimeException;
 use Yii;
 use yii\base\Exception;
@@ -85,6 +85,7 @@ class D3files extends ActiveRecord
      * @param int $userId
      * @throws ForbiddenHttpException
      * @throws Exception
+     * @throws ReflectionException
      */
     public static function saveContent($fileName, $modelName, $modelId, $fileContent, $fileTypes, $userId = 0): void
     {
@@ -175,6 +176,7 @@ class D3files extends ActiveRecord
      * @return array
      * @throws ForbiddenHttpException
      * @throws \yii\db\Exception
+     * @throws ReflectionException
      */
     public static function getRecordFilesList($modelName, $modelId): array
     {

@@ -57,6 +57,18 @@ class D3Files extends Component
     }
 
     /**
+     * @param array $file
+     * @param string $extensions
+     * @return bool
+     * @return bool
+     */
+    public static function fileHasExtension(array $file, string $extensions): bool
+    {
+        $ext = self::getFileExtension($file);
+        return preg_match($extensions, $ext);
+    }
+
+    /**
      * Filter the files by extension
      * @param array $files
      * @param string $ext

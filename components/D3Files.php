@@ -44,11 +44,10 @@ class D3Files extends Component
      * @param string $viewExtensions
      * @return bool
      */
-    public static function hasViewExtension(array $files, string $viewExtensions): bool
+    public static function hasFileWithExtension(array $files, string $extensions): bool
     {
         foreach ($files as $f) {
-            $ext = self::getFileExtension($f);
-            if (preg_match($viewExtensions, $ext)) {
+            if (self::fileHasExtension($f, $extensions)) {
                 return true;
                 break;
             }
@@ -90,22 +89,18 @@ class D3Files extends Component
      * @param array $fileList
      * @param string $viewExtensions
      * @param array $urlParams
-     * @param string $contentTarget
      * @return array
      */
-    public static function getPreviewFilesList(array $fileList, string $viewExtensions, array $urlParams, string $contentTarget): array
+    public static function getPreviewFilesList(array $fileList, string $viewExtensions, array $urlParams): array
     {
         $fl = [];
         foreach ($fileList as $i => $file) {
-            if (!self::hasViewExtension([$file], $viewExtensions)) {
-                continue;
+            if (self::hasFileWithExtension([$file], $viewExtensions)) {
+                $urlParams['id'] = $file['file_model_id'];
+                $file['src'] = Url::to($urlParams, true);
+                $fl[] = $file;
             }
-            $file['content-target'] = $contentTarget;
-            $urlParams['id'] = $file['file_model_id'];
-            $file['src'] = Url::to($urlParams, true);
-            $fl[] = $file;
         }
-
         return $fl;
     }
 

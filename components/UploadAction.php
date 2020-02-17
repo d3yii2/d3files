@@ -2,16 +2,17 @@
 namespace d3yii2\d3files\components;
 
 use d3yii2\d3files\widgets\D3FilesPreviewWidget;
+use Exception;
 use Yii;
-use yii\base\Action;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\d3files\components\D3Files as D3FilesComponent;
 use yii\db\Expression;
-use yii\web\Response;
 use yii\web\NotFoundHttpException;
 use yii\web\HttpException;
+
+use function in_array;
 
 /**
  * Class DownloadAction
@@ -19,24 +20,16 @@ use yii\web\HttpException;
  *
  * Uploads files and adds file records to D3files model
  */
-class UploadAction extends Action
+class UploadAction extends D3FilesAction
 {
-
     /**
-     * @var string|string[] parent model name (with namespace)
-     * $_POST['model_name'] is used if controller actions are not disabled
+     * @param int $id
+     * @return array
      */
-    public $modelName;
-
-    public function run(int $id): string
+    public function run(int $id): array
     {
         try {
-
-            // $id here is id for model to which will be attached attachments
-
-            Yii::$app->response->format = Response::FORMAT_JSON;
-
-            $postModelName = Yii::$app->request->post('model_name');
+           $postModelName = Yii::$app->request->post('model_name');
 
             /** @var \d3yii2\d3files\D3Files $d3filesModule */
             $d3filesModule = Yii::$app->getModule('d3files');
@@ -56,7 +49,6 @@ class UploadAction extends Action
             }
 
             $this->modelName = $postModelName;
-
 
             // Check access rights to the record the file is attached to
             D3files::performReadValidation($this->modelName, $id);
@@ -80,7 +72,6 @@ class UploadAction extends Action
             $model->user_id = Yii::$app->user->getId();
 
             if ($model->save()) {
-
                 // Get or create model name id
                 $modelMN = new D3filesModelName();
                 $model_name_id = $modelMN->getByName($this->modelName, true);
@@ -108,12 +99,11 @@ class UploadAction extends Action
             $hasPreview = Yii::$app->request->get('preview');
 
             if ($hasPreview) {
-
                 $modelFileList = D3FilesComponent::getModelFilesList($postModelName, $modelM->model_id);
 
                 $previewExtensions = '/(gif|pdf|jpe?g|png)$/i';
 
-                if (D3FilesComponent::hasViewExtension([$renderParam], $previewExtensions)) {
+                if (D3FilesComponent::hasFileWithExtension([$renderParam], $previewExtensions)) {
                     $fModel = new D3filesModel();
                     $fModel->id = $id;
                     $urlParams = [
@@ -138,16 +128,19 @@ class UploadAction extends Action
                 }
             }
 
-            return $this->controller->renderFile(
-                $d3filesModule->getView('d3files/upload'),
-                $renderParam
-            );
+            return [
+                self::STATUS => self::STATUS_SUCCESS,
+                self::MESSAGE => Yii::t('d3files', 'File uploaded successfully.'),
+                'content' => $this->controller->renderFile($d3filesModule->getView('d3files/upload'), $renderParam)
+            ];
         } catch (HttpException | NotFoundHttpException $e) {
             Yii::error($e->getMessage());
-            return $e->getMessage();
-        } catch (\Exception $e) {
+            Yii::$app->response->statusCode = 406;
+            return [self::STATUS => self::STATUS_ERROR, self::MESSAGE => $e->getMessage()];
+        } catch (Exception $e) {
             Yii::error($e->getMessage());
-            return '';
+            Yii::$app->response->statusCode = 502;
+            return [self::STATUS => self::STATUS_ERROR, self::MESSAGE => Yii::t('d3system', 'Unexpected Server Error')];
         }
     }
 }

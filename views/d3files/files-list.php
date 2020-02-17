@@ -2,6 +2,7 @@
 
 use d3yii2\d3files\D3FilesAsset;
 use d3yii2\d3files\widgets\D3FilesWidget;
+use yii\bootstrap\Html;
 use yii\helpers\Url;
 
 /**
@@ -48,13 +49,26 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
                         ?>
                         <div class="<?= $uploadBtnClass ?>" data-toggle="tooltip"
                              data-title="<?= Yii::t('d3files', 'Upload file') ?>">
-                            <label class="d3files-upload-btn btn btn-success btn-xs"
-                                   data-title="<?= Yii::t('d3files', 'Upload file') ?>">
-                                <input type="file" class="d3file-input" style="display: none;"
-                                       data-url="<?= $uploadUrl ?>"
-                                       name="<?= $model_name ?>"/>
+                            <?= Html::beginForm(
+                                false,
+                                'POST',
+                                ['class' => 'd3files-upload-form', 'enctype' => 'multipart/form-data']
+                            ) ?>
+                            <label class="d3files-upload-btn btn btn-success btn-xs" data-title="<?=
+                            Yii::t('d3files', 'Upload file') ?>">
+                                <?= Html::fileInput(
+                                    'upload_file',
+                                    null,
+                                    [
+                                         'class' => 'd3file-input',
+                                         'style' => 'display: none',
+                                         'data-url' => $uploadUrl,
+                                         'data-model_name' => $model_name
+                                    ]
+                                ) ?>
                                 <span class="glyphicon glyphicon-plus align-middle" style="cursor: pointer;"></span>
                             </label>
+                            <?= Html::endForm() ?>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -65,7 +79,7 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
             <div class="row">
                 <div class="col-sm-12 d3files-drop-zone"
                      title="<?= Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically') ?>"
-                     style="border: 2px dashed rgb(187,187,187); color: #bbbbbb; text-align: center; padding: 8px;">
+                     style="border: 2px dashed #bbbbbb; color: #bbbbbb; text-align: center; padding: 8px;">
                     <span class="glyphicon glyphicon-cloud-upload"></span>
                     <?= Yii::t('d3files', 'Drag&Drop file here') ?>
                 </div>

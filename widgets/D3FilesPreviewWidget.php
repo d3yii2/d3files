@@ -183,17 +183,15 @@ class D3FilesPreviewWidget extends D3FilesWidget
     {
         parent::initFilesList();
 
-        $urlParams = [
-            $this->urlPrefix . 'd3filesopen',
-            'model_name' => $this->model_name,
-        ];
-
         // Rebuild the list adding some preview params to files
         foreach ($this->fileList as $i => $file) {
             if (D3Files::hasFileWithExtension([$file], $this->previewExtensions)) {
-                $urlParams['id'] = $file['file_model_id'];
-                $file['src'] = Url::to($urlParams, true);
-                $fl[] = $file;
+                $file['src'] = Url::to([
+                    $this->urlPrefix . 'd3filesopen',
+                    'id' => $file['file_model_id'],
+                    'model_name' => $this->model_name,
+                ]);
+                $this->fileList[$i] = $file;
             }
         }
         return $this->fileList;

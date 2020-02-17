@@ -1,146 +1,218 @@
-$(function(){
+/*jslint browser */
+/*globals document, window, $, FormData, D3FilesVars, confirm, console*/
+/*global document, window, $, FormData, D3FilesVars, confirm, console*/
 
-    function showError(data, el)
-    {
-        el.find('.d3files-alert').remove();
+/*jshint esversion: 6 */
 
-        var html = '<div class="d3files-alert alert alert-danger alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
-        html += '<button type="button" class="close" data-dismiss="alert" aria-label="' + D3FilesVars.i18n.aria_label + '"><span aria-hidden="true">&times;</span></button>';
-        html += '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> ';
-        html += '<strong>' + data.status + '</strong> ';
-        html += '<span class="sr-only">' + data.name + '</span> ';
-        html += data.message;
-        html += '</div>';
+function clearAlert(widget) {
+    "use strict";
+    let alert = widget.find(".d3files-alert");
+    alert.remove();
+}
 
-        el.prepend(html);
+function showError(response, widget) {
+    "use strict";
+    let html;
+    let ariaLabel = D3FilesVars.i18n.aria_label;
+    clearAlert(widget);
+    html = "<div class=\"d3files-alert alert alert-danger alert-dismissible\" role=\"alert\">";
+    html += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"" + ariaLabel + "\">" +
+            "<span aria-hidden=\"true\">&times;</span>" +
+            "</button>";
+    html += "<span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span> ";
+    //html += "<strong>" + response.status + "</strong> ";
+    //html += "<span class=\"sr-only\">" + response.name + "</span> ";
+    html += response.msg;
+    html += "</div>";
+
+    widget.prepend(html);
+}
+
+function showSuccess(response, widget) {
+    "use strict";
+    let html;
+    let ariaLabel = D3FilesVars.i18n.aria_label;
+    clearAlert(widget);
+
+    html = "<div class=\"d3files-alert alert alert-success alert-dismissible\" role=\"alert\">";
+    html += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"" + ariaLabel + "\">" +
+            "<span aria-hidden=\"true\">&times;</span>" +
+            "</button>";
+    html += "<span class=\"glyphicon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span> ";
+    html += response.msg;
+    html += "</div>";
+
+    widget.prepend(html);
+}
+
+function uploadFile(file, widget) {
+    "use strict";
+    let form;
+    let fileInputName;
+    let tbl;
+    let hasPreview;
+    let url;
+    let fd;
+    let fileInput;
+
+    tbl = widget.find("table.d3files-table");
+
+    if (0 === tbl.length) {
+        console.log("D3Files error: cannot find the table");
+        return false;
+    }
+    form = widget.find("form");
+
+    if (0 === form.length) {
+        console.log("D3Files error: cannot find the form");
+        return false;
     }
 
-    function showSuccess(msg, el)
-    {
-        el.find('.d3files-alert').remove();
+    clearAlert(widget);
 
-        var html = '<div class="d3files-alert alert alert-success alert-dismissible" role="alert" style="margin: 0; margin-bottom: 1px;">';
-        html += '<button type="button" class="close" data-dismiss="alert" aria-label="' + D3FilesVars.i18n.aria_label + '"><span aria-hidden="true">&times;</span></button>';
-        html += '<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> ';
-        html += msg;
-        html += '</div>';
-
-        el.prepend(html);
+    hasPreview = widget.data("type");
+    fileInput = form.find(".d3file-input");
+    url = fileInput.attr("data-url");
+    if (hasPreview) {
+        url += "&preview=1";
+    }
+    fileInputName = fileInput.data("model_name");
+    fd = new FormData(form[0]);
+    fd.append("model_name", fileInputName);
+    if ("undefined" !== typeof file) {
+        fd.append("upload_file", file);
     }
 
-    $(document).on('click', '.d3files-delete', function(e) {
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: fd,
+        cache: false,
+        processData: false,  // tell jQuery not to process the data
+        contentType: false,  // tell jQuery not to set contentType
+        success: function (data) {
+            //let closestRow = emptyDiv.closest("tr");
+            //closestRow.remove();
+            tbl.append(data.content);
+            showSuccess(data, widget);
+            if ("undefined" !== typeof document.D3FP) {
+                document.D3FP.reflow();
+            }
+        },
+        failed: function (data) {
+            showError(data, widget);
+            console.log(data);
+        },
+        error: function (xhr) {
+            let response = $.parseJSON(xhr.responseText);
+            console.log(response);
+            if (response) {
+                showError(response, widget);
+                console.log(response.error);
+            } else {
+                // This would mean an invalid response from the server - maybe the site went down or whatever...
+                showError({msg: "Unexpected server error"}, widget);
+            }
+        }
+    });
+}
 
-        var el = $(this).closest('.d3files-widget');
+function handleDragLeave(e) {
+    "use strict";
+    let targetElement = $(e.target);
+    targetElement.css("border-color", "#bbb");
+    targetElement.css("color", "#bbbbbb");
+}
 
-        el.find('.d3files-alert').remove();
+function handleFileSelect(e) {
+    "use strict";
+    let file;
+    let targetEl;
+    let closestWidget;
+    e.stopPropagation();
+    e.preventDefault();
+    handleDragLeave(e);
+    targetEl = $(e.target);
+    file = e.dataTransfer.files[0];
+    closestWidget = targetEl.closest(".d3files-widget");
+    uploadFile(file, closestWidget);
+}
+
+function handleDragOver(e) {
+    "use strict";
+    let targetElement = $(e.target);
+    e.stopPropagation();
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy"; // Explicitly show this is a copy.
+    targetElement.css("border-color", "#555");
+    targetElement.css("color", "#555555");
+}
+
+$(function () {
+    "use strict";
+
+    let input;
+    let dropZone;
+    let d = $(document);
+    d.on("click", ".d3files-delete", function () {
+        let url;
+        let tbl;
+        let row;
+        let widget = $(this).closest(".d3files-widget");
+        let alert = widget.find(".d3files-alert");
+
+        alert.remove();
 
         if (!confirm(D3FilesVars.i18n.confirm)) {
             return false;
         }
 
-        var url = $(this).attr('href');
-        var tbl = $(this).closest('table');
-        var row = $(this).closest('tr');
+        url = $(this).attr("href");
+        tbl = $(this).closest("table");
+        row = $(this).closest("tr");
 
         $.ajax({
-            url:     url,
-            type:    'POST',
-            data:    {},
-            success: function(data) {
+            url: url,
+            type: "POST",
+            data: {},
+            success: function (data) {
+                let html;
                 row.remove();
-                if (!tbl.find('tr').length) {
-                    addEmptyRow();
+                if (!tbl.find("tr").length) {
+                    html = "" +
+                            "<tr>" +
+                            "<td colspan=\"2\"><div class=\"empty\">" + D3FilesVars.i18n.no_results + "</div></td>" +
+                            "</tr>";
+                    tbl.append(html);
                 }
-                showSuccess(data, el);
+                showSuccess(data, widget);
             },
-            error: function(xhr) {
-                showError(xhr.responseJSON, el);
+            error: function (xhr) {
+                showError(xhr.responseJSON, widget);
             }
         });
-
-        function addEmptyRow() {
-            var html = '<tr><td colspan="2"><div class="empty">' + D3FilesVars.i18n.no_results + '</div></td></tr>';
-            tbl.append(html);
-        }
-
         return false;
     });
 
-    $('.d3file-input').on('change', function() {
-        uploadFile(this.files[0], $(this).closest('.d3files-widget'));
-        return false;
+    input = $(".d3files-widget input[type=\"file\"]");
+
+    input.on("change", function () {
+        let widget = $(this).closest(".d3files-widget");
+        uploadFile($(this), widget);
     });
 
-    function uploadFile(file, el) {
-
-        el.find('.d3files-alert').remove();
-
-        var tbl = el.find('table.d3files-table'),
-            hasPreview = el.data('type'),
-            url = el.find('.d3file-input').attr('data-url');
-
-        if (hasPreview) {
-            url += '&preview=1';
-        }
-
-        var xhr = new XMLHttpRequest();
-        var fd  = new FormData();
-        xhr.open('POST', url, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                var response = $.parseJSON(xhr.responseText);
-
-                if (xhr.status == 200) {
-                    tbl.find('div.empty').closest('tr').remove();
-                    tbl.append(response);
-                    showSuccess(D3FilesVars.i18n.file_uploaded, el);
-                    if ("undefined" !== typeof document.D3FP) {
-                        document.D3FP.reflow();
-                    }
-                } else {
-                    showError(D3FilesVars.i18n.file_not_uploaded, el);
-                }
-            }
-        };
-        fd.append('model_name', el.find('.d3file-input').attr('name'));
-        fd.append('_csrf', yii.getCsrfToken());
-        fd.append('upload_file', file);
-        xhr.send(fd);
-    }
+    dropZone = $(".d3files-drop-zone");
 
     // Check for the File API support.
-    if (!window.File) {
-        $('.d3files-drop-zone').hide();
-    } else {
-        function handleFileSelect(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            handleDragLeave(e);
-            var file = e.dataTransfer.files[0];
-            uploadFile(file, $(e.target).closest('.d3files-widget'));
-        }
-
-        function handleDragOver(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-            $(e.target).css('border-color', '#555');
-            $(e.target).css('color', '#555');
-        }
-
-        function handleDragLeave(e) {
-            $(e.target).css('border-color', '#bbb');
-            $(e.target).css('color', '#bbb');
-        }
-
+    if (window.File) {
         // Setup the dnd listeners.
-        $('.d3files-drop-zone').each(function() {
-            var dropZone = $(this)[0];
-
-            dropZone.addEventListener('dragover', handleDragOver, false);
-            dropZone.addEventListener('dragleave', handleDragLeave, false);
-            dropZone.addEventListener('drop', handleFileSelect, false);
+        dropZone.each(function () {
+            let dropZoneItem = $(this)[0];
+            dropZoneItem.addEventListener("dragover", handleDragOver, false);
+            dropZoneItem.addEventListener("dragleave", handleDragLeave, false);
+            dropZoneItem.addEventListener("drop", handleFileSelect, false);
         });
-
+    } else {
+        dropZone.hide();
     }
 });

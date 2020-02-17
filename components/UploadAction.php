@@ -103,7 +103,7 @@ class UploadAction extends D3FilesAction
 
                 $previewExtensions = '/(gif|pdf|jpe?g|png)$/i';
 
-                if (D3FilesComponent::hasFileWithExtension([$renderParam], $previewExtensions)) {
+                if (D3FilesComponent::fileHasExtension($renderParam, $previewExtensions)) {
                     $fModel = new D3filesModel();
                     $fModel->id = $id;
                     $urlParams = [
@@ -121,7 +121,7 @@ class UploadAction extends D3FilesAction
 
                     $renderParam['previewButtonContent'] = $this->controller->renderFile(
                         $d3filesModule->getView('d3files/' . D3FilesPreviewWidget::VIEW_MODAL_BUTTON),
-                        ['icon' => D3FilesPreviewWidget::DEFAULT_ICON, 'file' => $file, 'fileList' => $previewFileList]
+                        ['icon' => D3FilesPreviewWidget::DEFAULT_ICON, 'file' => $file, 'previewFileList' => $previewFileList]
                     );
                 } else {
                     $renderParam['previewButtonContent'] = '';

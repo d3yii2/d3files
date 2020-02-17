@@ -68,7 +68,7 @@ class D3FilesWidget extends D3Widget
     public $actionColumn;
     public $urlPrefix = '/d3files/d3files/';
 
-    public $uploadButtonPlacement = self::BUTTON_PLACEMENT_LEFT;
+    public $uploadButtonPlacement = self::BUTTON_PLACEMENT_RIGHT;
 
     public const VIEW_FILES_LIST = 'files-list';
 

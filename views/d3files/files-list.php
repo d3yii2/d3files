@@ -28,7 +28,7 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
 
 ?>
 
-<div id="d3files-widget-<?= $model_id ?>" class="panel d3files-widget"<?= $data ?>>
+<div id="d3files-widget-<?= $model_id ?>" class="panel d3files-widget" <?= $data ?>>
     <div class="panel-heading">
         <?php
         if (!$hideTitle) {

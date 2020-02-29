@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    'Attachment error' => 'Pielikuma kļūda',
     'Cannot upload the file' => 'Failu neizdevās augšuplādēt',
     'File uploaded successfully.' => 'Fails veiksmīgi augšuplādēts',
     'File not uploaded.' => 'Fails netika augšuplādēts',

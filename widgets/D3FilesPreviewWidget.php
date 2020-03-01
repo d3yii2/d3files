@@ -220,17 +220,16 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public function getModalToolbarContent(): string
     {
-        $content = '';
+        $previewButtons = $this->showPrevNextButtons ? $this->getPrevNextFileButtons() : '';
 
-        if ($this->showPrevNextButtons) {
-            $content .= $this->getPrevNextFileButtons();
-        }
-
-        $content .= '
-            <div class="pull-left">
-                <span class="d3preview-model-files"></span>
+        $content = '
+            <div class="row">
+                <div class="col-sm-4"><span class="d3preview-model-files pull-left"></span></div>
+                <div class="col-sm-4 text-center">' . $previewButtons . '</div>
+                <div class="col-sm-4 text-center">
+                   <div class="d3preview-image-content" style="display: none"></div>
+                </div>
            </div>
-           <div class="d3preview-image-content" style="display: none"></div>
            ';
 
         return $content;

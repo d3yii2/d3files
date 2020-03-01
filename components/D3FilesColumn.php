@@ -102,6 +102,7 @@ class D3FilesColumn extends DataColumn
             $options = array_merge(
                 [
                     'model' => $model,
+                    'model_name' => $this->modelClass,
                     'fileList' => $modelFiles,
                     'showPrevNextButtons' => true,
                     'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,

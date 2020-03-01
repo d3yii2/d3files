@@ -42,7 +42,7 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
                         </h3>
                     </div>
                     <?php
-                    if (!$readOnly):
+                    if (!$readOnly) :
                         $uploadBtnClass = D3FilesWidget::BUTTON_PLACEMENT_LEFT === $uploadButtonPlacement
                             ? 'pull-left'
                             : 'pull-right';
@@ -74,18 +74,18 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
                 </div>
             </div>
             <?php
-        }
-        if (!$readOnly): ?>
-            <div class="row">
-                <div class="col-sm-12 d3files-drop-zone"
-                     title="<?= Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically') ?>"
-                     style="border: 2px dashed #bbbbbb; color: #bbbbbb; text-align: center; padding: 8px;">
-                    <span class="glyphicon glyphicon-cloud-upload"></span>
-                    <?= Yii::t('d3files', 'Drag&Drop file here') ?>
+            if (!$readOnly) : ?>
+                <div class="row">
+                    <div class="col-sm-12 d3files-drop-zone"
+                         title="<?= Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically') ?>"
+                         style="border: 2px dashed #bbbbbb; color: #bbbbbb; text-align: center; padding: 8px;">
+                        <span class="glyphicon glyphicon-cloud-upload"></span>
+                        <?= Yii::t('d3files', 'Drag&Drop file here') ?>
+                    </div>
                 </div>
-            </div>
-        <?php endif;
-        if (isset($embedContent)): ?>
+            <?php endif;
+        }
+        if (isset($embedContent)) : ?>
             <div class="row">
                 <?= $embedContent ?>
             </div>

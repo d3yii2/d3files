@@ -164,7 +164,7 @@
                     throw new Error('loadFile got catch: ' + err);
                 }
             }
-            if ("png" === ext || "jpg" === ext|| "jpeg" === ext) {
+            if ("png" === ext || "jpg" === ext || "jpeg" === ext || "gif" === ext) {
                 this.loadImage(f, this.handlers.modalContent);
                 this.activeFile = f;
                 return true;

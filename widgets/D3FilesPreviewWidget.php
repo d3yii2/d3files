@@ -73,6 +73,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public const EMBED_CONTENT_CLASS = 'd3files-embed-content';
     public const PREVIEW_BUTTON_CLASS = 'd3files-preview-button';
 
+    private const MODAL_ID = 'D3FilesPreviewModal';
+
     /**
      * @throws Exception
      */
@@ -118,7 +120,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 Yii::$app->view->params['AjaxAssetRegistered'] = true;
             }
         }
-        $pageFooterHtml = null;
 
         // Render the PdfObject content in the footer if the files have PDF extension
         if ($hasPdf && !isset(Yii::$app->view->params['PdfObjectRendered'])) {
@@ -138,7 +139,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
         }
 
         // Ensure modal preview is enabled and the layout rendered once
-        if (self::VIEW_TYPE_MODAL === $this->viewType && !isset(Yii::$app->view->params['ThModalRendered'])) {
+        if (self::VIEW_TYPE_MODAL === $this->viewType && !isset(Yii::$app->view->params['D3FilesModalRendered'])) {
 
             if (is_callable($this->dialogWidgetClass)) {
                 throw new D3Exception('Invalid Modal Dialog class: ' . $this->dialogWidgetClass);
@@ -148,19 +149,12 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
             // Make modal 80% height of the page
             $modalOptions['dialogHtmlOptions'] = ['style' => 'height:80%'];
+            $modalOptions['id'] = self::MODAL_ID;
             $modalOptions['contentClass'] = PDFObject::CONTENT_CLASS;
-
             $modalOptions['title'] = $this->getModalTitle();
             $modalOptions['toolbarContent'] = $this->getModalToolbarContent();
 
-            // Avoid rendering the HTML multiple times by widget second calls
-            Yii::$app->view->params['ThModalRendered'] = true;
-
-            $pageFooterHtml .= $this->dialogWidgetClass::widget($modalOptions);
-        }
-
-        if ($pageFooterHtml) {
-            Yii::$app->view->setPageFooter($pageFooterHtml);
+            $this->dialogWidgetClass::widget($modalOptions);
         }
 
         Yii::$app->getView()->registerJs(
@@ -225,8 +219,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
         $content = '
             <div class="row">
                 <div class="col-sm-4"><span class="d3preview-model-files pull-left"></span></div>
-                <div class="col-sm-4 text-center">' . $previewButtons . '</div>
-                <div class="col-sm-4 text-center">
+                <div class="col-sm-5 text-center">' . $previewButtons . '</div>
+                <div class="col-sm-3 text-center">
                    <div class="d3preview-image-content" style="display: none"></div>
                 </div>
            </div>
@@ -314,8 +308,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
         $attrs['title'] = Yii::t('d3files', 'Preview atachment');
         $attrs['class'] = 'd3files-preview-widget-load ';
         $attrs['data-toggle'] = 'modal';
-        //@FIXME - modal ID jāpadod widžetam parametros, lai nav atkarīgs no ThModal
-        $attrs['data-target'] = '#' . ThModal::MODAL_ID;
+        $attrs['data-target'] = '#' . self::MODAL_ID;
 
         return $attrs;
     }

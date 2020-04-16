@@ -4,7 +4,6 @@ namespace d3yii2\d3files\components;
 
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\widgets\D3FilesPreviewWidget;
-use d3yii2\d3files\widgets\D3FilesWidget;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Exception;
@@ -88,7 +87,7 @@ class D3FilesColumn extends DataColumn
      * @return string
      * @throws \Exception
      */
-    public function renderDataCellContent($model, $key, $index)
+    public function renderDataCellContent($model, $key, $index): string
     {
         try {
             if (empty($this->recordsWithFiles[$model->id])) {
@@ -108,6 +107,7 @@ class D3FilesColumn extends DataColumn
                     'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,
                     'nextButtonLabel' => $this->nextButtonLabel,
                     'prevButtonLabel' => $this->prevButtonLabel,
+                    'useInColumn' => true,
                 ],
                 $this->previewOptions
             );
@@ -120,6 +120,7 @@ class D3FilesColumn extends DataColumn
         }catch (\Exception $exception){
             Yii::error('D3FilesColumn::renderDataCellContent exception: ' . $exception->getMessage());
         }
+        return '';
     }
 
     /**
@@ -137,13 +138,11 @@ class D3FilesColumn extends DataColumn
 
         $items = D3files::forListBox($this->modelClass, $this->dataProviderIds);
 
-        $dropdown = Html::activeDropDownList(
+        return Html::activeDropDownList(
             $this->model,
             'attachment_type',
             $items,
             $this->filterListBoxOptions
         );
-
-        return $dropdown;
     }
 }

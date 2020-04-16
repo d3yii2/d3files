@@ -2,6 +2,7 @@
 
 namespace d3yii2\d3files\widgets;
 
+use d3system\widgets\D3Widget;
 use d3yii2\d3files\components\D3Files;
 use d3yii2\d3files\D3Files as D3FilesModule;
 use Exception;
@@ -32,7 +33,7 @@ use yii\helpers\Json;
  *
  * @property array $viewParams
  */
-class D3FilesWidget extends Widget
+class D3FilesWidget extends D3Widget
 {
     public $model;
     public $model_name;
@@ -67,7 +68,7 @@ class D3FilesWidget extends Widget
     public $actionColumn;
     public $urlPrefix = '/d3files/d3files/';
 
-    public $uploadButtonPlacement = self::BUTTON_PLACEMENT_LEFT;
+    public $uploadButtonPlacement = self::BUTTON_PLACEMENT_RIGHT;
 
     public const VIEW_FILES_LIST = 'files-list';
 

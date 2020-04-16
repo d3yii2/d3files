@@ -6,13 +6,13 @@ use d3yii2\d3files\widgets\D3FilesPreviewWidget;
 /**
  * @var string $icon
  * @var array $file
- * @var array $fileList
+ * @var array $previewFileList
  */
 
-if (empty($file) || empty($fileList)) {
+if (empty($file) || empty($previewFileList)) {
     echo '';
 } else {
-    $previewButtonAttrs = D3FilesPreviewWidget::getPreviewModalButtonAttributes($file, $fileList);
+    $previewButtonAttrs = D3FilesPreviewWidget::getPreviewModalButtonAttributes($file, $previewFileList);
 
     echo Html::a('<span class="' . $icon . '"></span>', 'javascript:void(0)', $previewButtonAttrs);
 }

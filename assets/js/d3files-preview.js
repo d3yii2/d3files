@@ -164,7 +164,7 @@
                     throw new Error('loadFile got catch: ' + err);
                 }
             }
-            if ("png" === ext || "jpg" === ext|| "jpeg" === ext) {
+            if ("png" === ext || "jpg" === ext || "jpeg" === ext || "gif" === ext) {
                 this.loadImage(f, this.handlers.modalContent);
                 this.activeFile = f;
                 return true;
@@ -336,7 +336,7 @@
             return wf;
         },
         getFileExtension: function(name) {
-            return name.split(/\#|\?/)[0].split('.').pop().trim();
+            return name.split(/\#|\?/)[0].split('.').pop().trim().toLowerCase();
         },
         initFilesListDropdown: function(m) {
             if ("undefined" === m.files) {

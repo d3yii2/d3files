@@ -1,11 +1,8 @@
 <?php
 namespace d3yii2\d3files\components;
 
-use ReflectionClass;
-use ReflectionException;
 use Yii;
 use yii\base\Component;
-use yii\db\Exception;
 use yii\helpers\Url;
 use d3yii2\d3files\models\D3files as ModelD3Files;
 
@@ -47,16 +44,27 @@ class D3Files extends Component
      * @param string $viewExtensions
      * @return bool
      */
-    public static function hasViewExtension(array $files, string $viewExtensions): bool
+    public static function hasFileWithExtension(array $files, string $extensions): bool
     {
         foreach ($files as $f) {
-            $ext = self::getFileExtension($f);
-            if (preg_match($viewExtensions, $ext)) {
+            if (self::fileHasExtension($f, $extensions)) {
                 return true;
                 break;
             }
         }
         return false;
+    }
+
+    /**
+     * @param array $file
+     * @param string $extensions
+     * @return bool
+     * @return bool
+     */
+    public static function fileHasExtension(array $file, string $extensions): bool
+    {
+        $ext = self::getFileExtension($file);
+        return preg_match($extensions, $ext);
     }
 
     /**
@@ -81,29 +89,18 @@ class D3Files extends Component
      * @param array $fileList
      * @param string $viewExtensions
      * @param array $urlParams
-     * @param string $contentTarget
-     * @param bool $checkViewExtension
      * @return array
      */
-    public static function getPreviewFilesList(
-        array $fileList,
-        string $viewExtensions,
-        array $urlParams,
-        string $contentTarget,
-        bool $checkViewExtension = true
-    ): array
+    public static function getPreviewFilesList(array $fileList, string $viewExtensions, array $urlParams): array
     {
         $fl = [];
         foreach ($fileList as $i => $file) {
-            if ($checkViewExtension && !self::hasViewExtension([$file], $viewExtensions)) {
-                continue;
+            if (self::hasFileWithExtension([$file], $viewExtensions)) {
+                $urlParams['id'] = $file['file_model_id'];
+                $file['src'] = Url::to($urlParams, true);
+                $fl[] = $file;
             }
-            $file['content-target'] = $contentTarget;
-            $urlParams['id'] = $file['file_model_id'];
-            $file['src'] = Url::to($urlParams, true);
-            $fl[] = $file;
         }
-
         return $fl;
     }
 
@@ -111,7 +108,7 @@ class D3Files extends Component
      * @param string $modelName
      * @param string $modelId
      * @return array
-     * @throws Exception
+     * @throws \yii\db\Exception
      */
     public static function getModelFilesList(string $modelName, string $modelId): array
     {
@@ -125,7 +122,7 @@ class D3Files extends Component
 
     /**
      * @param array $list
-     * @param string $id
+     * @param int $id
      * @return array|null
      */
     public static function getFileFromListById(array $list, string $id): ?array
@@ -141,13 +138,13 @@ class D3Files extends Component
     /**
      * @param null $modelName
      * @return string
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public static function getAllowedFileTypes($modelName = null): string
     {
         if ($modelName) {
             // Check for model defined attachment types first
-            $model = new ReflectionClass($modelName);
+            $model = new \ReflectionClass($modelName);
             $modelFileTypes = $model->getConstant('D3FILES_ALLOWED_EXT_REGEXP');
             if ($modelFileTypes) {
                 return $modelFileTypes;

@@ -4,13 +4,10 @@ namespace d3yii2\d3files\widgets;
 
 use d3system\exceptions\D3Exception;
 use d3yii2\d3files\D3FilesPreviewAsset;
-use d3yii2\d3files\models\D3files as ModelD3Files;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaBlankonThema\assetbundles\AjaxAsset;
-use eaBlankonThema\widget\ThModal;
 use Exception;
 use yii\base\InvalidConfigException;
-use yii\db\ActiveRecord;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -41,6 +38,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
      * @property string $filesDropdown
      * @property string $modalToolbarContent
      * @property string $assetsUrl
+     * @property bool $useInColumn
      */
 
     public $icon = self::DEFAULT_ICON;
@@ -58,6 +56,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public $contentTargetSelector = self::EMBED_CONTENT_CLASS;
     public $nextButtonLabel;
     public $prevButtonLabel;
+    /** @var bool */
+    public $useInColumn = false;
 
     public const DEFAULT_ICON = 'glyphicon glyphicon-eye-open';
 

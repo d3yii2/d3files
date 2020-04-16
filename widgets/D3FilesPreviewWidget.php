@@ -149,6 +149,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
             // Make modal 80% height of the page
             $modalOptions['dialogHtmlOptions'] = ['style' => 'height:80%'];
+            $modalOptions['contentHtmlOptions'] = ['style' => 'height:100%'];
             $modalOptions['id'] = self::MODAL_ID;
             $modalOptions['contentClass'] = PDFObject::CONTENT_CLASS;
             $modalOptions['title'] = $this->getModalTitle();
@@ -227,6 +228,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
            ';
 
         return $content;
+
     }
 
     public function getFilesDropdown(): string

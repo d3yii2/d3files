@@ -5,3 +5,7 @@
 .d3files-item {
     margin-right: 6px;
  }
+
+.d3preview-image-content {
+    overflow: auto;
+}

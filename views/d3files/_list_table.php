@@ -17,17 +17,13 @@ use d3yii2\d3files\components\D3Files;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-?>
-<div class="table-responsive">
-    <table class="table d3files-table"><?php
+?><div class="table-responsive"><table class="table d3files-table"><?php
     foreach ($fileList as $file) {
         if (!D3Files::hasFileWithExtension([$file], $viewByExtensions)) {
             continue;
         }
 
-        ?>
-        <tr>
-        <td class="col-xs-10"><?=
+        ?><tr><td class="col-xs-10"><?=
             Html::a(
                 '<i class="fa fa-cloud-download text-primary"></i> ' . $file['file_name'],
                 Url::to([
@@ -41,17 +37,13 @@ use yii\helpers\Url;
                     'data-toggle' => 'tooltip',
                     'class' => 'text-primary',
                 ]
-            ) ?>
-        </td>
-        <td class="col-xs-1"><?php
-        if (isset($previewExtensions) && isset($previewFileList) && D3Files::fileHasExtension($file, $previewExtensions)) {
+            ) ?></td><td class="col-xs-1"><?php
+        if (isset($previewExtensions, $previewFileList) && D3Files::fileHasExtension($file, $previewExtensions)) {
             echo $this->render($previewButton, compact('icon', 'file', 'previewFileList'));
         }
         if ($actionColumn && is_callable($actionColumn)) {
-            ?><?php $actionColumn($file);
-        } ?>
-        </td>
-        <td class="text-center col-xs-1"><?php
+            echo $actionColumn($file);
+        } ?></td><td class="text-center col-xs-1"><?php
         if (!$readOnly) {
             echo Html::a(
                 '<span class="glyphicon glyphicon-trash"></span>',
@@ -69,7 +61,5 @@ use yii\helpers\Url;
             );
         }
         ?></td></tr><?php
-    } ?>
-    </table>
-</div>
+    } ?></table></div>
 

@@ -147,8 +147,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
             $modalOptions = [];
 
-            // Make modal 80% height of the page
-            $modalOptions['dialogHtmlOptions'] = ['style' => 'height:80%'];
+            // Force modal width/height
+            $modalOptions['dialogHtmlOptions'] = ['style' => 'width:70%;height:80%'];
             $modalOptions['contentHtmlOptions'] = ['style' => 'height:100%'];
             $modalOptions['id'] = self::MODAL_ID;
             $modalOptions['contentClass'] = PDFObject::CONTENT_CLASS;

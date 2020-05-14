@@ -23,6 +23,7 @@ return [
     'File not uploaded.' => 'Fails netika augšuplādēts',
     'Filter by Attachment' => 'Atlasīt pēc pielikuma',
     'Forbidden file type: {0}' => 'Neatļauts faila tips: {0}',
+    'from' => 'no',
     'ID' => '',
     'Insert DB record failed' => 'Neizdevās izveidot datubāzes ierakstu',
     'The requested file does not exist.' => 'Pieprasītais fails neeksistē',

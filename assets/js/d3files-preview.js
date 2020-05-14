@@ -16,7 +16,11 @@
             modalContent: $('#th-modal .th-modal-content'),
             modalMessages: $('#th-modal .th-modal-messages'),
             imageContent: $('.d3preview-image-content'),
-            filesListContent: $('.d3preview-model-files')
+            filesListContent: $('.d3preview-model-files'),
+            counterI: $(".d3preview-counter-i"),
+            counterFrom: $(".d3preview-counter-from"),
+            counterTotal: $(".d3preview-counter-total"),
+            selectRowCheckbox: $(this.gridSelector)
         };
         this.selectedElementsQuery = '#ThGridViewTable tbody input[type="checkbox"]:checked';
         this.filesList = [];
@@ -34,6 +38,7 @@
         this.activeModel = null;
         this.activeModelIndex = null;
         this.activeFile = null;
+        this.i18n = {Selected: "Selected", from: "from"};
     };
 
     $.D3FilesPreview.prototype = {
@@ -71,13 +76,19 @@
         preview: function (e) {
             this.handlers.modalMessages.empty();
             this.handlers.modalContent.empty();
-
             try {
                 let m = this.getAttachmentData(e);
+                let modelI = 0;
                 this.selectedRows = this.getSelectedRows();
                 if (0 < this.selectedRows.length) {
-                    this.handlers.modalMessages.html('Selected: ' + this.selectedRows.length);
+                    this.handlers.modalMessages.html(this.i18n.Selected + ': ' + this.selectedRows.length);
+                    this.setCounterTotal(this.selectedRows.length);
+                    modelI = this.getArrIndexByVal(this.selectedRows, m.modelId);
+                } else {
+                    this.setCounterTotal(this.filesList.length);
+                    modelI = this.getModelIndex(m.modelId);
                 }
+                this.setCounterI(modelI + 1);
                 this.activeModel = m;
                 let fileId = e.data('file-id'),
                     ma = "undefined" === typeof fileId ? this.getNextActiveFile(m) : this.getFileById(fileId, m.files);
@@ -97,6 +108,15 @@
             } catch (err) {
                 console.log(this.logErrorPrefix + "preview() Catch got: " + err);
             }
+        },
+        setCounterI: function (count) {
+            this.handlers.counterI.text(count);
+        },
+        setCounterFrom: function (text) {
+            this.handlers.counterFrom.text(text);
+        },
+        setCounterTotal: function (count) {
+            this.handlers.counterTotal.text(count);
         },
         getFileById: function (id, files) {
             if ("undefined" === typeof id) {

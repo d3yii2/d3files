@@ -9,7 +9,9 @@
     "use strict";
 
     $.D3FilesPreview = function () {
+        this.gridSelector = '#ThGridViewTable tbody';
         this.handlers = {
+            previewButton: $('.d3files-preview-widget-load'),
             previewDropdown: $('.d3files-preview-dropdown'),
             prevButton: $('.d3files-preview-prev-button'),
             nextButton: $('.d3files-preview-next-button'),
@@ -22,7 +24,6 @@
             counterTotal: $(".d3preview-counter-total"),
             selectRowCheckbox: $(this.gridSelector)
         };
-        this.selectedElementsQuery = '#ThGridViewTable tbody input[type="checkbox"]:checked';
         this.filesList = [];
         this.selectedRows = [];
         this.modelFiles = null;
@@ -69,7 +70,7 @@
                 });
             }
 
-            $('table .d3files-preview-widget-load').on('click', function () {
+            self.handlers.previewButton.on('click', function () {
                 self.preview($(this));
             });
         },
@@ -99,11 +100,13 @@
 
                 this.loadFile(ma);
                 this.renderModelFiles(m);
-
-                let fl = 0 < this.selectedRows.length ? this.selectedRows : this.filesList;
-
                 if (this.prevNextButtons) {
-                    this.initPrevNextButtons(m, fl);
+                    if (this.selectedRows.length) {
+                        this.initPrevNextButtons(m, this.selectedRows);
+                    } else {
+                        let allRows = this.getAllRows();
+                        this.initPrevNextButtons(m, allRows);
+                    }
                 }
             } catch (err) {
                 console.log(this.logErrorPrefix + "preview() Catch got: " + err);
@@ -204,28 +207,6 @@
             img.css('max-height', '400px');
             this.handlers.imageContent.append(img);
         },
-        getPrevModel: function (m, ml) {
-            if ("object" !== typeof m) {
-                throw new TypeError('getPrevModel m argument is not an object');
-            }
-            if ("object" !== typeof ml) {
-                throw new TypeError('getPrevModel ml argument is not an object');
-            }
-            let mi = this.getModelIndex(m.modelId),
-                id = parseInt(this.getArrPrevIndex(ml, mi));
-            return ml[id];
-        },
-        getNextModel: function (m, ml) {
-            if ("object" !== typeof m) {
-                throw new TypeError('getNextModel m argument is not an object');
-            }
-            if ("object" !== typeof ml) {
-                throw new TypeError('getNextModel ml argument is not an object');
-            }
-            let mi = this.getModelIndex(m.modelId),
-                id = parseInt(this.getArrNextIndex(ml, mi));
-            return ml[id];
-        },
         getModelIndex: function (modelId) {
             let index = null;
             $.each(this.filesList, function (i, item) {
@@ -239,35 +220,12 @@
             });
             return index;
         },
-        getPrevModelBySelection: function (currId) {
-            let s = this.getSelectedRows();
-            if (s.length === 0) {
-                return null;
-            }
-            let ml = this.getFilesListFromSelected(s),
-                i = this.getArrPrevIndex(ml, currId);
-            return this.filesList[i];
-        },
         getFilesListFromSelected: function(s) {
             let l = [];
             $(s).each(function () {
                 l.push($(this).val());
             });
             return l;
-        },
-        getNextModelBySelection: function (currId) {
-            let s = this.getSelectedRows();
-            if (s.length === 0) {
-                return null;
-            }
-            let i = this.getArrIndexByVal(s, currId);
-            // Just take first selected if current row is not
-            if (!i) {
-                let mId = s[0],
-                    mi = this.getModelIndex(mId);
-                return this.filesList[mi];
-            }
-            return this.filesList[i];
         },
         getArrIndexByVal: function (arr, val) {
             let index = null;
@@ -278,19 +236,6 @@
                 }
             });
             return index;
-        },
-        getArrPrevIndex: function (arr, index) {
-            if (arr.length === 0) {
-                return null;
-            }
-            let k = index-1;
-            if (0 > k) {
-                return null;
-            }
-            if (-1 === arr[k]) {
-                return null;
-            }
-            return k;
         },
         getArrNextIndex: function (arr, index) {
             if (arr.length === 0) {
@@ -304,6 +249,25 @@
                 return null;
             }
             return k;
+        },
+        getArrNextValue: function(arr, val) {
+            var next = $.inArray(val, arr) + 1;
+            if (next < arr.length) {
+                let nextVal = arr[next];
+                return nextVal;
+            } else {
+                return null;
+            }
+        },
+        getArrPrevValue: function(arr, val) {
+            var prv = $.inArray(val, arr) - 1;
+            if (prv >= 0) {
+                let prevVal = arr[prv];
+                return prevVal;
+            }
+            else {
+                return null;
+            }
         },
         updateFilesList: function () {
             this.filesList = this.buildFilesList();
@@ -320,13 +284,25 @@
         /* Get the array of the files from selected rows */
         getSelectedRows: function () {
             let s = [],
-                rows = $(this.selectedElementsQuery);
+                rows = $(this.gridSelector + ' input[type="checkbox"]:checked');
             // For testing
             /*if (!rows.length) {
-                throw new Error('Selected elements not found by: ' + this.selectedElementsQuery);
+                throw new Error('Selected elements not found by: ' + this.gridSelector);
             }*/
             rows.each(function () {
-                s.push($(this).val());
+                let mid = parseInt($(this).val());
+                if ($("a[data-model-id=" + mid + "]").length > 0) {
+                    s.push(mid);
+                }
+            });
+            return s;
+        },
+        getAllRows: function () {
+            let s = [],
+              rows = $(this.gridSelector + ' a.d3files-preview-widget-load');
+            rows.each(function () {
+                let mid = parseInt($(this).data("model-id"));
+                s.push(mid);
             });
             return s;
         },
@@ -401,20 +377,35 @@
             });
             this.handlers.filesListContent.html(ul);
         },
-        initPrevNextButtons: function(m, ml) {
+        getNextData: function(modelId, arr) {
+            let nextModelId = this.getArrNextValue(arr, modelId);
+            if (! nextModelId) {
+                return null;
+            }
+            let data = $("a[data-model-id=" + nextModelId + "]").data(this.previewButtonDataName);
+            return data;
+        },
+        getPrevData: function(modelId, arr) {
+            let prevModelId = this.getArrPrevValue(arr, modelId);
+            if (! prevModelId) {
+                return null;
+            }
+            let data = $("a[data-model-id=" + prevModelId + "]").data(this.previewButtonDataName);
+            return data;
+        },
+        initPrevNextButtons: function(m, rows) {
             try {
                 this.handlers.nextButton.hide();
                 this.handlers.prevButton.hide();
-
-                let nms = this.getNextModelBySelection(m.modelId),
-                    nm = nms || this.getNextModel(m, ml);
-                if (nm) {
-                    this.setLoadButtonAttrs(this.handlers.nextButton, nm);
+                let modelId = parseInt(m.modelId);
+                let nms = this.getNextData(modelId, rows);
+                if (nms) {
+                    this.setLoadButtonAttrs(this.handlers.nextButton, nms);
                     this.handlers.nextButton.show();
                 }
-                let pm = this.getPrevModel(m, ml);
-                if (pm) {
-                    this.setLoadButtonAttrs(this.handlers.prevButton, pm);
+                let pms = this.getPrevData(modelId, rows);
+                if (pms) {
+                    this.setLoadButtonAttrs(this.handlers.prevButton, pms);
                     this.handlers.prevButton.show();
                 }
             } catch (e) {
@@ -423,6 +414,7 @@
         },
         setLoadButtonAttrs: function(b, f) {
             b.data(this.previewButtonDataName, f);
+            //b.attr('data-' + this.previewButtonDataName, f);
         }
     };
     $(document).on('pjax:success', function() {

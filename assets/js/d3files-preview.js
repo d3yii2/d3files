@@ -73,6 +73,22 @@
             self.handlers.previewButton.on('click', function () {
                 self.preview($(this));
             });
+
+            this.handlers.selectRowCheckbox.on('change', function (e) {
+                self.togglePreviewIcons(e);
+            });
+        },
+        togglePreviewIcons: function (e) {
+            let selectedRows = this.getSelectedRows();
+            if (0 < selectedRows.length) {
+                this.handlers.previewButton.hide();
+                $(selectedRows).each(function () {
+                    let btn = $('a[data-model-id=' + this + ']');
+                    btn.show();
+                });
+            } else {
+                this.handlers.previewButton.show();
+            }
         },
         preview: function (e) {
             this.handlers.modalMessages.empty();

@@ -159,7 +159,9 @@ class D3FilesPreviewWidget extends D3FilesWidget
         }
 
         Yii::$app->getView()->registerJs(
-            'document.D3FP = new $.D3FilesPreview();document.D3FP.setOption("prevNextButtons",  ' . ( $this->showPrevNextButtons ? "true" : "false" ) . ');document.D3FP.reflow();',
+            'document.D3FP = new $.D3FilesPreview();
+                document.D3FP.setOption("prevNextButtons",  ' . ( $this->showPrevNextButtons ? "true" : "false" ) . ');
+                document.D3FP.reflow();',
             View::POS_READY,
             'd3fp'
         );
@@ -219,7 +221,14 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
         $content = '
             <div class="row">
-                <div class="col-sm-4"><span class="d3preview-model-files pull-left"></span></div>
+                <div class="col-sm-4">
+                    <div class="d3preview-counter pull-left">
+                        <span class="d3preview-counter-i"></span>
+                        <span class="d3preview-counter-from">' . Yii::t('d3files', 'from') . '</span>
+                        <span class="d3preview-counter-total"></span>
+                    </div>
+                    <span class="d3preview-model-files pull-left"></span>
+                </div>
                 <div class="col-sm-5 text-center">' . $previewButtons . '</div>
                 <div class="col-sm-3 text-center">
                    <div class="d3preview-image-content" style="display: none"></div>
@@ -282,6 +291,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
         return [
             'data-d3files-preview' => Json::encode(['files' => $files, 'modelId' => $file['model_id']]),
             'data-file-id' => $file['id'],
+            'data-model-id' => $file['model_id'],
         ];
     }
 

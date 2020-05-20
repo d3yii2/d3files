@@ -7,158 +7,140 @@ namespace d3yii2\d3files\components;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
-use ReflectionException;
+use eaBlankonThema\components\FlashHelper;
+use Exception;
 use Yii;
-use yii\base\Action;
-use yii\web\ForbiddenHttpException;
+use yii\db\Expression;
 use yii\web\HttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
+use yii\web\Response;
 
 use function basename;
 use function file_get_contents;
 use function file_put_contents;
+use function in_array;
+use function is_array;
+use function uniqid;
 
-class DownloadFromUrlAction extends Action
+class DownloadFromUrlAction extends D3FilesAction
 {
-    /**
-     * @var string
-     */
-    public $modelClass;
-
-
     public const THE_REQUESTED_FILE_DOES_NOT_EXIST = 'The requested file does not exist.';
     public const THE_REQUEST_INVALID = 'The request is invalid.';
 
     /**
      * @param int $id
-     * @throws HttpException
-     * @throws NotFoundHttpException
-     * @throws ReflectionException
-     * @throws ForbiddenHttpException
+     * @return Response
      */
-    public function run(int $id): void
+    public function run(int $id): Response
     {
-        $modelClass = $this->modelClass;
-        $request    = Yii::$app->request;
+        try {
+            $request       = Yii::$app->request;
+            $postModelName = Yii::$app->request->post('model_name');
 
-//        if (!Yii::$app->getModule('d3files')->disableController) {
-//            if (is_array($this->modelName) && !in_array($modelName, $this->modelName, true)) {
-//                throw new HttpException(422, 'Can not upload file for requested model');
-//            }
-//
-//            if (!is_array($this->modelName) && $modelName !== $this->modelName) {
-//                throw new HttpException(422, 'Can not upload file for requested model');
-//            }
-//        }
+            /** @var \d3yii2\d3files\D3Files $d3filesModule */
+            $d3filesModule = Yii::$app->getModule('d3files');
 
-        if ($request->isPost) {
-            $getResponseMessage = $this->collectFile($request);
-            echo $getResponseMessage;
-        } else {
-            throw new MethodNotAllowedHttpException(Yii::t('d3files', self::THE_REQUEST_INVALID));
-        }
-        exit();
+            //Broken ?
+            if (!$d3filesModule->disableController) {
+                if (is_array($this->modelName) && !in_array($postModelName, $this->modelName, true)) {
+                    throw new HttpException(422, 'Can not upload file for requested model');
+                }
 
+                if (!is_array($this->modelName) && $postModelName !== $this->modelName) {
+                    throw new HttpException(422, 'Can not upload file for requested model');
+                }
+            }
 
-        if (!$fileModel = D3filesModel::findOne(
-            [
-                'id'      => $id,
-                'deleted' => 0
-            ]
-        )) {
-            Yii::error('Can not find D3filesModel. id=' . $id);
-            throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
-        }
+            if (!$this->getRequestFile($request)) {
+                throw new NotFoundHttpException(Yii::t('d3files', 'Download File url is not set.'));
+            }
 
-        if (!$file = D3files::findOne($fileModel->d3files_id)) {
-            Yii::error('Can not find D3files. id=' . $fileModel->d3files_id);
-            throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
-        }
+            $getUrl      = $this->getRequestFile($request);
+            $getFileName = $this->getFileName($getUrl);
 
-        if (!$fileModelName = D3filesModelName::findOne($fileModel->model_name_id)) {
-            Yii::error('Can not find D3filesModelName. id=' . $fileModel->model_name_id);
-            throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
-        }
+            // Check access rights to the record the file is attached to
+            D3files::performReadValidation($this->modelName, $id);
 
-        // Check access rights to the record the file is attached to
-        D3files::performReadValidation($fileModelName->name, (int)$fileModel->model_id);
+            $tmp_id = uniqid('d3f', false);
 
-        $modelName = $fileModelName->name;
-
-        if (!$fileModel->is_file) {
-            if (!$realFileModel = D3filesModel::findOne(
+            $fileHandler = new FileHandler(
                 [
-                    'd3files_id' => $fileModel->d3files_id,
-                    //'deleted' => 0,
-                    'is_file'    => 1
+                    'model_name' => $this->modelName,
+                    'model_id'   => $tmp_id,
+                    'file_name'  => $getFileName,
                 ]
-            )) {
-                Yii::error('No found $realFileModel d3files_id=' . $fileModel->d3files_id);
-                throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
+            );
+
+            if ($request->isPost) {
+                $this->store($getUrl, $fileHandler->getFilePath());
+            } else {
+                throw new MethodNotAllowedHttpException(Yii::t('d3files', self::THE_REQUEST_INVALID));
             }
-            if (!$realfileModelName = D3filesModelName::findOne($realFileModel->model_name_id)) {
-                Yii::error('No found $realfileModelName id=' . $realFileModel->model_name_id);
-                throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
+
+            $model = new D3files();
+
+            $model->file_name    = $getFileName;
+            $model->add_datetime = new Expression('NOW()');
+            $model->user_id      = Yii::$app->user->getId();
+
+            if ($model->save()) {
+                // Get or create model name id
+                $modelMN       = new D3filesModelName();
+                $model_name_id = $modelMN->getByName($this->modelName, true);
+
+                $modelM                = new D3filesModel();
+                $modelM->d3files_id    = $model->id;
+                $modelM->is_file       = 1;
+                $modelM->model_name_id = $model_name_id;
+                $modelM->model_id      = $id;
+                $modelM->save();
+
+                $fileHandler->rename($model->id);
+            } else {
+                $fileHandler->remove();
+                FlashHelper::addDanger(Yii::t('d3files', 'Insert DB record failed'));
             }
 
-            $modelName = $realfileModelName->name;
-            //$modelName
-        }
-
-        $fileHandler = new FileHandler(
-            [
-                'model_name' => $modelName,
-                'model_id'   => $file->id,
-                'file_name'  => $file->file_name,
-            ]
-        );
-        if ($this->downloadType === 'download') {
-            $fileHandler->download();
-            return;
-        }
-
-        if ($this->downloadType === 'open') {
-            $fileHandler->open();
-            return;
+            return $this->controller->goBack();
+        } catch (HttpException | NotFoundHttpException $e) {
+            FlashHelper::addDanger($e->getMessage());
+            return $this->controller->goBack();
+        } catch (Exception $e) {
+            FlashHelper::addDanger($e->getMessage());
+            return $this->controller->goBack();
         }
     }
 
     /**
      * @param Request $request
-     * @return string
+     * @return string|null
      */
-    protected function getRequestFile(Request $request): string
+    protected function getRequestFile(Request $request): ?string
     {
         return $request->post('url');
     }
 
     /**
-     * @param $getUrl
+     * @param string $getUrl
      * @return string
      */
-    protected function getFileName($getUrl): string
+    protected function getFileName(string $getUrl): string
     {
         return basename($getUrl);
     }
 
     /**
-     * @param Request $request
-     * @return string
+     * @param $getUrl
+     * @param $getFileName
      */
-    final public function collectFile(Request $request): string
+    final public function store($getUrl, $getFileName): void
     {
-        $getUrl = $this->getRequestFile($request);
-
-        $fileName = $this->getFileName($getUrl);
-
-        if (file_put_contents($fileName, file_get_contents($getUrl))) {
-            $message = "File downloaded successfully";
+        if (file_put_contents($getFileName, file_get_contents($getUrl))) {
+            FlashHelper::addSuccess(Yii::t('d3files', "File downloaded successfully"));
         } else {
-            $message = "File downloading failed.";
+            FlashHelper::addWarning(Yii::t('d3files', "File downloading failed."));
         }
-
-        return $message;
     }
 }

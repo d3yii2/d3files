@@ -4,6 +4,7 @@ use d3yii2\d3files\D3FilesAsset;
 use eaBlankonThema\widget\ThAlertList;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
+use yii2d3\d3emails\controllers\DownloadFromUrlController;
 
 /**
  * @var bool $viewType
@@ -18,6 +19,8 @@ use yii\helpers\Url;
  * @var bool $hideTitle
  * @var array $_params_
  * @var string $uploadButtonPlacement
+ * @var bool $isSelect
+ *
  */
 
 D3FilesAsset::register($this);
@@ -59,14 +62,26 @@ $uploadUrl = Url::to([$urlPrefix . 'd3downloadfromurl', 'id' => $model_id]);
             $model_name
         ) ?>
 
-        <?= Html::textInput(
-            'url',
-            null,
-            [
-                'class' => 'form-group',
-                'style' => 'width:100%;margin-top: 10px;'
-            ]
-        ) ?>
+        <?php if (!isset($isSelect)): ?>
+            <?= Html::textInput(
+                'url',
+                null,
+                [
+                    'class' => 'form-group',
+                    'style' => 'width:100%;margin-top: 10px;'
+                ]
+            ) ?>
+        <?php else: ?>
+            <?= Html::dropDownList(
+                'url',
+                null,
+                (new DownloadFromUrlController())->view($model),
+                [
+                    'class' => 'form-group',
+                    'style' => 'width:100%;margin-top: 10px;'
+                ]
+            ) ?>
+        <?php endif; ?>
 
         <div class="col-md-12 pull-right">
             <?= \yii\helpers\Html::submitButton(

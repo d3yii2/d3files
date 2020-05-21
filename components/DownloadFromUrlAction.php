@@ -11,6 +11,7 @@ use eaBlankonThema\components\FlashHelper;
 use Exception;
 use Yii;
 use yii\db\Expression;
+use yii\helpers\FileHelper;
 use yii\web\HttpException;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
@@ -18,6 +19,7 @@ use yii\web\Request;
 use yii\web\Response;
 
 use function basename;
+use function dirname;
 use function file_get_contents;
 use function file_put_contents;
 use function in_array;
@@ -74,7 +76,10 @@ class DownloadFromUrlAction extends D3FilesAction
             );
 
             if ($request->isPost) {
-                $this->store($getUrl, $fileHandler->getFilePath());
+                $filePath = $fileHandler->getFilePath();
+                FileHelper::createDirectory(dirname($filePath));
+
+                $this->store($getUrl, $filePath);
             } else {
                 throw new MethodNotAllowedHttpException(Yii::t('d3files', self::THE_REQUEST_INVALID));
             }

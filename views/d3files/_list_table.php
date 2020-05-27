@@ -38,6 +38,7 @@ use yii\helpers\Url;
                     'class' => 'text-primary',
                 ]
             ) ?></td><td class="col-xs-1"><?php
+
         if (isset($previewExtensions, $previewFileList) && D3Files::fileHasExtension($file, $previewExtensions)) {
             echo $this->render($previewButton, compact('icon', 'file', 'previewFileList'));
         }

@@ -38,12 +38,13 @@ use yii\helpers\Url;
                     'class' => 'text-primary',
                 ]
             ) ?></td><td class="col-xs-1"><?php
-        if (isset($previewExtensions) && isset($previewFileList) && D3Files::fileHasExtension($file, $previewExtensions)) {
+
+        if (isset($previewExtensions, $previewFileList) && D3Files::fileHasExtension($file, $previewExtensions)) {
             echo $this->render($previewButton, compact('icon', 'file', 'previewFileList'));
         }
         if ($actionColumn && is_callable($actionColumn)) {
             echo $actionColumn($file);
-        }?></td><td class="text-center col-xs-1"><?php
+        } ?></td><td class="text-center col-xs-1"><?php
         if (!$readOnly) {
             echo Html::a(
                 '<span class="glyphicon glyphicon-trash"></span>',

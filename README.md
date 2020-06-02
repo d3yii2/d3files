@@ -155,6 +155,7 @@ For implementing access control add separate actions for upload, download and de
                             'd3filesopen', //d3filesopen
                             'd3filesupload',
                             'd3filesdelete',
+                            'd3downloadfromurl',
                         ],
                         'roles' => ['role1','role2'],
                     ],
@@ -165,6 +166,7 @@ For implementing access control add separate actions for upload, download and de
                 'actions' => [
                     'd3filedelete' => ['POST'],
                     'd3fileupload' => ['POST'],
+                    'd3downloadfromurl'=> ['POST'],
                 ],
             ],
         ];
@@ -191,8 +193,11 @@ For implementing access control add separate actions for upload, download and de
                 'class' => 'd3yii2\d3files\components\DownloadAction',
                 'modelName' => RkInvoice::class,
                 'downloadType' => 'open'
-            ],            
-            
+            ],  
+            'd3downloadfromurl' => [
+                'class' => DownloadFromUrlAction::class,
+                'modelName' => RkInvoice::class,
+            ],          
         ];
     }
 
@@ -220,6 +225,22 @@ d3yii2\d3files\widgets\D3FilesPreviewWidget::widget([
     'defaultExtension' => 'pdf', // Optional (PDF by default),
     'viewExtensions' => ['pdf']  // Optional.- (['pdf', 'png', 'jpg', 'jpeg'] by default)
 ])
+```
+
+Download From file from url
+```php
+<?=
+d3yii2\d3files\widgets\D3FilesWidget::widget(
+    [
+        'model_name' => RkInvoice::class,
+        'model' => $model,
+        'model_id' => $model->id,
+        'title' => Yii::t('d3lietvediba', 'Download File from url'),
+        'readOnly' => !$fullAccess,
+        'view' => '@d3yii2/d3files/views/d3files/download-from-url'
+    ]
+)
+?>
 ```
 
 For the PDF files server should support iframes. If the files are not loading

@@ -133,9 +133,10 @@ function handleFileSelect(e) {
     e.preventDefault();
     handleDragLeave(e);
     targetEl = $(e.target);
-    file = e.dataTransfer.files[0];
     closestWidget = targetEl.closest(".d3files-widget");
-    uploadFile(file, closestWidget);
+        $.each(e.dataTransfer.files, function (index, file) {
+        uploadFile(file, closestWidget);
+    });
 }
 
 function handleDragOver(e) {

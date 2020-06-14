@@ -334,6 +334,13 @@ $filePath = '/temp/avatar.jpg';
 D3files::saveFile($fileName, Users::className(), $model->id, $filePath, $fileTypes);
 ```
 
+### Attach already saved file to record
+
+```php
+$model = Users::findOne($id);
+D3filesModel::createCopy($fileModelId, Users::class, $model->id);
+```
+
 ### Change log
  - 0.9.0 (Feb 26, 2017) - added RU translation
  - 0.9.3 (May 29, 2017) - auto creating upload directories

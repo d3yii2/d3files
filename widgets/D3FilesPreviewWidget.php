@@ -91,7 +91,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
         $hasAjax = false;
 
         if (self::VIEW_TYPE_NONE !== $this->viewType) {
-
             if (self::VIEW_TYPE_MODAL !== $this->viewType) {
                 $this->buttonView = self::VIEW_INLINE_BUTTON;
                 $this->pdfObjectOptions = [
@@ -123,7 +122,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
         // Render the PdfObject content in the footer if the files have PDF extension
         if ($hasPdf && !isset(Yii::$app->view->params['PdfObjectRendered'])) {
-            if((self::VIEW_TYPE_INLINE === $this->viewType)) {
+            if ((self::VIEW_TYPE_INLINE === $this->viewType)) {
                 $pdfObjectOptions = array_merge(
                     [
                         'closeButtonOptions' => ['label' => Yii::t('d3files', 'Close')],
@@ -140,7 +139,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
         // Ensure modal preview is enabled and the layout rendered once
         if (self::VIEW_TYPE_MODAL === $this->viewType && !isset(Yii::$app->view->params['D3FilesModalRendered'])) {
-
             if (is_callable($this->dialogWidgetClass)) {
                 throw new D3Exception('Invalid Modal Dialog class: ' . $this->dialogWidgetClass);
             }
@@ -160,7 +158,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
         Yii::$app->getView()->registerJs(
             'document.D3FP = new $.D3FilesPreview();
-                document.D3FP.setOption("prevNextButtons",  ' . ( $this->showPrevNextButtons ? "true" : "false" ) . ');
+                document.D3FP.setOption("prevNextButtons",  ' . ($this->showPrevNextButtons ? "true" : "false") . ');
                 document.D3FP.reflow();',
             View::POS_READY,
             'd3fp'
@@ -237,7 +235,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
            ';
 
         return $content;
-
     }
 
     public function getFilesDropdown(): string

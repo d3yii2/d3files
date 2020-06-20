@@ -86,6 +86,11 @@ class D3FilesWidget extends D3Widget
 
         D3FilesModule::registerTranslations();
 
+        // Read the model record from model classname and id if given
+        if ($this->model_name && $this->model_id) {
+            $this->model = $this->model_name::findOne($this->model_id);
+        }
+
         if (property_exists($this->model, 'd3filesControllerRoute')) {
             $this->controllerRoute = $this->model->d3filesControllerRoute;
         }

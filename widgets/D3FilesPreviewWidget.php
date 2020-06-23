@@ -193,8 +193,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
             if (D3Files::hasFileWithExtension([$file], $this->previewExtensions)) {
                 $file['src'] = Url::to([
                     $this->urlPrefix . 'd3filesopen',
-                    'id' => $file['file_model_id'],
-                    'model_name' => $this->model_name,
+                    'model_name_id' => $this->nameModel->id,
                 ]);
                 $this->fileList[$i] = $file;
             }
@@ -269,7 +268,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 $this->previewExtensions,
                 [
                     'd3filesopen',
-                    'model_name' => $this->model_name,
+                    'model_name_id' => $this->nameModel->id,
                 ]
             ),
         ];

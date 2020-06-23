@@ -87,6 +87,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
             $this->viewType = self::VIEW_TYPE_MODAL;
         }
 
+        $hasPreviewFiles = false;
         $hasPdf = false;
         $hasAjax = false;
 
@@ -107,6 +108,10 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 } else {
                     $hasAjax = true;
                 }
+
+                if (D3Files::hasFileWithExtension([$file], $this->previewExtensions)) {
+                    $hasPreviewFiles = true;
+                }
             }
 
             D3FilesPreviewAsset::register(Yii::$app->view);
@@ -121,7 +126,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
         }
 
         // Render the PdfObject content in the footer if the files have PDF extension
-        if ($hasPdf && !isset(Yii::$app->view->params['PdfObjectRendered'])) {
+        // Another preview types (e.g. images are also loaded via PdfObject and some optimization is @TODO)
+        if (($hasPdf || $hasPreviewFiles) && !isset(Yii::$app->view->params['PdfObjectRendered'])) {
             if ((self::VIEW_TYPE_INLINE === $this->viewType)) {
                 $pdfObjectOptions = array_merge(
                     [

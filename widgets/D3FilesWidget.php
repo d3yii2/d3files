@@ -5,6 +5,7 @@ namespace d3yii2\d3files\widgets;
 use d3system\widgets\D3Widget;
 use d3yii2\d3files\components\D3Files;
 use d3yii2\d3files\D3Files as D3FilesModule;
+use d3yii2\d3files\models\D3filesModelName;
 use Exception;
 use Yii;
 use yii\base\Widget;
@@ -37,6 +38,7 @@ class D3FilesWidget extends D3Widget
 {
     public $model;
     public $model_name;
+    public $nameModel;
     public $model_id;
     public $title;
     public $icon = 'glyphicon glyphicon-paperclip';
@@ -107,6 +109,8 @@ class D3FilesWidget extends D3Widget
         if (!$this->model_id && $this->model) {
             $this->model_id = $this->model->primaryKey;
         }
+
+        $this->nameModel = D3filesModelName::findOne(['name' => $this->model_name]);
 
         $this->initFilesList();
 

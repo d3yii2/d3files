@@ -268,7 +268,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 $this->previewExtensions,
                 [
                     'd3filesopen',
-                    'model_name_id' => $this->nameModel->id,
+                    'model_name_id' => $this->nameModel->id ?? null,
                 ]
             ),
         ];

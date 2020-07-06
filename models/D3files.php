@@ -229,6 +229,45 @@ class D3files extends ActiveRecord
 
         $connection = Yii::$app->getDb();
         $command = $connection->createCommand($sSql, $parameters);
+        $raw = $command->getRawSql();
+        return $command->queryAll();
+    }
+
+    /**
+     * get file list for widget by model name id and model id
+     *
+     * @param $modelName
+     * @param $modelId
+     * @return array
+     * @throws \yii\db\Exception
+     */
+    public static function fileListForWidgetByNameId(int $modelNameId, int $modelId): array
+    {
+        $sSql = /** @lang text */
+            '
+            SELECT 
+              f.id,
+              f.file_name,
+              fm.id  file_model_id
+            FROM
+              d3files f
+              INNER JOIN d3files_model fm
+                ON f.id = fm.d3files_id
+              INNER JOIN d3files_model_name fmn
+                ON fm.model_name_id = fmn.id
+            WHERE fmn.name_id    = :model_name_id
+              AND fm.model_id = :model_id
+              AND fm.deleted  = 0
+        ';
+
+        $parameters = [
+            ':model_name_id' => $modelNameId,
+            ':model_id' => $modelId,
+        ];
+
+        $connection = Yii::$app->getDb();
+        $command = $connection->createCommand($sSql, $parameters);
+        $raw = $command->getRawSql();
         return $command->queryAll();
     }
 

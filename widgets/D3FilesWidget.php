@@ -65,7 +65,7 @@ class D3FilesWidget extends D3Widget
     public $viewByFancyBoxExtensions;
     //File extensions to show
     public $viewByExtensions;
-    public $fileList;
+    public $fileList = [];
     // Implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php
     public $actionColumn;
     public $urlPrefix = '/d3files/d3files/';
@@ -88,9 +88,18 @@ class D3FilesWidget extends D3Widget
 
         D3FilesModule::registerTranslations();
 
-        // Read the model record from model classname and id if given
         if ($this->model_name && $this->model_id) {
+            // Find the record by model name and id
             $this->model = $this->model_name::findOne($this->model_id);
+        }
+
+        // Just exit if there is no model data (new record?)
+        if (!$this->model || empty($this->model->primaryKey)) {
+            return;
+        }
+
+        if (!$this->model_name) {
+            $this->model_name = get_class($this->model);
         }
 
         if (property_exists($this->model, 'd3filesControllerRoute')) {
@@ -102,15 +111,13 @@ class D3FilesWidget extends D3Widget
             $this->urlPrefix = $this->controllerRoute;
         }
 
-        if (!$this->model_name) {
-            $this->model_name = get_class($this->model);
-        }
-
-        if (!$this->model_id && $this->model) {
+        if (!$this->model_id) {
             $this->model_id = $this->model->primaryKey;
         }
 
-        $this->nameModel = D3filesModelName::findOne(['name' => $this->model_name]);
+        if (!$this->nameModel) {
+            $this->nameModel = D3filesModelName::findOne(['name' => $this->model_name]);
+        }
 
         $this->initFilesList();
 

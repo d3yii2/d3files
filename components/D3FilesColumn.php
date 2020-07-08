@@ -3,6 +3,7 @@
 namespace d3yii2\d3files\components;
 
 use d3yii2\d3files\models\D3files;
+use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\d3files\widgets\D3FilesPreviewWidget;
 use Yii;
 use yii\db\ActiveRecord;
@@ -25,6 +26,7 @@ class D3FilesColumn extends DataColumn
 {
     public $model;
     public $modelClass;
+    public $nameModel;
     public $filterListBoxOptions = [];
     public $showFilter = false;
     public $previewOptions = [];
@@ -65,6 +67,7 @@ class D3FilesColumn extends DataColumn
 
         try {
             $recordsWithFiles = D3files::getAllByModelRecordIds($this->modelClass, $this->dataProviderIds);
+            $this->nameModel = D3filesModelName::findOne(['name' => $this->modelClass]);
         } catch (Exception $exception) {
             Yii::error('D3FilesColumn::initFiles exception: ' . $exception->getMessage());
             return;
@@ -101,7 +104,7 @@ class D3FilesColumn extends DataColumn
             $options = array_merge(
                 [
                     'model' => $model,
-                    'model_name' => $this->modelClass,
+                    'nameModel' => $this->nameModel,
                     'fileList' => $modelFiles,
                     'showPrevNextButtons' => true,
                     'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,

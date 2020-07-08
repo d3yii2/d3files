@@ -4,6 +4,7 @@ namespace d3yii2\d3files\widgets;
 
 use d3system\exceptions\D3Exception;
 use d3yii2\d3files\D3FilesPreviewAsset;
+use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaBlankonThema\assetbundles\AjaxAsset;
 use Exception;
@@ -187,6 +188,10 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public function initFilesList(): array
     {
         parent::initFilesList();
+    
+        if (!$this->nameModel) {
+            $this->nameModel = D3filesModelName::findOne(['name' => $this->model_name]);
+        }
 
         // Rebuild the list adding some preview params to files
         foreach ($this->fileList as $i => $file) {
@@ -298,18 +303,19 @@ class D3FilesPreviewWidget extends D3FilesWidget
             'data-model-id' => $file['model_id'],
         ];
     }
-
+    
     /**
      * @param array $file
+     * @param array $files
      * @return array
      */
-    public static function getPreviewInlineButtonAttributes(array $file): array
+    public static function getPreviewInlineButtonAttributes(array $file, array $files = []): array
     {
-        return [
-            'class' => PDFObject::LOAD_BUTTON_CLASS,
-            'data-src' => $file['src'],
-            'content-target' => self::EMBED_CONTENT_CLASS,
-        ];
+        $attrs = self::getPreviewButtonDataAttributes($file, $files);
+        $attrs['title'] = Yii::t('d3files', 'Preview atachment');
+        $attrs['class'] = 'd3files-preview-widget-load ';
+        
+        return $attrs;
     }
 
     /**

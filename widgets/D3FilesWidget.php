@@ -6,9 +6,9 @@ use d3system\widgets\D3Widget;
 use d3yii2\d3files\components\D3Files;
 use d3yii2\d3files\D3Files as D3FilesModule;
 use d3yii2\d3files\models\D3filesModelName;
-use Exception;
+use ReflectionException;
+use yii\base\Exception;
 use Yii;
-use yii\base\Widget;
 use yii\db\ActiveRecord;
 use yii\helpers\Json;
 
@@ -76,9 +76,10 @@ class D3FilesWidget extends D3Widget
 
     public const BUTTON_PLACEMENT_LEFT = 'left';
     public const BUTTON_PLACEMENT_RIGHT = 'right';
-
+    
     /**
      * @throws Exception
+     * @throws ReflectionException
      */
     public function init(): void
     {
@@ -88,35 +89,28 @@ class D3FilesWidget extends D3Widget
 
         D3FilesModule::registerTranslations();
 
-        if ($this->model_name && $this->model_id) {
-            // Find the record by model name and id
-            $this->model = $this->model_name::findOne($this->model_id);
+        if (!$this->model) {
+            // Just exit if there is no model data (new record?)
+            if (!$this->model_name && !$this->model_id) {
+                return;
+            } elseif (!$this->model_name || !$this->model_id) {
+                throw new Exception('Either model object or model id and model name should be specified');
+            }
+        } else {
+            $this->model_id = $this->model->primaryKey ?? null;
+            
+            if (!$this->model_name) {
+                $this->model_name = get_class($this->model);
+            }
+            
+            if (property_exists($this->model, 'd3filesControllerRoute')) {
+                $this->controllerRoute = $this->model->d3filesControllerRoute;
+            }
         }
-
-        // Just exit if there is no model data (new record?)
-        if (!$this->model || empty($this->model->primaryKey)) {
-            return;
-        }
-
-        if (!$this->model_name) {
-            $this->model_name = get_class($this->model);
-        }
-
-        if (property_exists($this->model, 'd3filesControllerRoute')) {
-            $this->controllerRoute = $this->model->d3filesControllerRoute;
-        }
-
+        
         // Disabled controller actions, remove url prefix
         if (Yii::$app->getModule('d3files')->disableController) {
             $this->urlPrefix = $this->controllerRoute;
-        }
-
-        if (!$this->model_id) {
-            $this->model_id = $this->model->primaryKey;
-        }
-
-        if (!$this->nameModel) {
-            $this->nameModel = D3filesModelName::findOne(['name' => $this->model_name]);
         }
 
         $this->initFilesList();
@@ -125,7 +119,10 @@ class D3FilesWidget extends D3Widget
             $this->registerJsTranslations();
         }
     }
-
+    
+    /**
+     * @throws \yii\db\Exception
+     */
     public function initFilesList()
     {
         // Load the file list if has not been set in constructor
@@ -136,7 +133,6 @@ class D3FilesWidget extends D3Widget
 
     /**
      * @return string|void
-     * @throws Exception
      */
     public function run()
     {
@@ -151,7 +147,7 @@ class D3FilesWidget extends D3Widget
         try {
             $viewParams = $this->getViewParams();
             return $this->render($this->view, $viewParams);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Yii::error('D3FilesWidget:run Exception message: ' . PHP_EOL . $exception->getMessage());
             Yii::error('D3FilesWidget:run Exception trace: ' . PHP_EOL . $exception->getTraceAsString());
             return Yii::t('d3files', 'Attachment error');

@@ -90,21 +90,18 @@ class D3FilesWidget extends D3Widget
 
         D3FilesModule::registerTranslations();
 
-        if (!$this->model) {
-            // Just exit if there is no model data (new record?)
-            if (!$this->model_name && !$this->model_id) {
-                return;
-            } elseif (!$this->model_name || !$this->model_id) {
-                throw new Exception('Either model object or model id and model name should be specified');
-            }
-        } else {
+        if ($this->nameModel) {
+            $this->model_name = get_class($this->nameModel);
+        }
+        
+        if ($this->model) {
             $this->model_id = $this->model->primaryKey ?? null;
             
             if (!$this->model_name) {
                 $this->model_name = get_class($this->model);
             }
             
-            if (property_exists($this->model, 'd3filesControllerRoute')) {
+            if ('' === $this->controllerRoute && property_exists($this->model, 'd3filesControllerRoute')) {
                 $this->controllerRoute = $this->model->d3filesControllerRoute;
             }
         }
@@ -126,6 +123,11 @@ class D3FilesWidget extends D3Widget
      */
     public function initFilesList()
     {
+        // New record?
+        if (!$this->model_id) {
+            return;
+        }
+        
         // Load the file list if has not been set in constructor
         if (!$this->fileList) {
             $this->fileList = D3Files::getModelFilesList($this->model_name, $this->model_id);

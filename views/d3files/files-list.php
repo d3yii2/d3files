@@ -18,6 +18,7 @@ use yii\helpers\Url;
  * @var bool $hideTitle
  * @var array $_params_
  * @var string $uploadButtonPlacement
+ * @var bool $allowUpload
  */
 
 D3FilesAsset::register($this);
@@ -30,19 +31,18 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
 
 <div id="d3files-widget-<?= $model_id ?>" class="panel d3files-widget" <?= $data ?>>
     <div class="panel-heading">
-        <?php
-        if (!$hideTitle) {
-            ?>
             <div class="row">
                 <div class="col-sm-12 ">
-                    <div class="pull-left">
-                        <h3 class="panel-title text-left">
-                            <span class="<?= $icon ?>"></span>
-                            <?= $title ?>
-                        </h3>
-                    </div>
-                    <?php
-                    if (!$readOnly) :
+                    <?php if (!$hideTitle): ?>
+                        <div class="pull-left">
+                            <h3 class="panel-title text-left">
+                                <span class="<?= $icon ?>"></span>
+                                <?= $title ?>
+                            </h3>
+                        </div>
+                    <?php endif;
+  
+                    if (!$readOnly && $allowUpload) :
                         $uploadBtnClass = D3FilesWidget::BUTTON_PLACEMENT_LEFT === $uploadButtonPlacement
                             ? 'pull-left'
                             : 'pull-right';
@@ -50,22 +50,22 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
                         <div class="<?= $uploadBtnClass ?>" data-toggle="tooltip"
                              data-title="<?= Yii::t('d3files', 'Upload file') ?>">
                             <?= Html::beginForm(
-                                false,
-                                'POST',
-                                ['class' => 'd3files-upload-form', 'enctype' => 'multipart/form-data']
-                            ) ?>
+                            false,
+                            'POST',
+                            ['class' => 'd3files-upload-form', 'enctype' => 'multipart/form-data']
+                        ) ?>
                             <label class="d3files-upload-btn btn btn-success btn-xs" data-title="<?=
                             Yii::t('d3files', 'Upload file') ?>">
                                 <?= Html::fileInput(
-                                    'upload_file',
-                                    null,
-                                    [
+                                'upload_file',
+                                null,
+                                [
                                          'class' => 'd3file-input',
                                          'style' => 'display: none',
                                          'data-url' => $uploadUrl,
                                          'data-model_name' => $model_name
                                     ]
-                                ) ?>
+                            ) ?>
                                 <span class="glyphicon glyphicon-plus align-middle" style="cursor: pointer;"></span>
                             </label>
                             <?= Html::endForm() ?>
@@ -74,7 +74,7 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
                 </div>
             </div>
             <?php
-            if (!$readOnly) : ?>
+            if (!$readOnly && $allowUpload) : ?>
                 <div class="row">
                     <div class="col-sm-12 d3files-drop-zone"
                          title="<?= Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically') ?>"
@@ -84,7 +84,6 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
                     </div>
                 </div>
             <?php endif;
-        }
         if (isset($embedContent)) : ?>
             <div class="row">
                 <?= $embedContent ?>

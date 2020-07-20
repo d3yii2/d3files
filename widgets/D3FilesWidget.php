@@ -5,9 +5,10 @@ namespace d3yii2\d3files\widgets;
 use d3system\widgets\D3Widget;
 use d3yii2\d3files\components\D3Files;
 use d3yii2\d3files\D3Files as D3FilesModule;
-use Exception;
+use d3yii2\d3files\models\D3filesModelName;
+use ReflectionException;
+use yii\base\Exception;
 use Yii;
-use yii\base\Widget;
 use yii\db\ActiveRecord;
 use yii\helpers\Json;
 
@@ -37,9 +38,11 @@ class D3FilesWidget extends D3Widget
 {
     public $model;
     public $model_name;
+    public $nameModel;
     public $model_id;
     public $title;
     public $icon = 'glyphicon glyphicon-paperclip';
+    public $allowUpload = false;
     public $hideTitle = false;
     public $readOnly = false;
     // File handling controller route. If empty, then use actual controller
@@ -63,7 +66,7 @@ class D3FilesWidget extends D3Widget
     public $viewByFancyBoxExtensions;
     //File extensions to show
     public $viewByExtensions;
-    public $fileList;
+    public $fileList = [];
     // Implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php
     public $actionColumn;
     public $urlPrefix = '/d3files/d3files/';
@@ -74,9 +77,10 @@ class D3FilesWidget extends D3Widget
 
     public const BUTTON_PLACEMENT_LEFT = 'left';
     public const BUTTON_PLACEMENT_RIGHT = 'right';
-
+    
     /**
      * @throws Exception
+     * @throws ReflectionException
      */
     public function init(): void
     {
@@ -86,21 +90,25 @@ class D3FilesWidget extends D3Widget
 
         D3FilesModule::registerTranslations();
 
-        if (property_exists($this->model, 'd3filesControllerRoute')) {
-            $this->controllerRoute = $this->model->d3filesControllerRoute;
+        if ($this->nameModel) {
+            $this->model_name = get_class($this->nameModel);
         }
-
+        
+        if ($this->model) {
+            $this->model_id = $this->model->primaryKey ?? null;
+            
+            if (!$this->model_name) {
+                $this->model_name = get_class($this->model);
+            }
+            
+            if ('' === $this->controllerRoute && property_exists($this->model, 'd3filesControllerRoute')) {
+                $this->controllerRoute = $this->model->d3filesControllerRoute;
+            }
+        }
+        
         // Disabled controller actions, remove url prefix
         if (Yii::$app->getModule('d3files')->disableController) {
             $this->urlPrefix = $this->controllerRoute;
-        }
-
-        if (!$this->model_name) {
-            $this->model_name = get_class($this->model);
-        }
-
-        if (!$this->model_id && $this->model) {
-            $this->model_id = $this->model->primaryKey;
         }
 
         $this->initFilesList();
@@ -109,9 +117,17 @@ class D3FilesWidget extends D3Widget
             $this->registerJsTranslations();
         }
     }
-
+    
+    /**
+     * @throws \yii\db\Exception
+     */
     public function initFilesList()
     {
+        // New record?
+        if (!$this->model_id) {
+            return;
+        }
+        
         // Load the file list if has not been set in constructor
         if (!$this->fileList) {
             $this->fileList = D3Files::getModelFilesList($this->model_name, $this->model_id);
@@ -120,7 +136,6 @@ class D3FilesWidget extends D3Widget
 
     /**
      * @return string|void
-     * @throws Exception
      */
     public function run()
     {
@@ -135,7 +150,7 @@ class D3FilesWidget extends D3Widget
         try {
             $viewParams = $this->getViewParams();
             return $this->render($this->view, $viewParams);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             Yii::error('D3FilesWidget:run Exception message: ' . PHP_EOL . $exception->getMessage());
             Yii::error('D3FilesWidget:run Exception trace: ' . PHP_EOL . $exception->getTraceAsString());
             return Yii::t('d3files', 'Attachment error');
@@ -161,6 +176,7 @@ class D3FilesWidget extends D3Widget
             'actionColumn' => $this->actionColumn,
             'readOnly' => $this->readOnly,
             'uploadButtonPlacement' => $this->uploadButtonPlacement,
+            'allowUpload' => $this->allowUpload,
         ];
     }
 

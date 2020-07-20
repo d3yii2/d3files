@@ -9,6 +9,7 @@ use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\d3files\components\D3Files as D3FilesComponent;
 use yii\db\Expression;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\HttpException;
 
@@ -108,7 +109,7 @@ class UploadAction extends D3FilesAction
                     $fModel->id = $id;
                     $urlParams = [
                         'd3filesopen',
-                        'model_name' => $postModelName,
+                        'model_name_id' => $model_name_id,
                     ];
                     $previewFileList = D3FilesComponent::getPreviewFilesList(
                         $modelFileList,

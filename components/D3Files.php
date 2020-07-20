@@ -121,6 +121,22 @@ class D3Files extends Component
     }
 
     /**
+     * @param int $modelNameId
+     * @param int $modelId
+     * @return array
+     * @throws \yii\db\Exception
+     */
+    public static function getModelFilesListByNameId(int $modelNameId, int $modelId): array
+    {
+        $files = ModelD3Files::fileListForWidgetByNameId($modelNameId, $modelId);
+
+        foreach ($files as $i => $f) {
+            $files[$i]['model_id'] = $modelId;
+        }
+        return $files;
+    }
+
+    /**
      * @param array $list
      * @param int $id
      * @return array|null

@@ -24,12 +24,23 @@ class DownloadAction extends Action
 
     public const THE_REQUESTED_FILE_DOES_NOT_EXIST = 'The requested file does not exist.';
 
-    public function run(int $id, string $model_name = ''): void
+    public function run(int $id, string $model_name_id = ''): void
     {
 
-        if(!$model_name){
+        if (!$model_name_id){
+            if (empty($this->modelName)) {
+                throw new HttpException(404, 'Either one of model name id or model id should be set');
+            }
             $model_name = $this->modelName;
+        } else {
+            $nameModel = D3filesModelName::findOne($model_name_id);
+            if (!$nameModel) {
+                throw new HttpException(404, 'D3filesModelName not found by id: ' . $model_name_id);
+            }
+            $model_name = $nameModel->name;
+            $this->modelName = $model_name;
         }
+
         if(!Yii::$app->getModule('d3files')->disableController){
             if (is_array($this->modelName) && !in_array($model_name, $this->modelName, true)) {
                 throw new HttpException(422, 'Can not upload file for requested model');

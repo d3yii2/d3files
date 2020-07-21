@@ -76,6 +76,10 @@ class D3FilesUploadWidget extends D3Widget
                 'showCaption' => $this->showCaption,
                 'showRemove' => $this->showRemove,
             ];
+            
+            if (!$this->showUpload) {
+                $this->pluginOptions['fileActionSettings'] = ['showUpload' => false];
+            }
         }
     }
     

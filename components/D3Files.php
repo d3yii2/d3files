@@ -3,8 +3,10 @@ namespace d3yii2\d3files\components;
 
 use Yii;
 use yii\base\Component;
+use yii\db\ActiveRecord;
 use yii\helpers\Url;
 use d3yii2\d3files\models\D3files as ModelD3Files;
+use yii\web\UploadedFile;
 
 /**
  * Class D3Files
@@ -168,5 +170,22 @@ class D3Files extends Component
         }
 
         return Yii::$app->getModule('d3files')->fileTypes ?? FileHandler::FILE_TYPES;
+    }
+    
+    /**
+     * @param $model
+     * @param $className
+     * @param string $field
+     * @throws \Exception
+     */
+    public static function uploadModelFile(ActiveRecord  $model, string $className, string $field = 'upload_file')
+    {
+        if ($model->primaryKey) {
+            $uploadedFile = UploadedFile::getInstance($model, $field);
+    
+            if ($uploadedFile) {
+                \d3yii2\d3files\models\D3files::saveYii2UploadFile($uploadedFile, $className, $model->primaryKey);
+            }
+        }
     }
 }

@@ -42,7 +42,7 @@ class D3FilesWidget extends D3Widget
     public $model_id;
     public $title;
     public $icon = 'glyphicon glyphicon-paperclip';
-    public $allowUpload = false;
+    public $allowUpload = true;
     public $hideTitle = false;
     public $readOnly = false;
     // File handling controller route. If empty, then use actual controller

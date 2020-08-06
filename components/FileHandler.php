@@ -171,9 +171,8 @@ class FileHandler
     {
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
-        file_put_contents($filePath, $fileContent);
-
-        return true;
+        
+        return file_put_contents($filePath, $fileContent);
     }
 
     /**

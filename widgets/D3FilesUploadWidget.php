@@ -11,6 +11,7 @@ use Yii;
 /**
  * Class D3FilesUploadWidget
  * @package d3yii2\d3files\widgets
+ * Documentation: https://demos.krajee.com/widget-details/fileinput
  */
 class D3FilesUploadWidget extends D3Widget
 {
@@ -19,6 +20,7 @@ class D3FilesUploadWidget extends D3Widget
     public $name = 'upload_file';
     public $modelName;
     public $modelId;
+    public $ajaxUpload = null;
     public $uploadExtraData = [];
     public $maxFileCount = 3;
     public $options;
@@ -53,6 +55,11 @@ class D3FilesUploadWidget extends D3Widget
         if ($this->addModelId) {
             if (!$this->modelId && isset($this->model->primaryKey)) {
                 $this->modelId = $this->model->primaryKey;
+                
+                // Automatically enable ajax upload for existing record if not set
+                if (null === $this->ajaxUpload) {
+                    $this->ajaxUpload = true;
+                }
             }
             $url['id'] = $this->modelId;
         }
@@ -69,7 +76,7 @@ class D3FilesUploadWidget extends D3Widget
             $this->pluginOptions = [
                 'encodeUrl' => false,
                 'showUpload' => $this->showUpload,
-                'uploadUrl' => Url::to($url),
+                'uploadUrl' => true === $this->ajaxUpload ? Url::to($url) : false,
                 'uploadExtraData' => $this->uploadExtraData,
                 'maxFileCount' => $this->maxFileCount,
                 'showPreview' => $this->showPreview,

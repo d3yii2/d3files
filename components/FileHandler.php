@@ -257,4 +257,13 @@ class FileHandler
     {
         $this->options['model_id'] = $id;
     }
+    
+    /**
+     * @return false|int
+     */
+    public function getFileSize()
+    {
+        $file_path = $this->getFilePath();
+        return filesize($file_path);
+    }
 }

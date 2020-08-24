@@ -184,8 +184,48 @@ class D3Files extends Component
             $uploadedFile = UploadedFile::getInstance($model, $field);
     
             if ($uploadedFile) {
-                \d3yii2\d3files\models\D3files::saveYii2UploadFile($uploadedFile, $className, $model->primaryKey);
+                ModelD3Files::saveYii2UploadFile($uploadedFile, $className, $model->primaryKey);
             }
         }
+    }
+    
+    /**
+     * @param ActiveRecord $modelFrom
+     * @param ActiveRecord $modelTo
+     * @return bool
+     * @throws \yii\db\Exception
+     */
+    public static function copyFilesBetweenModels(ActiveRecord $modelFrom, ActiveRecord $modelTo)
+    {
+        $modelName = get_class($modelFrom);
+        
+        $modelFiles = ModelD3Files::getRecordFilesList($modelName, $modelFrom->id);
+    
+        foreach ($modelFiles as $file) {
+
+            // Just ignore non-existent files silently
+            if (!file_exists($file['file_path'])) {
+                continue;
+            }
+            
+            $fileContent = file_get_contents($file['file_path']);
+            
+            $ext = pathinfo($file['file_name'], PATHINFO_EXTENSION);
+ 
+            $fileTypes = self::getAllowedFileTypes($modelName);
+            if (!preg_match($fileTypes, $ext)) {
+                continue;
+            }
+            
+            ModelD3Files::saveContent(
+                $file['file_name'],
+                $modelName,
+                $modelTo->id,
+                $fileContent,
+                $fileTypes
+            );
+        }
+        
+        return true;
     }
 }

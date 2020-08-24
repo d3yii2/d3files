@@ -76,13 +76,18 @@ class D3FilesUploadWidget extends D3Widget
             $this->pluginOptions = [
                 'encodeUrl' => false,
                 'showUpload' => $this->showUpload,
-                'uploadUrl' => true === $this->ajaxUpload ? Url::to($url) : false,
-                'uploadExtraData' => $this->uploadExtraData,
                 'maxFileCount' => $this->maxFileCount,
                 'showPreview' => $this->showPreview,
                 'showCaption' => $this->showCaption,
                 'showRemove' => $this->showRemove,
             ];
+            
+            if (true === $this->ajaxUpload) {
+                $this->pluginOptions['uploadUrl'] = Url::to($url);
+                $this->pluginOptions['uploadExtraData'] = $this->uploadExtraData;
+                
+            }
+            
             
             if (!$this->showUpload) {
                 $this->pluginOptions['fileActionSettings'] = ['showUpload' => false];

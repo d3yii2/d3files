@@ -195,9 +195,9 @@ class D3Files extends Component
      * @return bool
      * @throws \yii\db\Exception
      */
-    public static function copyFilesBetweenModels(ActiveRecord $modelFrom, ActiveRecord $modelTo)
+    public static function copyFilesBetweenModels(ActiveRecord $modelFrom, ActiveRecord $modelTo, ?string $modelFromClass = null)
     {
-        $modelName = get_class($modelFrom);
+        $modelName = $modelFromClass ?? get_class($modelFrom);
         
         $modelFiles = ModelD3Files::getRecordFilesList($modelName, $modelFrom->id);
     

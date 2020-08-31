@@ -52,16 +52,18 @@ class D3FilesUploadWidget extends D3Widget
         }
     
         $url = [$this->urlPrefix . 'd3filesupload'];
+    
+        // If enabled, get the id from model primary key
         if ($this->addModelId) {
             if (!$this->modelId && isset($this->model->primaryKey)) {
                 $this->modelId = $this->model->primaryKey;
-                
-                // Automatically enable ajax upload for existing record if not set
-                if (null === $this->ajaxUpload) {
-                    $this->ajaxUpload = true;
-                }
             }
             $url['id'] = $this->modelId;
+        }
+    
+        // Automatically enable ajax upload for existing record if not set
+        if ($this->modelId && null === $this->ajaxUpload) {
+            $this->ajaxUpload = true;
         }
     
         if (empty($this->uploadExtraData)) {

@@ -25,7 +25,7 @@ class D3FilesUploadWidget extends D3Widget
     public $maxFileCount = 3;
     public $options;
     public $pluginOptions;
-    public $showUpload = true;
+    public $showUpload = null;
     public $urlPrefix = '/d3files/d3files/';
     public $controllerRoute = '';
     public $showPreview = true;
@@ -87,9 +87,12 @@ class D3FilesUploadWidget extends D3Widget
             if (true === $this->ajaxUpload) {
                 $this->pluginOptions['uploadUrl'] = Url::to($url);
                 $this->pluginOptions['uploadExtraData'] = $this->uploadExtraData;
-                
+    
+                if (null === $this->showUpload) {
+                    $this->showUpload = true;
+                    $this->pluginOptions['showUpload'] = true;
+                }
             }
-            
             
             if (!$this->showUpload) {
                 $this->pluginOptions['fileActionSettings'] = ['showUpload' => false];

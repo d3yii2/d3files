@@ -171,9 +171,8 @@ class FileHandler
     {
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
-        file_put_contents($filePath, $fileContent);
-
-        return true;
+        
+        return file_put_contents($filePath, $fileContent);
     }
 
     /**
@@ -257,5 +256,14 @@ class FileHandler
     public function setModelId($id): void
     {
         $this->options['model_id'] = $id;
+    }
+    
+    /**
+     * @return false|int
+     */
+    public function getFileSize()
+    {
+        $file_path = $this->getFilePath();
+        return filesize($file_path);
     }
 }

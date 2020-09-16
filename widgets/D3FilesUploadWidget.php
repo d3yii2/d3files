@@ -11,6 +11,7 @@ use Yii;
 /**
  * Class D3FilesUploadWidget
  * @package d3yii2\d3files\widgets
+ * Documentation: https://demos.krajee.com/widget-details/fileinput
  */
 class D3FilesUploadWidget extends D3Widget
 {
@@ -19,11 +20,12 @@ class D3FilesUploadWidget extends D3Widget
     public $name = 'upload_file';
     public $modelName;
     public $modelId;
+    public $ajaxUpload = null;
     public $uploadExtraData = [];
     public $maxFileCount = 3;
     public $options;
     public $pluginOptions;
-    public $showUpload = true;
+    public $showUpload = null;
     public $urlPrefix = '/d3files/d3files/';
     public $controllerRoute = '';
     public $showPreview = true;
@@ -50,11 +52,18 @@ class D3FilesUploadWidget extends D3Widget
         }
     
         $url = [$this->urlPrefix . 'd3filesupload'];
+    
+        // If enabled, get the id from model primary key
         if ($this->addModelId) {
             if (!$this->modelId && isset($this->model->primaryKey)) {
                 $this->modelId = $this->model->primaryKey;
             }
             $url['id'] = $this->modelId;
+        }
+    
+        // Automatically enable ajax upload for existing record if not set
+        if ($this->modelId && null === $this->ajaxUpload) {
+            $this->ajaxUpload = true;
         }
     
         if (empty($this->uploadExtraData)) {
@@ -69,13 +78,21 @@ class D3FilesUploadWidget extends D3Widget
             $this->pluginOptions = [
                 'encodeUrl' => false,
                 'showUpload' => $this->showUpload,
-                'uploadUrl' => Url::to($url),
-                'uploadExtraData' => $this->uploadExtraData,
                 'maxFileCount' => $this->maxFileCount,
                 'showPreview' => $this->showPreview,
                 'showCaption' => $this->showCaption,
                 'showRemove' => $this->showRemove,
             ];
+            
+            if (true === $this->ajaxUpload) {
+                $this->pluginOptions['uploadUrl'] = Url::to($url);
+                $this->pluginOptions['uploadExtraData'] = $this->uploadExtraData;
+    
+                if (null === $this->showUpload) {
+                    $this->showUpload = true;
+                    $this->pluginOptions['showUpload'] = true;
+                }
+            }
             
             if (!$this->showUpload) {
                 $this->pluginOptions['fileActionSettings'] = ['showUpload' => false];

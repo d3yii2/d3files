@@ -39,7 +39,7 @@ class D3FilesUploadWidget extends D3Widget
     public function init(): void
     {
         if (!$this->options) {
-            $this->options = ['multiple' => true, 'accept' => 'image/*'];
+``            $this->options = ['multiple' => true];
         }
     
         if ($this->model && property_exists($this->model, 'd3filesControllerRoute')) {

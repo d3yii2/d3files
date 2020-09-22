@@ -56,19 +56,40 @@ class UploadAction extends D3FilesAction
 
             $tmp_id = uniqid('d3f', false);
 
+            $fileName = $_FILES['upload_file']['name'];
+            
+            $modelFiles = D3FilesComponent::getModelFilesList($this->modelName, $id);
+            
+            $namesArr = [];
+            foreach ($modelFiles as $file) {
+                $namesArr[$file['file_model_id']] = $file['file_name'];
+            }
+            
+            $versionOk = false;
+            $versionCounter = 0;
+            $fileData = pathinfo($fileName);
+    
+            // If the file with the same name exists, extend the name with the version, e.g. file(1).ext, file(2).ext
+            do {
+                $versionName = $versionCounter > 0
+                    ? $fileData['filename'] . '(' . ( $versionCounter + 1 ) . ') . ' . $fileData['extension']
+                    : $fileName;
+                $versionCounter ++;
+            } while (in_array($versionName, $namesArr));
+    
             $fileHandler = new FileHandler(
                 [
                     'model_name' => $this->modelName,
                     'model_id' => $tmp_id,
-                    'file_name' => $_FILES['upload_file']['name'],
+                    'file_name' => $versionName,
                 ]
             );
-
+        
             $fileHandler->upload();
 
             $model = new D3files();
 
-            $model->file_name = $_FILES['upload_file']['name'];
+            $model->file_name = $versionName;
             $model->add_datetime = new Expression('NOW()');
             $model->user_id = Yii::$app->user->getId();
 

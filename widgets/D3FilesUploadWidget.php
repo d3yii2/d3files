@@ -3,6 +3,7 @@
 namespace d3yii2\d3files\widgets;
 
 use d3system\widgets\D3Widget;
+use d3yii2\d3files\components\D3Files;
 use Exception;
 use kartik\widgets\FileInput;
 use yii\helpers\Url;
@@ -32,6 +33,7 @@ class D3FilesUploadWidget extends D3Widget
     public $showCaption = true;
     public $showRemove = true;
     public $addModelId = true;
+    public $autostart = true;
     
     /**
      * @throws Exception
@@ -88,9 +90,13 @@ class D3FilesUploadWidget extends D3Widget
                 $this->pluginOptions['uploadUrl'] = Url::to($url);
                 $this->pluginOptions['uploadExtraData'] = $this->uploadExtraData;
     
-                if (null === $this->showUpload) {
+                if (null === $this->showUpload && ! $this->autostart) {
                     $this->showUpload = true;
                     $this->pluginOptions['showUpload'] = true;
+                }
+                
+                if ($this->autostart) {
+                    $this->initAssets();
                 }
             }
             
@@ -121,5 +127,18 @@ class D3FilesUploadWidget extends D3Widget
                     'pluginOptions' => $this->pluginOptions
                 ]
             );
+    }
+    
+    public function initAssets()
+    {
+        $js = '
+        var d3UploadField = $("[data-krajee-fileinput]");
+        if ("undefined" !== typeof d3UploadField) {
+            d3UploadField.fileinput().on("filebatchselected", function(event, files) {
+                d3UploadField.fileinput("upload");
+            });
+        }';
+        
+        Yii::$app->view->registerJs($js, Yii::$app->view::POS_READY);
     }
 }

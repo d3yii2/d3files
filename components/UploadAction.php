@@ -23,6 +23,8 @@ use function in_array;
  */
 class UploadAction extends D3FilesAction
 {
+    public $fileInputName = 'upload_file';
+    
     /**
      * @param int $id
      * @return array
@@ -45,7 +47,7 @@ class UploadAction extends D3FilesAction
                 }
             }
 
-            if (!isset($_FILES['upload_file'])) {
+            if (!isset($_FILES[$this->fileInputName])) {
                 throw new NotFoundHttpException(Yii::t('d3files', 'File not uploaded.'));
             }
 
@@ -56,7 +58,7 @@ class UploadAction extends D3FilesAction
 
             $tmp_id = uniqid('d3f', false);
 
-            $fileName = $_FILES['upload_file']['name'];
+            $fileName = $_FILES[$this->fileInputName]['name'];
             
             $modelFiles = D3FilesComponent::getModelFilesList($this->modelName, $id);
             
@@ -117,11 +119,13 @@ class UploadAction extends D3FilesAction
                 'file_model_id' => $modelM->id,
                 'model_name' => $postModelName,
             ];
-
+    
+            $modelFileList = D3FilesComponent::getModelFilesList($postModelName, $modelM->model_id);
+            
             $hasPreview = Yii::$app->request->get('preview');
 
+            // Preview buttons for D3FilesPreviewWidget file list
             if ($hasPreview) {
-                $modelFileList = D3FilesComponent::getModelFilesList($postModelName, $modelM->model_id);
 
                 $previewExtensions = '/(gif|pdf|jpe?g|png)$/i';
 
@@ -149,11 +153,46 @@ class UploadAction extends D3FilesAction
                     $renderParam['previewButtonContent'] = '';
                 }
             }
-
+    
+            /**
+             *  Preview data for Kartik File Input
+             *  See the documentation examples: https://plugins.krajee.com/file-input-ajax-demo/6
+             *  @TODO - move inside loop to process $_FILE array (support multiple files upload)
+             */
+            $initialPreview = [];
+            $initialPreviewConfig = [];
+            
+            // URL to open the file
+            $initialPreview[] =  Url::to([
+                'd3filesopen',
+                'id' => $modelM->id,
+                'model_name_id' => $model_name_id,
+            ], true);
+            $initialPreviewConfig[] = [
+                'key' => $modelM->id,
+                'caption' =>  $model->file_name,
+                'size' => filesize($fileHandler->getUploadedFilePath()),
+                // URL to download the file
+                'downloadUrl' => Url::to([
+                    'd3filesdownload',
+                    'id' => $modelM->id,
+                    'model_name_id' => $model_name_id,
+                ], true),
+                // URL to delete the file
+                'url' => Url::to([
+                    'd3filesdelete',
+                    'id' => $modelM->id,
+                    'model_name_id' => $model_name_id,
+                ], true),
+            ];
+    
             return [
                 self::STATUS => self::STATUS_SUCCESS,
                 self::MESSAGE => Yii::t('d3files', 'File uploaded successfully.'),
-                'content' => $this->controller->renderFile($d3filesModule->getView('d3files/upload'), $renderParam)
+                'content' => $this->controller->renderFile($d3filesModule->getView('d3files/upload'), $renderParam),
+                'initialPreview' => $initialPreview,
+                'initialPreviewConfig' => $initialPreviewConfig,
+                'initialPreviewAsData' => true,                
             ];
         } catch (HttpException | NotFoundHttpException $e) {
             Yii::error($e->getMessage());

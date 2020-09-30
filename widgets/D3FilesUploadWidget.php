@@ -84,10 +84,13 @@ class D3FilesUploadWidget extends D3Widget
                 'showPreview' => $this->showPreview,
                 'showCaption' => $this->showCaption,
                 'showRemove' => $this->showRemove,
+                'overwriteInitial' => false,
+                'initialPreviewAsData' => true,
             ];
             
             if (true === $this->ajaxUpload) {
                 $this->pluginOptions['uploadUrl'] = Url::to($url);
+                $this->pluginOptions['deleteUrl'] = Url::to([$this->urlPrefix . 'd3filesdelete']);
                 $this->pluginOptions['uploadExtraData'] = $this->uploadExtraData;
     
                 if (null === $this->showUpload && ! $this->autostart) {

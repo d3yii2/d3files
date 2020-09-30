@@ -25,6 +25,8 @@ class FileHandler
     public const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip|csv)$/i';
 
     protected $options;
+    
+    private $uploadedFilePath;
 
     /**
      * FileHandler constructor.
@@ -116,6 +118,8 @@ class FileHandler
         if (!move_uploaded_file($_FILES['upload_file']['tmp_name'], $filePath)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
+        
+        $this->uploadedFilePath = $filePath;
 
         return true;
     }
@@ -131,6 +135,14 @@ class FileHandler
                     $this->options['model_id'],
                     $this->options['file_name']
                 ));
+    }
+    
+    /**
+     * @return string
+     */
+    public function getUploadedFilePath(): string
+    {
+        return $this->uploadedFilePath;
     }
 
     /**
@@ -172,7 +184,10 @@ class FileHandler
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
         
-        return file_put_contents($filePath, $fileContent);
+        if ($res = file_put_contents($filePath, $fileContent)) {
+            $this->uploadedFilePath = $filePath;
+        }
+        return $res;
     }
 
     /**
@@ -192,6 +207,7 @@ class FileHandler
         if (false === rename($oldName, $newName)) {
             throw new D3Exception('Cannot rename file from: ' . $oldName . ' to: ' . $newName);
         }
+        $this->uploadedFilePath = $newName;
     }
 
     /**

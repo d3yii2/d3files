@@ -9,3 +9,12 @@
 .d3preview-image-content {
     overflow: auto;
 }
+
+.krajee-default.file-preview-frame .kv-file-content,  .file-drop-zone {
+    overflow: auto;
+}
+
+.file-preview-image {
+    font: inherit !important;
+    color: inherit !important;
+}

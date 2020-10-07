@@ -31,6 +31,9 @@ class UploadAction extends D3FilesAction
      */
     public function run(int $id): array
     {
+        $initialPreview = [];
+        $initialPreviewConfig = [];
+        
         try {
            $postModelName = Yii::$app->request->post('model_name');
 
@@ -74,7 +77,7 @@ class UploadAction extends D3FilesAction
             // If the file with the same name exists, extend the name with the version, e.g. file(1).ext, file(2).ext
             do {
                 $versionName = $versionCounter > 0
-                    ? $fileData['filename'] . '(' . ( $versionCounter + 1 ) . ') . ' . $fileData['extension']
+                    ? $fileData['filename'] . '(' . ( $versionCounter + 1 ) . ').' . $fileData['extension']
                     : $fileName;
                 $versionCounter ++;
             } while (in_array($versionName, $namesArr));
@@ -159,15 +162,13 @@ class UploadAction extends D3FilesAction
              *  See the documentation examples: https://plugins.krajee.com/file-input-ajax-demo/6
              *  @TODO - move inside loop to process $_FILE array (support multiple files upload)
              */
-            $initialPreview = [];
-            $initialPreviewConfig = [];
             
             // URL to open the file
-            $initialPreview[] =  Url::to([
+            /*$initialPreview[] =  Url::to([
                 'd3filesopen',
                 'id' => $modelM->id,
                 'model_name_id' => $model_name_id,
-            ], true);
+            ], true);*/
             $initialPreviewConfig[] = [
                 'key' => $modelM->id,
                 'caption' =>  $model->file_name,
@@ -184,8 +185,9 @@ class UploadAction extends D3FilesAction
                     'id' => $modelM->id,
                     'model_name_id' => $model_name_id,
                 ], true),
+                'type' => strtolower(pathinfo($model->file_name, PATHINFO_EXTENSION))
             ];
-    
+            
             return [
                 self::STATUS => self::STATUS_SUCCESS,
                 self::MESSAGE => Yii::t('d3files', 'File uploaded successfully.'),
@@ -197,11 +199,17 @@ class UploadAction extends D3FilesAction
         } catch (HttpException | NotFoundHttpException $e) {
             Yii::error($e->getMessage());
             Yii::$app->response->statusCode = 406;
-            return [self::STATUS => self::STATUS_ERROR, self::MESSAGE => $e->getMessage()];
+            return [
+                self::STATUS => self::STATUS_ERROR,
+                self::MESSAGE => $e->getMessage(),
+            ];
         } catch (Exception $e) {
             Yii::error($e->getMessage());
             Yii::$app->response->statusCode = 502;
-            return [self::STATUS => self::STATUS_ERROR, self::MESSAGE => Yii::t('d3system', 'Unexpected Server Error')];
+            return [
+                self::STATUS => self::STATUS_ERROR,
+                self::MESSAGE => Yii::t('d3system', 'Unexpected Server Error'),
+            ];
         }
     }
 }

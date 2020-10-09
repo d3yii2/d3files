@@ -431,6 +431,30 @@
         setLoadButtonAttrs: function(b, f) {
             b.data(this.previewButtonDataName, f);
             //b.attr('data-' + this.previewButtonDataName, f);
+        },
+        getFirstPreviewItem: function(ext) {
+            let firstItem;
+            let self = this;
+            
+            if (!ext) {
+                ext = 'pdf';
+            }
+            
+            $.each(this.getFilesList(), function (i, item) {
+                var file = self.getFileByExtension(item.files, ext);
+                if (file) {
+                    firstItem = $("a[data-file-id='" + file.id + "']");
+                    return false;
+                }
+            });
+            return firstItem;
+        },
+        clickFirstPreviewItem: function(ext) {
+            let fpi = this.getFirstPreviewItem(ext);
+            if (!fpi) {
+                return false;
+            }
+            fpi.click();
         }
     };
     $(document).on('pjax:success', function() {

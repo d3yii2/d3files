@@ -115,7 +115,12 @@ class FileHandler
         $filePath = $this->getFilePath();
         $dir = dirname($filePath);
         FileHelper::createDirectory($dir);
-        if (!move_uploaded_file($_FILES['upload_file']['tmp_name'], $filePath)) {
+        
+        $tmpName = is_array($_FILES['upload_file']['tmp_name'])
+            ? $_FILES['upload_file']['tmp_name'][0]
+            : $_FILES['upload_file']['tmp_name'];
+        
+        if (!move_uploaded_file($tmpName, $filePath)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
         

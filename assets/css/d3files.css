@@ -6,15 +6,19 @@
     margin-right: 6px;
  }
 
-.d3preview-image-content {
-    overflow: auto;
-}
-
-.krajee-default.file-preview-frame .kv-file-content,  .file-drop-zone {
-    overflow: auto;
-}
-
 .file-preview-image {
     font: inherit !important;
     color: inherit !important;
+}
+
+.krajee-default.file-preview-frame .kv-file-content {
+    width: inherit !important;
+}
+
+.kv-fileinput-caption {
+    display: none !important;
+}
+
+.file-caption-main {
+    text-align: center;
 }

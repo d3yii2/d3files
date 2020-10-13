@@ -176,7 +176,7 @@ class UploadAction extends D3FilesAction
                 $initialPreview[] = in_array($fileExtension, ['png', 'jpg', 'jpeg', 'gif'])
                     ? Html::img(
                         Url::to(['d3filesopen', 'id' => $modelM->id, 'model_name_id' => $model_name_id,], true),
-                        ['width' => '200', 'height' => '140']
+                        ['class' => 'img-responsive']
                     ) : '.';
                 
                 $initialPreviewConfig[] = [

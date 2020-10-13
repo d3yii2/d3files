@@ -11,14 +11,30 @@
     color: inherit !important;
 }
 
-.krajee-default.file-preview-frame .kv-file-content {
-    width: inherit !important;
-}
-
 .kv-fileinput-caption {
     display: none !important;
 }
 
 .file-caption-main {
     text-align: center;
+}
+
+.file-preview {
+    overflow: hidden;
+}
+
+.file-input .krajee-default.file-preview-frame {
+    max-width: 150px;
+}
+
+.file-input .krajee-default.file-preview-frame .kv-file-content {
+    width: 100%;
+    min-height: 160px;
+}
+
+.file-input .krajee-default .file-caption-info, .file-input .krajee-default .file-size-info {
+    white-space: initial;
+    height: inherit;
+    overflow-wrap: break-word;
+    width: 100%;
 }

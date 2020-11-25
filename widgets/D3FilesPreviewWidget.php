@@ -101,7 +101,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
             if (self::VIEW_TYPE_MODAL !== $this->viewType) {
                 $this->buttonView = self::VIEW_INLINE_BUTTON;
                 $this->pdfObjectOptions = [
-                    'wrapperHtmlOptions' => ['style' => 'height:1200px'],
+                    'wrapperHtmlOptions' => ['style' => 'height:800px'],
                     //'targetElementClass' => self::EMBED_CONTENT_CLASS,
                 ];
             }

@@ -21,6 +21,7 @@ return [
     'Cannot upload the file' => 'Failu neizdevās augšuplādēt',
     'File uploaded successfully.' => 'Fails veiksmīgi augšuplādēts',
     'File not uploaded.' => 'Fails netika augšuplādēts',
+    'File too large' => 'Faila izmērs pārsniedz atļauto',
     'Filter by Attachment' => 'Atlasīt pēc pielikuma',
     'Forbidden file type: {0}' => 'Neatļauts faila tips: {0}',
     'from' => 'no',
@@ -57,5 +58,13 @@ return [
     'Type ID' => 'Tips',
     'User ID' => 'Lietotāja ID',
     'You don\'t have access to parent record' => 'Tev nav pieejas tiesību šim ierakstam',
-    'Upload file' => 'Augšupielādēt failu'
+    'Upload file' => 'Augšupielādēt failu',
+    'Unexpected upload error! Code: $1' => 'Neparadzēta augšupielādes kļūda! Kods: $1',
+    'The uploaded file exceeds the upload_max_filesize directive in php.ini' => 'Faila izmērs pārsniedz atļauto',
+    //'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form' => 'Faila izmērs pārsniedz norādīto HTML formā',
+    'The uploaded file was only partially uploaded' => 'Fails tika daļēji augšuplādēts',
+    'No file was uploaded' => 'Fails netika augšuplādēts',
+    //'Missing a temporary folder' => '',
+    //'Failed to write file to disk.' => '',
+    //'A PHP extension stopped the file upload.' => '',
 ];

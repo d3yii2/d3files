@@ -10,9 +10,9 @@ use yii\base\Exception;
 use yii\base\InvalidArgumentException;
 use yii\helpers\FileHelper;
 use yii\web\ForbiddenHttpException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
-
 use function dirname;
 
 /**
@@ -116,6 +116,17 @@ class FileHandler
         $dir = dirname($filePath);
         FileHelper::createDirectory($dir);
         
+        $errorCode = is_array($_FILES['upload_file']['error'])
+            ? $_FILES['upload_file']['error'][0]
+            : $_FILES['upload_file']['error'];
+        
+        if ($errorMsg = $this->getUploadError((int) $errorCode)) {
+            $userMsg = in_array($errorCode, ['1', '3', '4'])
+                ? Yii::t('d3files', $errorMsg)
+                : Yii::t('d3files', 'Unexpected upload error! Code: $1', [$errorCode]);
+            throw new HttpException(406, $userMsg);
+        }
+    
         $tmpName = is_array($_FILES['upload_file']['tmp_name'])
             ? $_FILES['upload_file']['tmp_name'][0]
             : $_FILES['upload_file']['tmp_name'];
@@ -128,7 +139,32 @@ class FileHandler
 
         return true;
     }
+    
+    /**
+     * @param int $state
+     * @return string|null
+     */
+    public function getUploadError(int $state): ?string
+    {
+        if (UPLOAD_ERR_OK === $state) {
+            return null;
+        }
+        
+        $errors = [
+            // 0 => 'There is no error, the file uploaded with success',
+            1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+            2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+            // Tricky! Can be user canceled, Network error, Webserver problem (Keep alive header?)
+            3 => 'The uploaded file was only partially uploaded',
+            4 => 'No file was uploaded',
+            6 => 'Missing a temporary folder',
+            7 => 'Failed to write file to disk.',
+            8 => 'A PHP extension stopped the file upload.',
+        ];
 
+        return $errors[$state];
+    }
+    
     /**
      * get file path for saving uploaded file
      * @return string

@@ -84,8 +84,10 @@ class D3FilesUploadWidget extends D3Widget
                 'showPreview' => $this->showPreview,
                 'showCaption' => $this->showCaption,
                 'showRemove' => $this->showRemove,
-                //'overwriteInitial' => false,
-                'initialPreviewAsData' => false,
+                'overwriteInitial' => false,
+                'initialPreviewAsData' => true,
+                //'preferIconicPreview' => true,
+                //'maxImageHeight' => '20',
             ];
             
             if (true === $this->ajaxUpload) {

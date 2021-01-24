@@ -177,9 +177,14 @@ class D3files extends ActiveRecord
     /**
      * get file list with file_path
      *
-     * @param $modelName
-     * @param $modelId
-     * @return array
+     * @param string $modelName model class name
+     * @param int $modelId   model record id
+     * @return array [
+     *                   'id' => 88,                          //d3files.id
+     *                   'file_name' => 'picture.jpg',        //d3files.file_name
+     *                   'file_model_id' => '44'              //d3files_model.id
+     *                   'file_path => '/var/www/car/upload/car/111.jpg'
+     *               ]
      * @throws ForbiddenHttpException
      * @throws \yii\db\Exception
      * @throws ReflectionException

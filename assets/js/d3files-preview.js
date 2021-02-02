@@ -219,6 +219,7 @@
             img.attr('src', f.src);
             img.attr('alt', f.file_name);
             img.attr('title', f.file_name);
+            img.attr('class', 'img-responsive');
             img.css('max-width', '400px');
             img.css('max-height', '400px');
             this.handlers.imageContent.append(img);

@@ -198,6 +198,7 @@
                     this.setPdfObject(this.pdfOptions);
                     this.loadPDF(f);
                     this.activeFile = f;
+                    $('.modal-dialog .modal-content').css('height', '80%');
                     return true;
                 } catch (err) {
                     throw new Error('loadFile got catch: ' + err);
@@ -214,15 +215,10 @@
             D3PDF.trigger (f.src);
         },
         loadImage: function (f) {
-            this.handlers.imageContent.html('').show();
-            let img = $('<img>');
-            img.attr('src', f.src);
-            img.attr('alt', f.file_name);
-            img.attr('title', f.file_name);
-            img.attr('class', 'img-responsive');
-            img.css('max-width', '400px');
-            img.css('max-height', '400px');
-            this.handlers.imageContent.append(img);
+            $('.modal-dialog .modal-content').css('height', 'unset');
+            new PhotoViewer([{
+                src: f.src
+            }]);
         },
         getModelIndex: function (modelId) {
             let index = null;

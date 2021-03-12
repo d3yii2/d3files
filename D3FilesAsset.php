@@ -9,9 +9,11 @@ class D3FilesAsset extends AssetBundle
     public $basePath = '@webroot';
     public $css = [
         'css/d3files.css',
+        'css/d3photo-view.min.css'
     ];
     public $js = [
         'js/d3files.js',
+        'js/d3photo-view.js'
     ];
     public $depends = [
         'yii\web\JqueryAsset',

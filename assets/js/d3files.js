@@ -194,7 +194,40 @@ $(function () {
         });
         return false;
     });
+    
+    
+    d.on("click", ".d3files-edit-notes", function () {
+        let textareaRow = $(this).closest("tr").next("tr.d3files-row-notes");
+        textareaRow.toggle();
+    });
+    
+    d.on("click", ".d3files-save-notes", function () {
+        let widget = $(this).closest(".d3files-widget");
+        let alert = widget.find(".d3files-alert");
+        let textarea = $(this).prev(".d3files-notes-field");
+        let notes = textarea ? textarea.val() : false;
+        let url;
 
+        if (notes) {
+            alert.remove();
+            url = $(this).data("url");
+            
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {notes: notes},
+                success: function (data) {
+                    showSuccess(data, widget);
+                    textarea.closest("tr.d3files-row-notes").hide();
+                },
+                error: function (xhr) {
+                    showError(xhr.responseJSON, widget);
+                }
+            });
+        }
+        return false;
+    });
+    
     input = $(".d3files-widget input[type=\"file\"]");
 
     input.on("change", function () {

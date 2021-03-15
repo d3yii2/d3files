@@ -221,6 +221,7 @@ class D3files extends ActiveRecord
             SELECT 
               f.id,
               f.file_name,
+              f.notes,
               fm.id  file_model_id
             FROM
               d3files f

@@ -61,6 +61,39 @@ use yii\helpers\Url;
                 ]
             );
         }
-        ?></td></tr><?php
+        ?></td>
+        <?php if (!$readOnly): ?>
+            <td>
+            <?= Html::a(
+                '<span class="glyphicon glyphicon-book"></span>',
+                '#',
+                [
+                    'onclick' => 'event.preventDefault()',
+                    'data-title' => Yii::t('d3files', 'Edit notes'),
+                    'data-placement' => 'top',
+                    'data-toggle' => 'tooltip',
+                    'class' => 'd3files-edit-notes text-primary',
+                ]
+            ) ?>
+            </td>
+            <?php endif; ?>
+        </tr>
+        <?php
+        if (!$readOnly): ?>
+            <tr class="d3files-row-notes" style="display:none">
+                <td colspan="5">
+                    <?= Html::textarea('d3files-notes', $file['notes'], ['class' => 'd3files-notes-field', 'rows' => 2, 'cols' => 2]) ?>
+                    <?= Html::button(
+                            Yii::t('d3files', 'Save Note'),
+                            [
+                                'value' => $file['notes'],
+                                'class' => 'btn btn-sm btn-success d3files-save-notes',
+                                'data-url' => Url::to([$urlPrefix . 'd3fileseditnotes', 'id' => $file['id']])
+                            ]
+                    ) ?>
+                </td>
+            </tr>
+        <?php
+        endif;
     } ?></table></div>
 

@@ -208,23 +208,21 @@ $(function () {
         let notes = textarea ? textarea.val() : false;
         let url;
 
-        if (notes) {
-            alert.remove();
-            url = $(this).data("url");
-            
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: {notes: notes},
-                success: function (data) {
-                    showSuccess(data, widget);
-                    textarea.closest("tr.d3files-row-notes").hide();
-                },
-                error: function (xhr) {
-                    showError(xhr.responseJSON, widget);
-                }
-            });
-        }
+        alert.remove();
+        url = $(this).data("url");
+        
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {notes: notes},
+            success: function (data) {
+                showSuccess(data, widget);
+                textarea.closest("tr.d3files-row-notes").hide();
+            },
+            error: function (xhr) {
+                showError(xhr.responseJSON, widget);
+            }
+        });
         return false;
     });
     

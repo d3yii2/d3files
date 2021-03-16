@@ -202,10 +202,12 @@ $(function () {
     });
     
     d.on("click", ".d3files-save-notes", function () {
-        let widget = $(this).closest(".d3files-widget");
+        let saveBtn = $(this);
+        let widget = saveBtn.closest(".d3files-widget");
         let alert = widget.find(".d3files-alert");
-        let textarea = $(this).prev(".d3files-notes-field");
+        let textarea = saveBtn.prev(".d3files-notes-field");
         let notes = textarea ? textarea.val() : false;
+        let row = saveBtn.closest("tr.d3files-row-notes");
         let url;
 
         alert.remove();
@@ -217,7 +219,8 @@ $(function () {
             data: {notes: notes},
             success: function (data) {
                 showSuccess(data, widget);
-                textarea.closest("tr.d3files-row-notes").hide();
+                row.prev('tr').find(".d3files-notes-text").text(notes);
+                row.hide();
             },
             error: function (xhr) {
                 showError(xhr.responseJSON, widget);

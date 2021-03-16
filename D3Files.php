@@ -23,6 +23,7 @@ class D3Files extends Module
     public $sharedLeftLoadings;
     public $imageExtensions = ['jpg', 'gif', 'png', 'bmp'];
     public $models = [];
+    public $enableNotes;
 
     public function init()
     {
@@ -46,5 +47,4 @@ class D3Files extends Module
         $this->viewPath or $this->viewPath = __DIR__ . '/views';
         return $this->viewPath . '/' . $view . '.php';
     }
-
 }

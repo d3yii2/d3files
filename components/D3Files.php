@@ -228,4 +228,12 @@ class D3Files extends Component
         
         return true;
     }
+    
+    /**
+     * @return mixed|object|null
+     */
+    public function isNotesEnabled()
+    {
+        return Yii::$app->getModule('d3files')->enableNotes;
+    }
 }

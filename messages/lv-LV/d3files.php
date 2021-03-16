@@ -18,7 +18,9 @@
  */
 return [
     'Attachment error' => 'Pielikuma kļūda',
+    'Edit notes' => 'Rediģēt piezīmi',
     'Cannot upload the file' => 'Failu neizdevās augšuplādēt',
+    'File Notes updated' => 'Faila piezīme saglabāta',
     'File uploaded successfully.' => 'Fails veiksmīgi augšuplādēts',
     'File not uploaded.' => 'Fails netika augšuplādēts',
     'File too large' => 'Faila izmērs pārsniedz atļauto',
@@ -53,6 +55,7 @@ return [
     'Preview atachment' => 'Priekšskatīt pielikumu',
     'Previous Attachment' => 'Iepriekšējais pielikums',
     'Next Attachment' => 'Nākamais pielikums',
+    'Save Note' => 'Saglabāt piezīmi',
     'Select attachment' => 'Izvēlies pielikumu',
     'Selected attachments' => 'Izvēlēti pielikumi',
     'Type ID' => 'Tips',

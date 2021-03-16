@@ -47,6 +47,7 @@ class D3FilesWidget extends D3Widget
     public $readOnly = false;
     // File handling controller route. If empty, then use actual controller
     public $controllerRoute = '';
+    public $enableNotes;
 
     /**
      * @deprecated $viewByFancyBox
@@ -111,6 +112,11 @@ class D3FilesWidget extends D3Widget
             $this->urlPrefix = $this->controllerRoute;
         }
 
+        // Check default settting from module if not specified
+        if (null === $this->enableNotes) {
+            $this->enableNotes = D3Files::isNotesEnabled();
+        }
+        
         $this->initFilesList();
 
         if (!$this->readOnly) {
@@ -177,6 +183,7 @@ class D3FilesWidget extends D3Widget
             'readOnly' => $this->readOnly,
             'uploadButtonPlacement' => $this->uploadButtonPlacement,
             'allowUpload' => $this->allowUpload,
+            'enableNotes' => $this->enableNotes,
         ];
     }
 

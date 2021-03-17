@@ -49,7 +49,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     public $icon = self::DEFAULT_ICON;
     public $previewExtensions = '/(gif|pdf|jpe?g|png)$/i';
-    public $viewExtension = 'pdf';
+    public $viewExtension = ['pdf', 'jpg'];
     public $currentFile;
     public $showPrevNext = false;
     public $prevFile;
@@ -242,9 +242,9 @@ class D3FilesPreviewWidget extends D3FilesWidget
                     <span class="d3preview-model-files pull-left"></span>
                 </div>
                 <div class="col-sm-5 text-center">' . $previewButtons . '</div>
-                <div class="col-sm-3 text-center">
-                   <div class="d3preview-image-content" style="display: none"></div>
-                </div>
+           </div>
+           <div class="row">
+                <div class="d3preview-image-content" style="display: none"></div>
            </div>
            ';
     }
@@ -279,7 +279,11 @@ class D3FilesPreviewWidget extends D3FilesWidget
         ];
 
         if (self::VIEW_MODAL_BUTTON === $this->view || self::VIEW_INLINE_BUTTON === $this->view) {
-            $params['file'] = D3Files::getFirstFileHavingExt($this->fileList, $this->viewExtension);
+            foreach ($this->viewExtension as $key => $extension) {
+                if($params['file'] = D3Files::getFirstFileHavingExt($this->fileList, $extension)) {
+                    break;
+                }
+            }
         }
 
         $params = array_merge(

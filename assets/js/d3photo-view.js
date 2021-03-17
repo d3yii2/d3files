@@ -1290,7 +1290,7 @@
     // Load the image progressively
     progressiveLoading: true,
     // The DOM element to which viewer will be added
-    insertInto: 'div.th-modal-content', // div.th-modal-content
+    insertInto: 'div.d3preview-image-content', // div.th-modal-content
     // Custom Buttons
     customButtons: {}
   };

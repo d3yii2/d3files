@@ -205,7 +205,7 @@
                 }
             }
             if ("png" === ext || "jpg" === ext || "jpeg" === ext || "gif" === ext) {
-                this.loadImage(f, this.handlers.modalContent);
+                this.loadImage(f);
                 this.activeFile = f;
                 return true;
             }
@@ -215,10 +215,13 @@
             D3PDF.trigger (f.src);
         },
         loadImage: function (f) {
+            $('.th-modal-content').empty();
             $('.modal-dialog .modal-content').css('height', 'unset');
             new PhotoViewer([{
                 src: f.src
             }]);
+            this.handlers.imageContent.show();
+
         },
         getModelIndex: function (modelId) {
             let index = null;

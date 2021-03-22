@@ -25,7 +25,7 @@ class FileHandler
     public const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip|csv)$/i';
 
     protected $options;
-    
+
     private $uploadedFilePath;
 
     /**
@@ -60,7 +60,14 @@ class FileHandler
         if (isset($options['file_path'])) {
             $this->options['file_path'] = $options['file_path'];
         }
+    }
 
+    /**
+     * @throws ForbiddenHttpException
+     * @throws ReflectionException
+     */
+    public function validateFileExtentsion()
+    {
         $fileTypes = self::getAllowedFileTypes($this->options);
 
         $fileExtension = pathinfo($this->options['file_name'])['extension'];
@@ -108,6 +115,8 @@ class FileHandler
      */
     public function upload(): bool
     {
+        $this->validateFileExtentsion();
+
         if (!isset($_FILES['upload_file'])) {
             throw new InvalidArgumentException(Yii::t('d3files', 'upload_file is not set'));
         }
@@ -115,31 +124,31 @@ class FileHandler
         $filePath = $this->getFilePath();
         $dir = dirname($filePath);
         FileHelper::createDirectory($dir);
-        
+
         $errorCode = is_array($_FILES['upload_file']['error'])
             ? $_FILES['upload_file']['error'][0]
             : $_FILES['upload_file']['error'];
-        
+
         if ($errorMsg = $this->getUploadError((int) $errorCode)) {
             $userMsg = in_array($errorCode, ['1', '3', '4'])
                 ? Yii::t('d3files', $errorMsg)
                 : Yii::t('d3files', 'Unexpected upload error! Code: $1', [$errorCode]);
             throw new HttpException(406, $userMsg);
         }
-    
+
         $tmpName = is_array($_FILES['upload_file']['tmp_name'])
             ? $_FILES['upload_file']['tmp_name'][0]
             : $_FILES['upload_file']['tmp_name'];
-        
+
         if (!move_uploaded_file($tmpName, $filePath)) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
-        
+
         $this->uploadedFilePath = $filePath;
 
         return true;
     }
-    
+
     /**
      * @param int $state
      * @return string|null
@@ -149,7 +158,7 @@ class FileHandler
         if (UPLOAD_ERR_OK === $state) {
             return null;
         }
-        
+
         $errors = [
             // 0 => 'There is no error, the file uploaded with success',
             1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
@@ -164,7 +173,7 @@ class FileHandler
 
         return $errors[$state];
     }
-    
+
     /**
      * get file path for saving uploaded file
      * @return string
@@ -177,7 +186,7 @@ class FileHandler
                     $this->options['file_name']
                 ));
     }
-    
+
     /**
      * @return string
      */
@@ -224,7 +233,7 @@ class FileHandler
     {
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
-        
+
         if ($res = file_put_contents($filePath, $fileContent)) {
             $this->uploadedFilePath = $filePath;
         }
@@ -314,7 +323,7 @@ class FileHandler
     {
         $this->options['model_id'] = $id;
     }
-    
+
     /**
      * @return false|int
      */

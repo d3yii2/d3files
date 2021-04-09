@@ -1946,7 +1946,7 @@
       key: "_createTemplate",
       value: function _createTemplate() {
         // PhotoViewer base HTML
-        var photoviewerHTML = "<div class=\"".concat(NS, "-modal\">\n        <div class=\"").concat(NS, "-inner\">\n          <div class=\"").concat(NS, "-header\">\n            <div class=\"").concat(NS, "-toolbar ").concat(NS, "-toolbar-header\">\n            ").concat(this._createBtns(this.options.headerToolbar), "\n            </div>\n            ").concat(this._createTitle(), "\n          </div>\n          <div class=\"").concat(NS, "-stage\">\n            <img class=\"starting-position ").concat(NS, "-image\" src=\"\" alt=\"\" />\n          </div>\n          <div class=\"").concat(NS, "-footer\">\n            <div class=\"").concat(NS, "-toolbar ").concat(NS, "-toolbar-footer\">\n            ").concat(this._createBtns(this.options.footerToolbar), "\n            </div>\n          </div>\n        </div>\n      </div>");
+        var photoviewerHTML = "<div class=\"".concat(NS, "-modal\">\n        <div class=\"").concat(NS, "-inner\">\n          <div class=\"").concat(NS, "-header\">\n            <div class=\"").concat(NS, "-toolbar ").concat(NS, "-toolbar-header\">\n            ").concat(this._createBtns(this.options.headerToolbar), "\n            </div>\n            ").concat(this._createTitle(), "\n          </div>\n          <div class=\"").concat(NS, "-stage\">\n            <img class=\"").concat(NS, "-image\" src=\"\" alt=\"\" />\n          </div>\n          <div class=\"").concat(NS, "-footer\">\n            <div class=\"").concat(NS, "-toolbar ").concat(NS, "-toolbar-footer\">\n            ").concat(this._createBtns(this.options.footerToolbar), "\n            </div>\n          </div>\n        </div>\n      </div>");
         return photoviewerHTML;
       }
     }, {
@@ -2196,11 +2196,11 @@
             originalHeight: img.height
           };
 
-          if (_this3.isMaximized || _this3.isOpened && _this3.options.fixedModalPos) {
+      //    if (_this3.isMaximized || _this3.isOpened && _this3.options.fixedModalPos) {
             _this3.setImageSize(img);
-          } else {
+       //   } else {
           //  _this3.setModalSize(img);
-          } // Callback of image loaded successfully
+        //  } // Callback of image loaded successfully
 
 
           if (fn) {

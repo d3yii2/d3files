@@ -197,9 +197,10 @@ class D3Files extends Component
      */
     public static function copyFilesBetweenModels(ActiveRecord $modelFrom, ActiveRecord $modelTo, ?string $modelFromClass = null)
     {
-        $modelName = $modelFromClass ?? get_class($modelFrom);
+        $modelFromName = $modelFromClass ?? get_class($modelFrom);
+        $modelToName = get_class($modelTo);
         
-        $modelFiles = ModelD3Files::getRecordFilesList($modelName, $modelFrom->id);
+        $modelFiles = ModelD3Files::getRecordFilesList($modelFromName, $modelFrom->id);
     
         foreach ($modelFiles as $file) {
 
@@ -212,14 +213,14 @@ class D3Files extends Component
             
             $ext = pathinfo($file['file_name'], PATHINFO_EXTENSION);
  
-            $fileTypes = self::getAllowedFileTypes($modelName);
+            $fileTypes = self::getAllowedFileTypes($modelToName);
             if (!preg_match($fileTypes, $ext)) {
                 continue;
             }
             
             ModelD3Files::saveContent(
                 $file['file_name'],
-                $modelName,
+                $modelToName,
                 $modelTo->id,
                 $fileContent,
                 $fileTypes

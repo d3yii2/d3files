@@ -10,7 +10,6 @@ use d3yii2\d3files\widgets\D3FilesPreviewWidget;
 use Exception;
 use Yii;
 use yii\db\Expression;
-use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -84,7 +83,7 @@ class UploadAction extends D3FilesAction
                         ? $fileData['filename'] . '(' . ($versionCounter + 1) . ').' . $fileData['extension']
                         : $fileName;
                     $versionCounter++;
-                } while (in_array($versionName, $namesArr));
+                } while (in_array($versionName, $namesArr, true));
                 
                 $fileHandler = new FileHandler(
                     [

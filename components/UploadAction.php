@@ -116,7 +116,7 @@ class UploadAction extends D3FilesAction
                     $fileHandler->rename($model->id);
                 } else {
                     $fileHandler->remove();
-                    throw new HttpException(500, Yii::t('d3files', 'Insert DB record failed'));
+                    throw new \yii\db\Exception(Yii::t('d3files', 'Insert DB record failed'));
                 }
                 
                 $renderParam = [

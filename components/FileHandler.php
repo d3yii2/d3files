@@ -3,6 +3,7 @@
 namespace d3yii2\d3files\components;
 
 use d3system\exceptions\D3Exception;
+use d3yii2\d3files\exceptions\D3FilesUserException;
 use ReflectionClass;
 use ReflectionException;
 use Yii;
@@ -31,7 +32,6 @@ class FileHandler
     /**
      * FileHandler constructor.
      * @param $options
-     * @throws ForbiddenHttpException
      * @throws ReflectionException
      */
     public function __construct($options)
@@ -66,7 +66,7 @@ class FileHandler
      * @throws ForbiddenHttpException
      * @throws ReflectionException
      */
-    public function validateFileExtentsion()
+    public function validateFileExtentsion(): void
     {
         $fileTypes = self::getAllowedFileTypes($this->options);
 
@@ -111,14 +111,14 @@ class FileHandler
      * copy posted file to upload directory
      * @return bool
      * @throws NotFoundHttpException
-     * @throws Exception
+     * @throws Exception|\ReflectionException
      */
     public function upload(): bool
     {
         $this->validateFileExtentsion();
 
         if (!isset($_FILES['upload_file'])) {
-            throw new InvalidArgumentException(Yii::t('d3files', 'upload_file is not set'));
+            throw new D3FilesUserException(Yii::t('d3files', 'upload_file is not set'));
         }
 
         $filePath = $this->getFilePath();
@@ -141,7 +141,7 @@ class FileHandler
             : $_FILES['upload_file']['tmp_name'];
 
         if (!move_uploaded_file($tmpName, $filePath)) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
+            throw new D3FilesUserException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
 
         $this->uploadedFilePath = $filePath;
@@ -217,7 +217,7 @@ class FileHandler
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
         if (!$uploadedFile->saveAs($filePath)) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The uploaded file does not exist.'));
+            throw new D3FilesUserException(Yii::t('d3files', 'The uploaded file does not exist.'));
         }
 
         return true;
@@ -275,14 +275,14 @@ class FileHandler
     }
 
     /**
-     * @throws NotFoundHttpException
+     * @throws \d3yii2\d3files\exceptions\D3FilesUserException
      */
     public function download(): void
     {
         $file_path = $this->getFilePath();
 
         if (!is_file($file_path)) {
-            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+            throw new D3FilesUserException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
         header('Content-Description: File Transfer');

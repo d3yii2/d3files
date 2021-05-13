@@ -2,14 +2,14 @@
 
 namespace d3yii2\d3files\components;
 
+use d3yii2\d3files\exceptions\D3FilesUserException;
 use d3yii2\d3files\models\D3files;
-use d3yii2\d3files\models\D3filesModel;
-use d3yii2\d3files\models\D3filesModelName;
+
 use Exception;
 use Yii;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use function in_array;
+
 
 /**
  * Class EditNotesAction
@@ -21,14 +21,13 @@ class EditNotesAction extends D3FilesAction
 {
     /**
      * @param int $id
-     * @param string $model_name
      * @return array
      */
     public function run(int $id): array
     {
         try {
             if (!$fileModel = D3files::findOne($id)) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+                throw new D3FilesUserException(Yii::t('d3files', 'The requested file does not exist.'));
             }
             
             //@FIXME - jāparedz iespēja pārbaudīt pieejas tiesības

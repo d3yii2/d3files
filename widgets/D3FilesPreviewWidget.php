@@ -8,13 +8,13 @@ use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaBlankonThema\assetbundles\AjaxAsset;
 use Exception;
-use yii\base\InvalidConfigException;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use Yii;
 use d3yii2\d3files\components\D3Files;
 use yii\web\View;
+use function is_callable;
 
 /**
  * Class D3FilesPreviewWidget
@@ -107,7 +107,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
             }
 
             // Check for PDF and AJAX loaded attachments to  assets and assign preview attributes
-            foreach ($this->fileList as $i => $file) {
+            foreach ($this->fileList as $file) {
                 $ext = D3Files::getFileExtension($file);
                 if ('pdf' === $ext) {
                     $hasPdf = true;
@@ -151,7 +151,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
         // Ensure modal preview is enabled and the layout rendered once
         if (self::VIEW_TYPE_MODAL === $this->viewType && !isset(Yii::$app->view->params['D3FilesModalRendered'])) {
-            if (\is_callable($this->dialogWidgetClass)) {
+            if (is_callable($this->dialogWidgetClass)) {
                 throw new D3Exception('Invalid Modal Dialog class: ' . $this->dialogWidgetClass);
             }
 
@@ -184,6 +184,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     /**
      * @return array
+     * @throws \yii\db\Exception
      */
     public function initFilesList(): array
     {
@@ -208,7 +209,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     /**
      * @return string
-     * @throws InvalidConfigException
      */
     public function getAssetsUrl(): string
     {
@@ -279,18 +279,17 @@ class D3FilesPreviewWidget extends D3FilesWidget
         ];
 
         if (self::VIEW_MODAL_BUTTON === $this->view || self::VIEW_INLINE_BUTTON === $this->view) {
-            foreach ($this->viewExtension as $key => $extension) {
+            foreach ($this->viewExtension as $extension) {
                 if($params['file'] = D3Files::getFirstFileHavingExt($this->fileList, $extension)) {
                     break;
                 }
             }
         }
 
-        $params = array_merge(
+        return array_merge(
             parent::getViewParams(),
             $params
         );
-        return $params;
     }
 
     /**

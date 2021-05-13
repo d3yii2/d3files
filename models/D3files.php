@@ -6,11 +6,10 @@ use d3system\exceptions\D3ActiveRecordException;
 use d3system\exceptions\D3Exception;
 use d3yii2\d3files\components\FileHandler;
 use ReflectionException;
-use RuntimeException;
 use Yii;
-use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
 use yii\db\Expression;
 use yii\web\ForbiddenHttpException;
 use yii\web\UploadedFile;
@@ -45,10 +44,13 @@ class D3files extends ActiveRecord
      * @param int $modelId
      * @param string $filePath
      * @param string $fileTypes
-     * @param int $userId
-     * @throws \Exception
+     * @param int|null $userId
+     * @throws \ReflectionException
+     * @throws \d3system\exceptions\D3ActiveRecordException
+     * @throws \d3system\exceptions\D3Exception
+     * @throws \yii\base\Exception
      */
-    public static function saveFile($fileName, $modelName, $modelId, $filePath, $fileTypes, $userId = 0): void
+    public static function saveFile(string $fileName,string  $modelName,int $modelId,string $filePath,string $fileTypes,?int $userId = 0): void
     {
         $fileHandler = new FileHandler(
             [
@@ -83,12 +85,14 @@ class D3files extends ActiveRecord
      * @param int $modelId
      * @param string $fileContent
      * @param string $fileTypes
-     * @param int $userId
-     * @throws ForbiddenHttpException
-     * @throws Exception
-     * @throws ReflectionException
+     * @param int|null $userId
+     * @throws \ReflectionException
+     * @throws \d3system\exceptions\D3ActiveRecordException
+     * @throws \d3system\exceptions\D3Exception
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
      */
-    public static function saveContent($fileName, $modelName, $modelId, $fileContent, $fileTypes, $userId = 0): void
+    public static function saveContent(string $fileName,string  $modelName,int $modelId,string $fileContent,string $fileTypes,?int $userId = 0): void
     {
         $fileHandler = new FileHandler(
             [
@@ -114,7 +118,7 @@ class D3files extends ActiveRecord
             }
         } else {
             $fileHandler->remove();
-            throw new RuntimeException(500, Yii::t('d3files', 'Insert DB record failed'));
+            throw new Exception(Yii::t('d3files', 'Insert DB record failed'));
         }
     }
 
@@ -125,7 +129,7 @@ class D3files extends ActiveRecord
      * @param int $modelId
      * @throws \Exception
      */
-    public static function saveYii2UploadFile(UploadedFile $uploadFile, $modelName, $modelId): void
+    public static function saveYii2UploadFile(UploadedFile $uploadFile, string $modelName,int $modelId): void
     {
         $fileHandler = new FileHandler(
             [
@@ -157,6 +161,7 @@ class D3files extends ActiveRecord
      * @param string $modelName
      * @param int $modelId
      * @param int $filesModelId
+     * @throws \d3system\exceptions\D3ActiveRecordException
      */
     private static function saveModelName(string $modelName, int $modelId, int $filesModelId): void
     {
@@ -185,11 +190,9 @@ class D3files extends ActiveRecord
      *                   'file_model_id' => '44'              //d3files_model.id
      *                   'file_path => '/var/www/car/upload/car/111.jpg'
      *               ]
-     * @throws ForbiddenHttpException
-     * @throws \yii\db\Exception
      * @throws ReflectionException
      */
-    public static function getRecordFilesList($modelName, $modelId): array
+    public static function getRecordFilesList(string $modelName, int $modelId): array
     {
         $filesList = self::fileListForWidget($modelName, $modelId);
         foreach ($filesList as $k => $fileRow) {
@@ -212,7 +215,6 @@ class D3files extends ActiveRecord
      * @param $modelName
      * @param $modelId
      * @return array
-     * @throws \yii\db\Exception
      */
     public static function fileListForWidget($modelName, $modelId): array
     {
@@ -241,17 +243,15 @@ class D3files extends ActiveRecord
 
         $connection = Yii::$app->getDb();
         $command = $connection->createCommand($sSql, $parameters);
-        $raw = $command->getRawSql();
         return $command->queryAll();
     }
 
     /**
      * get file list for widget by model name id and model id
      *
-     * @param $modelName
-     * @param $modelId
+     * @param int $modelNameId
+     * @param int $modelId
      * @return array
-     * @throws \yii\db\Exception
      */
     public static function fileListForWidgetByNameId(int $modelNameId, int $modelId): array
     {
@@ -279,7 +279,6 @@ class D3files extends ActiveRecord
 
         $connection = Yii::$app->getDb();
         $command = $connection->createCommand($sSql, $parameters);
-        $raw = $command->getRawSql();
         return $command->queryAll();
     }
 
@@ -301,7 +300,6 @@ class D3files extends ActiveRecord
      * @param string $modelClass
      * @param array $modelIds
      * @return array
-     * @throws \yii\db\Exception
      */
 
     public static function forListBox(string $modelClass, array $modelIds): array
@@ -326,7 +324,6 @@ class D3files extends ActiveRecord
      * @param string $modelClass
      * @param array $ids
      * @return array
-     * @throws \yii\db\Exception
      */
     public static function getAllByModelRecordIds(string $modelClass, array $ids): array
     {

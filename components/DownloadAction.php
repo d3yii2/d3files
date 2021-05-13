@@ -24,6 +24,13 @@ class DownloadAction extends Action
 
     public const THE_REQUESTED_FILE_DOES_NOT_EXIST = 'The requested file does not exist.';
 
+    /**
+     * @throws \d3yii2\d3files\exceptions\D3FilesUserException
+     * @throws \yii\web\HttpException
+     * @throws \yii\web\ForbiddenHttpException
+     * @throws \ReflectionException
+     * @throws \yii\web\NotFoundHttpException
+     */
     public function run(int $id, string $model_name_id = ''): void
     {
 

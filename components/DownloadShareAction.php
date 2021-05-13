@@ -17,6 +17,11 @@ use yii\web\NotFoundHttpException;
  */
 class DownloadShareAction extends Action
 {
+    /**
+     * @throws \ReflectionException
+     * @throws \d3yii2\d3files\exceptions\D3FilesUserException
+     * @throws \yii\web\NotFoundHttpException
+     */
     public function run($id, $hash)
     {
 

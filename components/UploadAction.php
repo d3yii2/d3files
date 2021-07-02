@@ -3,6 +3,7 @@
 namespace d3yii2\d3files\components;
 
 use d3yii2\d3files\components\D3Files as D3FilesComponent;
+use d3yii2\d3files\exceptions\D3FilesUserException;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
@@ -76,7 +77,11 @@ class UploadAction extends D3FilesAction
                 $tmp_id = uniqid('d3f', false);
                 $versionCounter = 0;
                 $fileData = pathinfo($fileName);
-                
+
+                if(!isset($fileData['extension'])){
+                    throw new D3FilesUserException(Yii::t('d3files','Can not upload the file without extension'));
+                }
+
                 // If the file with the same name exists, extend the name with the version, e.g. file(1).ext, file(2).ext
                 do {
                     $versionName = $versionCounter > 0
@@ -207,15 +212,21 @@ class UploadAction extends D3FilesAction
                 'initialPreviewAsData' => true,
                // 'previewFileIcon' => "<i class='glyphicon glyphicon-king'></i>",
             ];
+        } catch (D3FilesUserException $e) {
+            Yii::$app->response->statusCode = 406;
+            return [
+                self::STATUS => self::STATUS_ERROR,
+                self::MESSAGE => $e->getMessage(),
+            ];
         } catch (HttpException | NotFoundHttpException $e) {
-            Yii::error($e->getMessage());
+            Yii::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
             Yii::$app->response->statusCode = 406;
             return [
                 self::STATUS => self::STATUS_ERROR,
                 self::MESSAGE => $e->getMessage(),
             ];
         } catch (Exception $e) {
-            Yii::error($e->getMessage());
+            Yii::error($e->getMessage() . PHP_EOL . $e->getTraceAsString());
             Yii::$app->response->statusCode = 502;
             return [
                 self::STATUS => self::STATUS_ERROR,

@@ -47,4 +47,5 @@ return [
     'mandatory POST parameter model_name is not set' => '',
     'upload_file is not set' => '',
     'You don\'t have access to parent record' => 'У вас нет доступа к родительской записи',
+    'Can not upload the file without extension' => 'Невозможно загрузить файл без расширения'
 ];

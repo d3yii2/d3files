@@ -70,4 +70,5 @@ return [
     //'Missing a temporary folder' => '',
     //'Failed to write file to disk.' => '',
     //'A PHP extension stopped the file upload.' => '',
+    'Can not upload the file without extension' => 'Nevar augšupielādēt failu bez paplašinājuma'
 ];

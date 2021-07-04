@@ -3,7 +3,7 @@ namespace d3yii2\d3files;
 
 use Yii;
 use yii\base\Module;
-use yii\db\ActiveRecord;
+use yii\i18n\PhpMessageSource;
 
 /**
  * d3files module definition class
@@ -15,6 +15,7 @@ class D3Files extends Module
      */
     public $controllerNamespace = 'd3yii2\d3files\controllers';
     
+    /** @var string|callable upload directory */
     public $uploadDir;
     public $fileTypes;
     public $disableController;
@@ -31,11 +32,11 @@ class D3Files extends Module
         self::registerTranslations();
     }
     
-    public static function registerTranslations()
+    public static function registerTranslations(): void
     {
         $i18n = Yii::$app->i18n;
         $i18n->translations['d3files'] = [
-            'class'            => 'yii\i18n\PhpMessageSource',
+            'class'            => PhpMessageSource::class,
             'sourceLanguage'   => 'en-US',
             'basePath'         => __DIR__ . '/messages',
             'forceTranslation' => true

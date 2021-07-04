@@ -78,6 +78,7 @@ class FileHandler
     }
 
     /**
+     * get file upload path for model class
      * @param $model_name
      * @return string
      */
@@ -86,7 +87,11 @@ class FileHandler
         $pos = strrpos($model_name, '\\');
         $modelShortName = false === $pos ? $model_name : substr($model_name, $pos + 1);
 
-        return Yii::$app->getModule('d3files')->uploadDir
+        $uploadDir = Yii::$app->getModule('d3files')->uploadDir;
+        if (is_callable($uploadDir)){
+            return $uploadDir($modelShortName, Yii::$app);
+        }
+        return $uploadDir
             . DIRECTORY_SEPARATOR . $modelShortName;
     }
 

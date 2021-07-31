@@ -348,7 +348,8 @@
             return wf;
         },
         getFileExtension: function(name) {
-            return name.split(/\#|\?/)[0].split('.').pop().trim().toLowerCase();
+           // return name.split(/\#|\?/)[0].split('.').pop().trim().toLowerCase();
+            return name.substr( (name.lastIndexOf('.') +1) ).toLowerCase();
         },
         initFilesListDropdown: function(m) {
             if ("undefined" === m.files) {

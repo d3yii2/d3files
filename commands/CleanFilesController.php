@@ -24,33 +24,53 @@ class CleanFilesController extends Controller
      *
      * @return int
      */
-    public function actionRemove($modelName, $date)
+    public function actionRemoveOlderThan($modelName, $date)
     {
 
-        $oldFiles = D3Files::find()
-            ->innerJoin('d3files_model', '`d3files_model`.`d3files_id` = `d3files`.`id`')
+        $oldFiles = D3filesModel::find()
+            ->innerJoin('d3files', '`d3files`.`id` = `d3files_model`.`d3files_id`')
             ->innerJoin(['d3files_model_name', '`d3file_model_name`.id = `d3files_model`.`model_name_id'])
             ->where(['`d3files_model_name`.`name`' => $modelName ])
+            ->andWhere(['deleted' => 0])
             ->andWhere(['<', '`add_datetime`', $date ])
             ->all()
         ;
 
-        $this->out('Deleting ' . count($oldFiles) . ' files.');
+        $this->stdout('Deleting ' . count($oldFiles) . ' files.');
 
         foreach ($oldFiles as $file) {
+
+            $file->deleted = 1;
+            $file->save();
+        }
+
+        return 0;
+    }
+
+
+    /**
+     * @param $modelName
+     * @return int
+     * @throws \ReflectionException
+     */
+    public function actionRemoveFiles($modelName)
+    {
+        $deletedFiles = D3filesModel::findAll(['deleted' => 1]);
+
+        foreach ($deletedFiles as $fileModel) {
+
+            $file = $fileModel->getD3files()->one();
+
 
             $fileHandler = new FileHandler(
                 [
                     'model_name' => $modelName,
-                    'model_id' => $file->id,
-                    'file_name'  => $file->file_name,
+                    'model_id' => $fileModel->d3files_id,
+                    'file_name' => $file->file_name,
                 ]
             );
-            $filePath = $fileHandler->getFilePath();
-            $fileModel = D3filesModel::findOne(['d3files_id' => $file->id]);
 
-            $fileModel->delete();
-            $file->delete();
+            $filePath = $fileHandler->getFilePath();
 
             if (file_exists($filePath)) {
                 unlink($filePath);
@@ -59,4 +79,5 @@ class CleanFilesController extends Controller
 
         return 0;
     }
+    
 }

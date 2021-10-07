@@ -4,7 +4,6 @@
 namespace d3yii2\d3files\commands;
 
 use yii\console\Controller;
-use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\components\FileHandler;
 
@@ -47,20 +46,21 @@ class CleanFilesController extends Controller
         return 0;
     }
 
-
     /**
      * @param $modelName
-     * @return int
      * @throws \ReflectionException
+     *
+     * @return int
      */
     public function actionRemoveFiles($modelName)
     {
-        $deletedFiles = D3filesModel::findAll(['deleted' => 1]);
+        $deletedFiles = D3filesModel::find()
+            ->where(['deleted' => 1])
+            ->all();
 
         foreach ($deletedFiles as $fileModel) {
 
             $file = $fileModel->getD3files()->one();
-
 
             $fileHandler = new FileHandler(
                 [
@@ -71,9 +71,15 @@ class CleanFilesController extends Controller
             );
 
             $filePath = $fileHandler->getFilePath();
+            $fileModel->delete();
 
-            if (file_exists($filePath)) {
-                unlink($filePath);
+            if (!D3filesModel::findOne(['d3files_id' => $file->id])) {
+
+                $file->delete();
+
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
             }
         }
 

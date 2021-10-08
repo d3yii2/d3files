@@ -11,6 +11,8 @@ class CleanFilesController extends Controller
 {
 
     /**
+     * soft deletes all the file models older than date provided
+     *
      * date must be in format yyyy-mm-dd
      * example:
      * date -d '-3 year' '+%Y-%d-%m'
@@ -47,6 +49,9 @@ class CleanFilesController extends Controller
     }
 
     /**
+     * deletes all files saved under the model name
+     * with value "deleted = 1"
+     *
      * @param $modelName
      * @throws \ReflectionException
      *

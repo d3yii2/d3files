@@ -341,6 +341,20 @@ $model = Users::findOne($id);
 D3filesModel::createCopy($fileModelId, Users::class, $model->id);
 ```
 
+### Maintenance commands
+
+Soft delete
+
+```bash
+d3files/remove-older-than full/model/name yyyy-mm-dd
+```
+
+Deletes files and corresponding records in database
+
+```bash
+d3files/remove-files full/model/name
+```
+
 ### Change log
  - 0.9.0 (Feb 26, 2017) - added RU translation
  - 0.9.3 (May 29, 2017) - auto creating upload directories

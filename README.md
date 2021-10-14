@@ -343,13 +343,13 @@ D3filesModel::createCopy($fileModelId, Users::class, $model->id);
 
 ### Maintenance commands
 
-Soft delete
+Soft deletes files (sets deleted=0)
 
 ```bash
-d3files/remove-older-than full/model/name yyyy-mm-dd
+d3files/remove-older-than full/model/name months
 ```
 
-Deletes files and corresponding records in database
+Deletes files and corresponding records in database which have deleted=0
 
 ```bash
 d3files/remove-files full/model/name

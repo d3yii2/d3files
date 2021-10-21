@@ -7,6 +7,7 @@ use yii\console\Controller;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\components\FileHandler;
 use d3system\commands\D3CommandController;
+use Yii;
 
 class CleanFilesController extends D3CommandController
 {
@@ -91,6 +92,40 @@ class CleanFilesController extends D3CommandController
             }
 
         }
+
+        return 0;
+    }
+
+    /**
+     * Deletes files in runtime older than days provided
+     *
+     * @param $subDirectory
+     * @param $days
+     *
+     * @return int
+     */
+    public function actionRemoveRuntimeOlderThan($subDirectory, $days)
+    {
+
+        $runtimeDir = Yii::getAlias('@runtime');
+
+        $fileDir = $runtimeDir . '/' . $subDirectory;
+
+        $handler = opendir($runtimeDir . '/' . $subDirectory);
+
+        while (false !== ($file = readdir($handler)))  {
+
+            $fullFilePath = $fileDir . '/' . $file;
+
+            if (filemtime($fullFilePath) < strtotime('-' . $days . ' days') && !is_dir($fullFilePath)) {
+
+                $this->stdout('Deleting ' . $file . PHP_EOL);
+                unlink($fullFilePath);
+            }
+
+        }
+
+        closedir($handler);
 
         return 0;
     }

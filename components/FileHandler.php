@@ -308,6 +308,10 @@ class FileHandler
         $file_path = $this->getFilePath();
 
         if (!is_file($file_path)) {
+            Yii::error(
+                'Neatrad ' . $file_path . PHP_EOL
+                . '$this->options: ' . VarDumper::dumpAsString($this->options)
+            );            
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
         $mimeType = FileHelper::getMimeTypeByExtension($this->options['file_name']);

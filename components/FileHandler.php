@@ -10,6 +10,7 @@ use Yii;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
 use yii\helpers\FileHelper;
+use yii\helpers\VarDumper;
 use yii\web\ForbiddenHttpException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -81,6 +82,7 @@ class FileHandler
      * get file upload path for model class
      * @param $model_name
      * @return string
+     * @return string
      */
     protected static function getUploadDirPath($model_name): string
     {
@@ -96,6 +98,7 @@ class FileHandler
     }
 
     /**
+     * @param array $options
      * @param array $options
      * @return string
      * @throws ReflectionException
@@ -185,11 +188,15 @@ class FileHandler
      */
     public function getFilePath(): string
     {
-        return $this->options['file_path'] ?? ($this->options['upload_dir'] . DIRECTORY_SEPARATOR
-                . self::createSaveFileName(
-                    $this->options['model_id'],
-                    $this->options['file_name']
-                ));
+        if ($this->options['file_path'] ?? false) {
+            return $this->options['file_path'];
+        }
+        return $this->options['upload_dir']
+            . DIRECTORY_SEPARATOR
+            . self::createSaveFileName(
+                $this->options['model_id'],
+                $this->options['file_name']
+            );
     }
 
     /**

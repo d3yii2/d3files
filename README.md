@@ -343,16 +343,21 @@ D3filesModel::createCopy($fileModelId, Users::class, $model->id);
 
 ### Maintenance commands
 
-Soft deletes files (sets deleted=0)
-
+Soft deletes files (sets deleted=1)
+For model dektrium\user\models\User remove from database model dektrium\user\models\User oldest as 12 months  files
 ```bash
-d3files/remove-older-than full/model/name months
+yii d3files/remove-older-than 'dektrium\user\models\User' 12
 ```
 
-Deletes files and corresponding records in database which have deleted=0
+Deletes files and corresponding records in database which have deleted=1
+ ```bash
+yii d3files/remove-files 'dektrium\user\models\User'
+```
 
-```bash
-d3files/remove-files full/model/name
+Deletes model files from filesystem with out refence in database
+ ```bash
+yii d3files/clean-files/unused-files  'poker\poker\models\PkPlaygroundFixes'
+
 ```
 
 ### Change log
@@ -360,3 +365,4 @@ d3files/remove-files full/model/name
  - 0.9.3 (May 29, 2017) - auto creating upload directories
  - 0.9.4 (Nov 16, 2017) - added parameter controllerRoute  
  - 0.9.13 (Jul 2, 2018) - added action column
+ - 0.9.93 (febr 10, 2022) - added maint

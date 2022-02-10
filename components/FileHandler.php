@@ -84,7 +84,7 @@ class FileHandler
      * @return string
      * @return string
      */
-    protected static function getUploadDirPath($model_name): string
+    public static function getUploadDirPath($model_name): string
     {
         $pos = strrpos($model_name, '\\');
         $modelShortName = false === $pos ? $model_name : substr($model_name, $pos + 1);

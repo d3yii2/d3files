@@ -3,10 +3,11 @@
 
 namespace d3yii2\d3files\controllers;
 
-use yii\console\Controller;
+use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\components\FileHandler;
 use d3system\commands\D3CommandController;
+use yii\helpers\VarDumper;
 
 class CleanFilesController extends D3CommandController
 {
@@ -17,13 +18,11 @@ class CleanFilesController extends D3CommandController
      *
      * @param $modelName
      * @param $months
-     * @throws \ReflectionException
      * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
      *
      * @return int
      */
-    public function actionRemoveOlderThan($modelName, $months)
+    public function actionRemoveOlderThan($modelName, $months): int
     {
         $date = date('Y-m-d', strtotime('-'.$months.' month'));
 
@@ -52,9 +51,10 @@ class CleanFilesController extends D3CommandController
      * with value "deleted = 1"
      *
      * @param $modelName
-     * @throws \ReflectionException
-     *
      * @return int
+     * @throws \ReflectionException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionRemoveFiles($modelName)
     {
@@ -66,6 +66,7 @@ class CleanFilesController extends D3CommandController
 
         foreach ($deletedFiles as $fileModel) {
 
+            /** @var D3files $file */
             $file = $fileModel->getD3files()->one();
 
             $fileHandler = new FileHandler(
@@ -90,6 +91,48 @@ class CleanFilesController extends D3CommandController
                 $this->stdout('Can\'t delete file ' . $file->file_name . ', in use with model: '. $usedModel->id);
             }
 
+        }
+
+        return 0;
+    }
+
+    /**
+     * check all model files in upload directory and check it in db. if not used, delete
+     * @param string $modelName
+     * @return int
+     */
+    public function actionUnusedFiles(string $modelName): int
+    {
+        $dirPath = FileHandler::getUploadDirPath($modelName);
+        $handle = opendir($dirPath);
+
+        if ($handle) {
+            $i = 1;
+            while (($entry = readdir($handle)) !== FALSE) {
+                if ($entry ==='.') {
+                    continue;
+                }
+                if ($entry ==='..') {
+                    continue;
+                }
+                $i++;
+                $this->out($entry);
+                $fileName = pathinfo($entry, PATHINFO_FILENAME);
+                if (!preg_match('#^\d+$#',$fileName)) {
+                    $this->out(' ilegal file name');
+                    continue;
+                }
+                if (D3files::findOne($fileName)) {
+                    //$this->out(' Izmanto');
+                    continue;
+                }
+                $this->out(' unused');
+                if (!unlink($dirPath . '/' . $entry)){
+                    $this->out(' Error: can not unlink');
+                    continue;
+                }
+                $this->out(' unlinked');
+            }
         }
 
         return 0;

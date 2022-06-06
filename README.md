@@ -317,12 +317,33 @@ $url = 'http://www.yoursite.com/index.php?r=d3files/d3files/downloadshare&id=' .
 echo $url;
 ```
 
-### Get record files list 
+### Get record files list  
 
 ```php
 use d3yii2\d3files\models\D3files;
 $filesList = D3files::getRecordFilesList($model::className(),$model->id)
 ```
+
+### Get record files with full path 
+```php 
+    public static function getRecordFiles(string $className, int $recordId): array
+    {
+        $files = [];
+        foreach (D3Files::getModelFilesList($className, $recordId, true) as $file) {
+            $fileHandler = new FileHandler([
+                'model_name' => $file['className'],
+                'model_id' => $file['id'],
+                'file_name' => $file['file_name']
+            ]);
+                $files[] = [
+                    'fileName' => $file['file_name'],
+                    'filePath' => $fileHandler->getFilePath(),
+                ];
+        }
+        return $files;
+    }
+```
+
 
 ### Attach existing file to record
 

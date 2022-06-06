@@ -1,6 +1,7 @@
 <?php
 namespace d3yii2\d3files\components;
 
+use ReflectionClass;
 use Yii;
 use yii\base\Component;
 use yii\db\ActiveRecord;
@@ -109,12 +110,16 @@ class D3Files extends Component
     /**
      * @param string $modelName
      * @param string $modelId
+     * @param bool $forPath get data for building file path
      * @return array
-     * @throws \yii\db\Exception
      */
-    public static function getModelFilesList(string $modelName, string $modelId): array
+    public static function getModelFilesList(
+        string $modelName,
+        string $modelId,
+        bool $forPath = false
+    ): array
     {
-        $files = ModelD3Files::fileListForWidget($modelName, $modelId);
+        $files = ModelD3Files::fileListForWidget($modelName, $modelId, $forPath);
 
         foreach ($files as $i => $f) {
             $files[$i]['model_id'] = $modelId;
@@ -162,7 +167,7 @@ class D3Files extends Component
     {
         if ($modelName) {
             // Check for model defined attachment types first
-            $model = new \ReflectionClass($modelName);
+            $model = new ReflectionClass($modelName);
             $modelFileTypes = $model->getConstant('D3FILES_ALLOWED_EXT_REGEXP');
             if ($modelFileTypes) {
                 return $modelFileTypes;

@@ -212,14 +212,51 @@ class D3files extends ActiveRecord
     /**
      * get file list for widget
      *
-     * @param $modelName
-     * @param $modelId
+     * @param string $modelName
+     * @param int $modelId
+     * @param bool $forPath get data for building file path
      * @return array
+     * @throws \yii\db\Exception
      */
-    public static function fileListForWidget($modelName, $modelId): array
+    public static function fileListForWidget(
+        string $modelName,
+        int $modelId,
+        bool $forPath = false
+    ): array
     {
-        $sSql = /** @lang text */
-            '
+        if ($forPath) {
+            $sSql = '
+            SELECT 
+              f.id,
+              f.file_name,
+              f.notes,
+              CASE fm.is_file 
+                WHEN 1 THEN fm.id 
+                ELSE fmbase.id
+              END file_model_id,
+              CASE fm.is_file 
+                WHEN 1 THEN fmn.name
+                ELSE fmnBase.name
+              END className              
+            FROM
+              d3files f
+              INNER JOIN d3files_model fm
+                ON f.id = fm.d3files_id
+              INNER JOIN d3files_model_name fmn
+                ON fm.model_name_id = fmn.id
+              LEFT OUTER JOIN d3files_model fmbase
+                ON fm.is_file = 0
+                  AND fm.d3files_id = fmbase.d3files_id
+                  AND fmbase.is_file = 1   
+              LEFT OUTER JOIN d3files_model_name fmnBase
+                ON fmnBase.id = fmBase.model_name_id    
+            WHERE fmn.name    = :model_name
+              AND fm.model_id = :model_id
+              AND fm.deleted  = 0
+        ';
+
+        } else {
+            $sSql = '
             SELECT 
               f.id,
               f.file_name,
@@ -235,15 +272,15 @@ class D3files extends ActiveRecord
               AND fm.model_id = :model_id
               AND fm.deleted  = 0
         ';
+        }
 
-        $parameters = [
-            ':model_name' => $modelName,
-            ':model_id' => $modelId,
-        ];
-
-        $connection = Yii::$app->getDb();
-        $command = $connection->createCommand($sSql, $parameters);
-        return $command->queryAll();
+        return Yii::$app
+            ->getDb()
+            ->createCommand($sSql,[
+                ':model_name' => $modelName,
+                ':model_id' => $modelId,
+            ])
+            ->queryAll();
     }
 
     /**

@@ -232,7 +232,7 @@ class D3files extends ActiveRecord
               f.notes,
               CASE fm.is_file 
                 WHEN 1 THEN fm.id 
-                ELSE fmbase.id
+                ELSE fmBase.id
               END file_model_id,
               CASE fm.is_file 
                 WHEN 1 THEN fmn.name
@@ -244,10 +244,10 @@ class D3files extends ActiveRecord
                 ON f.id = fm.d3files_id
               INNER JOIN d3files_model_name fmn
                 ON fm.model_name_id = fmn.id
-              LEFT OUTER JOIN d3files_model fmbase
+              LEFT OUTER JOIN d3files_model fmBase
                 ON fm.is_file = 0
-                  AND fm.d3files_id = fmbase.d3files_id
-                  AND fmbase.is_file = 1   
+                  AND fm.d3files_id = fmBase.d3files_id
+                  AND fmBase.is_file = 1   
               LEFT OUTER JOIN d3files_model_name fmnBase
                 ON fmnBase.id = fmBase.model_name_id    
             WHERE fmn.name    = :model_name

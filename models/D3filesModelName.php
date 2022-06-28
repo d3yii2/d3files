@@ -50,7 +50,7 @@ class D3filesModelName extends ActiveRecord
      */
     public function getD3filesModels()
     {
-        return $this->hasMany(D3filesModel::className(), ['model_name_id' => 'id']);
+        return $this->hasMany(D3filesModel::class, ['model_name_id' => 'id']);
     }
 
     /**
@@ -59,11 +59,11 @@ class D3filesModelName extends ActiveRecord
      *
      * @return integer model name id
      */
-    public function getByName($name, $addIfNotSet)
+    public function getByName(string $name, bool $addIfNotSet)
     {
         $model = self::find()
             ->select('id')
-            ->where(['name' => $name])
+            ->where(['name' => trim($name)])
             ->one();
 
         if ($model) {
@@ -79,6 +79,5 @@ class D3filesModelName extends ActiveRecord
         $newModel->save();
 
         return $newModel->id;
-
     }
 }

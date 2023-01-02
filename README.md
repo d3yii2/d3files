@@ -152,9 +152,10 @@ For implementing access control add separate actions for upload, download and de
                         'allow' => true,
                         'actions' => [
                             'd3filesdownload',
-                            'd3filesopen', //d3filesopen
+                            'd3filesopen', 
                             'd3filesupload',
                             'd3filesdelete',
+                            'd3fileseditnotes'
                         ],
                         'roles' => ['role1','role2'],
                     ],
@@ -168,34 +169,42 @@ For implementing access control add separate actions for upload, download and de
                 ],
             ],
         ];
-        
         return array_merge(parent::behaviors(), $addBehaviors);
     }
 
     public function actions() {
         return [
             'd3filesdownload' => [
-                'class' => 'd3yii2\d3files\components\DownloadAction',
-                'modelName' => RkInvoice::className(),
+                'class' => d3yii2\d3files\components\DownloadAction::class,
+                'modelName' => D3pPerson::class,
             ],
             'd3filesupload'   => [
-                'class' => 'd3yii2\d3files\components\UploadAction',
-                'modelName' => RkInvoice::className(),
+                'class' => d3yii2\d3files\components\UploadAction::class,
+                'modelName' => D3pPerson::class,
             ],
             'd3filesdelete'   => [
-                'class' => 'd3yii2\d3files\components\DeleteAction',
-                'modelName' => RkInvoice::className(),
+                'class' => \d3yii2\d3files\components\DeleteAction::class,
+                'modelName' => D3pPerson::class,
             ],
+            // for D3FilesPreviewWidget
+            'd3filesopen' => [
+                'class' => Dd3yii2\d3files\components\ownloadAction::class,
+                'modelName' => D3pPerson::class,
+                'downloadType' => 'open'
+            ],        
             // for D3FilesPreviewWidget
             'd3filesopen' => [
                 'class' => 'd3yii2\d3files\components\DownloadAction',
                 'modelName' => RkInvoice::class,
                 'downloadType' => 'open'
-            ],            
-            
+            ],         
+            // for D3FilesPreviewWidget
+            'd3fileseditnotes' => [
+                'class' => EditNotesAction::class,
+                'modelName' => D3pPerson::class,
+            ],   
         ];
     }
-
 ```
 
 Widget

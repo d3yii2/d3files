@@ -94,7 +94,7 @@ File types are determined automatically to load PDF or images inside modal dialo
 ###
 Dependencies:
 
-eaBlankonThema\widget\ThModal
+eaArgonTheme\widget\ThModal
 
 d3system\yii2\web\D3SystemView
 

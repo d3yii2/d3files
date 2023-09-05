@@ -1,7 +1,7 @@
 <?php
 
 use d3yii2\d3files\widgets\D3FilesWidget;
-use eaBlankonThema\widget\ThModal;
+use eaArgonTheme\widget\ThModal;
 use yii\helpers\Html;
 
 \d3yii2\d3files\D3FilesAsset::register($this);

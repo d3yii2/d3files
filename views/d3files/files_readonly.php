@@ -1,6 +1,6 @@
 <?php
 
-use eaBlankonThema\widget\ThFancyBoxLink;
+use eaArgonTheme\widget\ThFancyBoxLink;
 use yii\helpers\Html;
 
 /**

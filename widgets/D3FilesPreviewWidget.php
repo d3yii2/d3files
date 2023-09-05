@@ -6,7 +6,7 @@ use d3system\exceptions\D3Exception;
 use d3yii2\d3files\D3FilesPreviewAsset;
 use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\pdfobject\widgets\PDFObject;
-use eaBlankonThema\assetbundles\AjaxAsset;
+use eaArgonTheme\assetbundles\AjaxAsset;
 use Exception;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -54,7 +54,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public $showPrevNext = false;
     public $prevFile;
     public $nextFile;
-    public $dialogWidgetClass = 'eaBlankonThema\widget\ThModal';
+    public $dialogWidgetClass = 'eaArgonTheme\widget\ThModal';
     public $pdfObjectOptions = [];
     public $showPrevNextButtons = false;
     public $viewType = self::VIEW_TYPE_MODAL;

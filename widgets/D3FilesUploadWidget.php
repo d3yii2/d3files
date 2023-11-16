@@ -34,6 +34,8 @@ class D3FilesUploadWidget extends D3Widget
     public $showRemove = true;
     public $addModelId = true;
     public $autostart = true;
+    public $disabled = false;
+    public $readonly = false;
     
     /**
      * @throws Exception
@@ -123,13 +125,17 @@ class D3FilesUploadWidget extends D3Widget
                 [
                     'options' => $this->options,
                     'pluginOptions' => $this->pluginOptions,
+                    'readonly' => $this->readonly,
+                    'disabled' => $this->disabled
                 ]
             )
             : FileInput::widget(
                 [
                     'name' => $this->name,
                     'options' => $this->options,
-                    'pluginOptions' => $this->pluginOptions
+                    'pluginOptions' => $this->pluginOptions,
+                    'readonly' => $this->readonly,
+                    'disabled' => $this->disabled
                 ]
             );
     }

@@ -91,6 +91,16 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
         <?php endif; ?>
     </div>
     <div class="panel-body no-padding">
+        <?php if (!$fileList): ?>
+            <div class="row">
+                <div class="col-sm-12 d3files-drop-zone"
+                     title="<?= Yii::t('d3files', 'No files yet') ?>"
+                     style="border: 2px dashed #bbbbbb; color: #bbbbbb; text-align: center; padding: 8px;">
+                    <span class="glyphicon glyphicon-cloud-upload"></span>
+                    <?= Yii::t('d3files', 'No files yet') ?>
+                </div>
+            </div>
+        <?php endif; ?>
         <?= $this->render('_list_table', $_params_) ?>
     </div>
 </div>

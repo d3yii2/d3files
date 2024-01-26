@@ -1,12 +1,15 @@
 <?php
 namespace d3yii2\d3files\components;
 
+use d3yii2\d3files\models\D3filesModel;
+use d3yii2\d3files\models\D3filesModelName;
 use ReflectionClass;
 use Yii;
 use yii\base\Component;
 use yii\db\ActiveRecord;
 use yii\helpers\Url;
 use d3yii2\d3files\models\D3files as ModelD3Files;
+use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
 /**
@@ -241,5 +244,27 @@ class D3Files extends Component
     public static function isNotesEnabled()
     {
         return Yii::$app->getModule('d3files')->enableNotes;
+    }
+
+    /**
+     * @param int $id
+     * @throws NotFoundHttpException
+     * @throws \yii\web\ForbiddenHttpException
+     */
+    public static function deleteFileById(int $id): void
+    {
+        if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0])) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+        }
+
+        if (!$fileModelName = D3filesModelName::findOne($fileModel->model_name_id)) {
+            throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+        }
+
+        // Check access rights to the record the file is attached to
+        \d3yii2\d3files\models\D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
+
+        $fileModel->deleted = 1;
+        $fileModel->save();
     }
 }

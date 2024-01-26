@@ -2,7 +2,6 @@
 
 namespace d3yii2\d3files\components;
 
-use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
 use Exception;
@@ -43,20 +42,7 @@ class DeleteAction extends D3FilesAction
 
             $this->modelName = $model_name;
 
-
-            if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0])) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
-            }
-
-            if (!$fileModelName = D3filesModelName::findOne($fileModel->model_name_id)) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
-            }
-
-            // Check access rights to the record the file is attached to
-            D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
-
-            $fileModel->deleted = 1;
-            $fileModel->save();
+            D3Files::deleteFileById($id);
 
             return [
                 self::STATUS => self::STATUS_SUCCESS,

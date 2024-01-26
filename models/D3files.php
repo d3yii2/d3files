@@ -129,7 +129,7 @@ class D3files extends ActiveRecord
      * @param int $modelId
      * @throws \Exception
      */
-    public static function saveYii2UploadFile(UploadedFile $uploadFile, string $modelName,int $modelId): void
+    public static function saveYii2UploadFile(UploadedFile $uploadFile, string $modelName, int $modelId, ?int $typeId = null): void
     {
         $fileHandler = new FileHandler(
             [
@@ -148,6 +148,10 @@ class D3files extends ActiveRecord
         $model->add_datetime = new Expression('NOW()');
         $model->user_id = Yii::$app->person->user_id;
 
+        if ($typeId) {
+            $model->type_id = $typeId;
+        }
+        
         if ($model->save()) {
             self::saveModelName($modelName, $modelId, $model->id);
             $fileHandler->rename($model->id);

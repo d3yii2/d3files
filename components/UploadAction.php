@@ -39,6 +39,9 @@ class UploadAction extends D3FilesAction
             $d3filesModule = Yii::$app->getModule('d3files');
             
             if (!$d3filesModule->disableController) {
+                if (!$postModelName) {
+                    throw new HttpException(422, 'Can not upload file');
+                }                
                 if (is_array($this->modelName) && !in_array($postModelName, $this->modelName, true)) {
                     throw new HttpException(422, 'Can not upload file for requested model');
                 }

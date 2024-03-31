@@ -2,7 +2,7 @@
 
 use d3yii2\d3files\D3FilesAsset;
 use d3yii2\d3files\widgets\D3FilesWidget;
-use yii\bootstrap\Html;
+use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**

@@ -62,7 +62,7 @@ class D3FilesColumn extends DataColumn
         $rows = $this->grid->dataProvider->getModels();
 
         foreach ($rows as $row) {
-            $this->dataProviderIds[] = $row->id;
+            $this->dataProviderIds[] = is_array($row) ? $row['id'] : $row->id;
         }
 
         try {
@@ -93,13 +93,15 @@ class D3FilesColumn extends DataColumn
     public function renderDataCellContent($model, $key, $index): string
     {
         try {
-            if (empty($this->recordsWithFiles[$model->id])) {
+            $modelId = is_array($model) ? $model['id'] : $model->id;
+            if (empty($this->recordsWithFiles[$modelId])) {
                 return '';
             }
 
-            $modelFiles = $this->recordsWithFiles[$model->id];
+            $modelFiles = $this->recordsWithFiles[$modelId];
 
-            $search = Yii::$app->request->get('RkInvoiceSearch');
+            //@FIXME - old dummy dependency
+            //$search = Yii::$app->request->get('RkInvoiceSearch');
 
             $options = array_merge(
                 [
@@ -115,9 +117,10 @@ class D3FilesColumn extends DataColumn
                 $this->previewOptions
             );
 
-            if (!empty($search['attachment_type'])) {
+            //@FIXME - old dummy dependency
+            /*if (!empty($search['attachment_type'])) {
                 $options['viewByExtensions'] = [$search['attachment_type']];
-            }
+            }*/
 
             return D3FilesPreviewWidget::widget($options);
         }catch (\Exception $exception){

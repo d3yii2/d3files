@@ -102,7 +102,11 @@ class D3FilesWidget extends D3Widget
                 $this->model_name = get_class($this->model);
             }
             
-            if ('' === $this->controllerRoute && property_exists($this->model, 'd3filesControllerRoute')) {
+            $hasRoute = is_array($this->model)
+                ? $this->model['d3filesControllerRoute'] ?? null
+                : property_exists($this->model, 'd3filesControllerRoute');
+            
+            if ('' === $this->controllerRoute && $hasRoute) {
                 $this->controllerRoute = $this->model->d3filesControllerRoute;
             }
         }

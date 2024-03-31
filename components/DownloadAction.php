@@ -22,6 +22,10 @@ class DownloadAction extends Action
 
     public $downloadType = 'download';
 
+    public $readValidationModelClass;
+
+    public $performReadValidationCallback;
+    
     public const THE_REQUESTED_FILE_DOES_NOT_EXIST = 'The requested file does not exist.';
 
     /**
@@ -78,9 +82,13 @@ class DownloadAction extends Action
             throw new NotFoundHttpException(Yii::t('d3files', self::THE_REQUESTED_FILE_DOES_NOT_EXIST));
         }
 
-        // Check access rights to the record the file is attached to
-        D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
 
+        $readValidationModel = $this->readValidationModelClass ?? $fileModelName->name;
+        
+        // Check access rights to the record the file is attached to
+        D3files::performReadValidation($readValidationModel, $fileModel->model_id);
+        
+        
         $modelName = $fileModelName->name;
         
         if(!$fileModel->is_file){

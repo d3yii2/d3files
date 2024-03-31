@@ -331,8 +331,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
         $attrs = self::getPreviewButtonDataAttributes($file, $files);
         $attrs['title'] = Yii::t('d3files', 'Preview atachment');
         $attrs['class'] = 'd3files-preview-widget-load ';
-        $attrs['data-toggle'] = 'modal';
-        $attrs['data-target'] = '#' . self::MODAL_ID;
+        $attrs['data-bs-toggle'] = 'modal';
+        $attrs['data-bs-target'] = '#' . self::MODAL_ID;
 
         return $attrs;
     }

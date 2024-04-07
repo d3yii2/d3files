@@ -108,7 +108,7 @@ class D3FilesColumn extends DataColumn
                     'model' => $model,
                     'nameModel' => $this->nameModel,
                     'fileList' => $modelFiles,
-                    'showPrevNextButtons' => true,
+                    'showPrevNextButtons' => false,
                     'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,
                     'nextButtonLabel' => $this->nextButtonLabel,
                     'prevButtonLabel' => $this->prevButtonLabel,

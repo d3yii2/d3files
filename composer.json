@@ -23,7 +23,8 @@
         "yiisoft/yii2-bootstrap": "@dev",
         "kartik-v/yii2-widget-fileinput": "dev-master",
         "d3yii2/pdfobject": "*",
-        "d3yii2/d3system": "*"
+        "d3yii2/d3system": "*",
+        "d3yii2/d3icon": "*"
     },
     "autoload": {
         "psr-4": {

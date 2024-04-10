@@ -5,9 +5,13 @@ namespace d3yii2\d3files\widgets;
 use d3system\exceptions\D3Exception;
 use d3yii2\d3files\D3FilesPreviewAsset;
 use d3yii2\d3files\models\D3filesModelName;
+use d3yii2\d3icon\components\IconSvg;
+use d3yii2\d3icon\Icon;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaArgonTheme\assetbundles\AjaxAsset;
+use eaArgonTheme\widget\ThModal;
 use Exception;
+use yii\bootstrap5\Modal;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -54,7 +58,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public $showPrevNext = false;
     public $prevFile;
     public $nextFile;
-    public $dialogWidgetClass = 'eaArgonTheme\widget\ThModal';
+    public $dialogWidgetClass = Modal::class;
+    public $dialogWidgetOptions = [];
     public $pdfObjectOptions = [];
     public $showPrevNextButtons = false;
     public $viewType = self::VIEW_TYPE_MODAL;
@@ -65,6 +70,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
     /** @var bool */
     public $useInColumn = false;
 
+    private $dialogWidgetRendered = false;
+    
     public const DEFAULT_ICON = 'glyphicon glyphicon-eye-open';
 
     public const VIEW_DROPDOWN_LIST = 'dropdown-list';
@@ -80,6 +87,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public const PREVIEW_BUTTON_CLASS = 'd3files-preview-button';
 
     private const MODAL_ID = 'D3FilesPreviewModal';
+
+    private const MODALS_RENDERED = 'PreviewModalsRendered';
 
     /**
      * @throws Exception
@@ -150,22 +159,43 @@ class D3FilesPreviewWidget extends D3FilesWidget
         }
 
         // Ensure modal preview is enabled and the layout rendered once
-        if (self::VIEW_TYPE_MODAL === $this->viewType && !isset(Yii::$app->view->params['D3FilesModalRendered'])) {
+        if (self::VIEW_TYPE_MODAL === $this->viewType) {
             if (is_callable($this->dialogWidgetClass)) {
                 throw new D3Exception('Invalid Modal Dialog class: ' . $this->dialogWidgetClass);
             }
 
-            $modalOptions = [];
+            $dialogDefaultOptions = [
+                'id' => self::MODAL_ID,
+                'dialogOptions' => ['class' => 'modal-dialog modal-lg h-100'],
+                'headerOptions' => ['class' => 'modal-header justify-content-end'],
+                'title' => $this->getModalTitle(),
+                'closeButton' => [
+                    'class' => 'btn btn-default btn-xs me-2',
+                    'label' => Icon::svg(IconSvg::X_CLOSE),
+                ]
+            ];
+            
+            $dialogOptions = array_merge($this->dialogWidgetOptions, $dialogDefaultOptions);
 
-            // Force modal width/height
-            $modalOptions['dialogHtmlOptions'] = ['style' => 'width:70%;height:80%'];
-            $modalOptions['contentHtmlOptions'] = ['style' => 'height:100%'];
-            $modalOptions['id'] = self::MODAL_ID;
-            $modalOptions['contentClass'] = PDFObject::CONTENT_CLASS;
-            $modalOptions['title'] = $this->getModalTitle();
-            $modalOptions['toolbarContent'] = $this->getModalToolbarContent();
+            if (!$this->isDialogRendered($dialogOptions['id'])) {
 
-            $this->dialogWidgetClass::widget($modalOptions);
+                 if (!isset(Yii::$app->view->params[self::MODALS_RENDERED])) {
+                    Yii::$app->view->params[self::MODALS_RENDERED] = [];
+                }
+
+                Yii::$app->view->params[self::MODALS_RENDERED][] = $dialogOptions['id'];
+
+                //Yii::$app->view->addToPageFooter(
+                    $this->dialogWidgetClass::begin($dialogOptions);
+                    echo $this->getModalToolbarContent();
+                    echo Html::tag(
+                        'div',
+                        '',
+                        ['class' => 'embed-content ' . PDFObject::CONTENT_CLASS]
+                    );
+                    $this->dialogWidgetClass::end();
+                //);
+            }
         }
 
         Yii::$app->getView()->registerJs(
@@ -231,14 +261,20 @@ class D3FilesPreviewWidget extends D3FilesWidget
     {
         $previewButtons = $this->showPrevNextButtons ? $this->getPrevNextFileButtons() : '';
 
-        return '
+        $content = '
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-sm-4">';
+        
+        if ($this->showPrevNextButtons) {
+            $content .= '
                     <div class="d3preview-counter pull-left">
                         <span class="d3preview-counter-i"></span>
                         <span class="d3preview-counter-from">' . Yii::t('d3files', 'from') . '</span>
                         <span class="d3preview-counter-total"></span>
-                    </div>
+                    </div>';
+        }
+        
+        $content .='
                     <span class="d3preview-model-files pull-left"></span>
                 </div>
                 <div class="col-sm-5 text-center">' . $previewButtons . '</div>
@@ -247,6 +283,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 <div class="d3preview-image-content" style="display: none"></div>
            </div>
            ';
+        
+        return $content;
     }
 
     public function getFilesDropdown(): string
@@ -364,4 +402,17 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
         return $buttons;
     }
+
+    /**
+     * Checks the current modal is rendered already
+     * There should be only one modal with unique ID per page
+     * @return bool
+     */
+    public function isDialogRendered($modalId): bool
+    {
+        $params = Yii::$app->view->params;
+
+        return !empty($params[self::MODALS_RENDERED]) && in_array($modalId, $params[self::MODALS_RENDERED]);
+    }
+
 }

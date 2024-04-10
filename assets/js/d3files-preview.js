@@ -15,8 +15,8 @@
             previewDropdown: $('.d3files-preview-dropdown'),
             prevButton: $('.d3files-preview-prev-button'),
             nextButton: $('.d3files-preview-next-button'),
-            modalContent: $('#th-modal .th-modal-content'),
-            modalMessages: $('#th-modal .th-modal-messages'),
+            embedContent: $('.modal .embed-content'),
+            modalMessages: $('.modal .modal-messages'),
             imageContent: $('.d3preview-image-content'),
             filesListContent: $('.d3preview-model-files'),
             counterI: $(".d3preview-counter-i"),
@@ -92,7 +92,7 @@
         },
         preview: function (e) {
             this.handlers.modalMessages.empty();
-            this.handlers.modalContent.empty();
+            this.handlers.embedContent.empty();
             try {
                 let m = this.getAttachmentData(e);
                 let modelI = 0;
@@ -215,8 +215,7 @@
             D3PDF.trigger (f.src);
         },
         loadImage: function (f) {
-            $('.th-modal-content').empty();
-            $('.modal-dialog .modal-content').css('height', 'unset');
+            this.handlers.embedContent.empty();
             new PhotoViewer([{
                 src: f.src
             }]);

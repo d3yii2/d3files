@@ -19,7 +19,7 @@
     "homepage": "https://github.com/d3yii2/d3files",
     "require": {
         "php": ">=7.4",
-        "yiisoft/yii2": "~2.0.0",
+        "yiisoft/yii2": ">=2.0.49",
         "yiisoft/yii2-bootstrap5": "@dev",
         "kartik-v/yii2-widget-fileinput": "@dev",
         "d3yii2/pdfobject": "*",

@@ -22,7 +22,7 @@
         "yiisoft/yii2": ">=2.0.49",
         "yiisoft/yii2-bootstrap5": "@dev",
         "kartik-v/yii2-widget-fileinput": "@dev",
-        "d3yii2/pdfobject": "*",
+        "d3yii2/pdfobject": "dev-argon",
         "d3yii2/d3system": "*",
         "d3yii2/d3icon": "*"
     },

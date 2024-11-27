@@ -364,6 +364,18 @@ $filePath = '/temp/avatar.jpg';
 D3files::saveFile($fileName, Users::className(), $model->id, $filePath, $fileTypes);
 ```
 
+### Attach existing content to record as attachment
+```php
+        D3files::saveContent(
+            'import-' . date('YmdHis') . '.csv',
+            get_class($voyage),
+            $voyage->id,
+            $this->csv,
+            '/(csv|txt)$/i',
+            Yii::$app->user->id
+        );
+```
+
 ### Attach already saved file to record
 
 ```php

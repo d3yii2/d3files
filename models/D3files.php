@@ -194,11 +194,11 @@ class D3files extends ActiveRecord
      */
     public static function getRecordFilesList(string $modelName, int $modelId): array
     {
-        $filesList = self::fileListForWidget($modelName, $modelId);
+        $filesList = self::fileListForWidget($modelName, $modelId, true);
         foreach ($filesList as $k => $fileRow) {
             $fileHandler = new FileHandler(
                 [
-                    'model_name' => $modelName,
+                    'model_name' => $fileRow['className'],
                     'model_id' => $fileRow['id'],
                     'file_name' => $fileRow['file_name'],
                 ]

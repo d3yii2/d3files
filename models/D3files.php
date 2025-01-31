@@ -129,7 +129,7 @@ class D3files extends ActiveRecord
      * @param int $modelId
      * @throws \Exception
      */
-    public static function saveYii2UploadFile(UploadedFile $uploadFile, string $modelName, int $modelId, ?int $typeId = null): int
+    public static function saveYii2UploadFile(UploadedFile $uploadFile, string $modelName,int $modelId): void
     {
         $fileHandler = new FileHandler(
             [
@@ -148,17 +148,13 @@ class D3files extends ActiveRecord
         $model->add_datetime = new Expression('NOW()');
         $model->user_id = Yii::$app->person->user_id;
 
-        if ($typeId) {
-            $model->type_id = $typeId;
-        }
-        
         if ($model->save()) {
-            $fileModelId = self::saveModelName($modelName, $modelId, $model->id);
+            self::saveModelName($modelName, $modelId, $model->id);
             $fileHandler->rename($model->id);
-            return $fileModelId;
-        } 
-        $fileHandler->remove();
-        throw new D3ActiveRecordException($model, Yii::t('d3files', 'Insert DB record failed'));
+        } else {
+            $fileHandler->remove();
+            throw new D3ActiveRecordException($model, Yii::t('d3files', 'Insert DB record failed'));
+        }
     }
 
     /**
@@ -167,7 +163,7 @@ class D3files extends ActiveRecord
      * @param int $filesModelId
      * @throws \d3system\exceptions\D3ActiveRecordException
      */
-    private static function saveModelName(string $modelName, int $modelId, int $filesModelId): int
+    private static function saveModelName(string $modelName, int $modelId, int $filesModelId): void
     {
         // Get or create model name id
         $nameModel = new D3filesModelName();
@@ -181,7 +177,6 @@ class D3files extends ActiveRecord
         if (!$filesModel->save()) {
             throw new D3ActiveRecordException($filesModel, null, 'Cannot save D3filesModel');
         }
-        return $filesModel->id;
     }
 
     /**
@@ -199,11 +194,11 @@ class D3files extends ActiveRecord
      */
     public static function getRecordFilesList(string $modelName, int $modelId): array
     {
-        $filesList = self::fileListForWidget($modelName, $modelId);
+        $filesList = self::fileListForWidget($modelName, $modelId, true);
         foreach ($filesList as $k => $fileRow) {
             $fileHandler = new FileHandler(
                 [
-                    'model_name' => $modelName,
+                    'model_name' => $fileRow['className'],
                     'model_id' => $fileRow['id'],
                     'file_name' => $fileRow['file_name'],
                 ]
@@ -235,6 +230,7 @@ class D3files extends ActiveRecord
               f.id,
               f.file_name,
               f.notes,
+              fm.is_file,
               CASE fm.is_file 
                 WHEN 1 THEN fm.id 
                 ELSE fmBase.id
@@ -266,7 +262,8 @@ class D3files extends ActiveRecord
               f.id,
               f.file_name,
               f.notes,
-              fm.id  file_model_id
+              fm.id  file_model_id,
+              fm.is_file
             FROM
               d3files f
               INNER JOIN d3files_model fm

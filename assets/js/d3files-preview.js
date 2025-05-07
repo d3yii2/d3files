@@ -43,10 +43,10 @@
     };
 
     $.D3FilesPreview.prototype = {
-        setOption: function(prop, val) {
+        setOption: function (prop, val) {
             this[prop] = val;
         },
-        setPdfObject: function(o) {
+        setPdfObject: function (o) {
             if ('undefined' === typeof D3PDF) {
                 console.log(this.logErrorPrefix + 'D3PDF is not defined. Missing pdfobject-custom.js ?');
                 return false;
@@ -192,7 +192,7 @@
         },
         loadFile: function (f) {
             let ext = this.getFileExtension(f.file_name);
-            if ("pdf" === ext || "PDF" === ext) {
+            if ("pdf" === ext || "PDF" === ext || "txt" === ext) {
                 try {
                     this.handlers.imageContent.html('').hide();
                     this.setPdfObject(this.pdfOptions);
@@ -212,7 +212,7 @@
             throw new Error('Unsupported file type for load: ' + ext);
         },
         loadPDF: function (f) {
-            D3PDF.trigger (f.src);
+            D3PDF.trigger(f.src);
         },
         loadImage: function (f) {
             $('.th-modal-content').empty();
@@ -236,7 +236,7 @@
             });
             return index;
         },
-        getFilesListFromSelected: function(s) {
+        getFilesListFromSelected: function (s) {
             let l = [];
             $(s).each(function () {
                 l.push($(this).val());
@@ -261,12 +261,12 @@
             if (k > arr.length) {
                 return null;
             }
-            if(-1 === arr[k]) {
+            if (-1 === arr[k]) {
                 return null;
             }
             return k;
         },
-        getArrNextValue: function(arr, val) {
+        getArrNextValue: function (arr, val) {
             var next = $.inArray(val, arr) + 1;
             if (next < arr.length) {
                 let nextVal = arr[next];
@@ -275,13 +275,12 @@
                 return null;
             }
         },
-        getArrPrevValue: function(arr, val) {
+        getArrPrevValue: function (arr, val) {
             var prv = $.inArray(val, arr) - 1;
             if (prv >= 0) {
                 let prevVal = arr[prv];
                 return prevVal;
-            }
-            else {
+            } else {
                 return null;
             }
         },
@@ -295,7 +294,7 @@
             return this.filesList;
         },
         getModelFilesList: function (id) {
-            return  $('#d3files-preview-button-' + id).data('d3files-files');
+            return $('#d3files-preview-button-' + id).data('d3files-files');
         },
         /* Get the array of the files from selected rows */
         getSelectedRows: function () {
@@ -315,7 +314,7 @@
         },
         getAllRows: function () {
             let s = [],
-              rows = $(this.gridSelector + ' a.d3files-preview-widget-load');
+                rows = $(this.gridSelector + ' a.d3files-preview-widget-load');
             rows.each(function () {
                 let mid = parseInt($(this).data("model-id"));
                 s.push(mid);
@@ -334,7 +333,7 @@
             });
             return r;
         },
-        getModelViewFilesByExt: function(f) {
+        getModelViewFilesByExt: function (f) {
             let wf = [];
             f.each(function (f) {
                 if ("undefined" === typeof f.file_name) {
@@ -347,27 +346,29 @@
             });
             return wf;
         },
-        getFileExtension: function(name) {
-           // return name.split(/\#|\?/)[0].split('.').pop().trim().toLowerCase();
-            return name.substr( (name.lastIndexOf('.') +1) ).toLowerCase();
+        getFileExtension: function (name) {
+            // return name.split(/\#|\?/)[0].split('.').pop().trim().toLowerCase();
+            return name.substr((name.lastIndexOf('.') + 1)).toLowerCase();
         },
-        initFilesListDropdown: function(m) {
+        initFilesListDropdown: function (m) {
             if ("undefined" === m.files) {
                 return false;
             }
             this.handlers.previewDropdown.empty();
             let self = this;
 
-            $.each(m.files, function(i, f) {
+            $.each(m.files, function (i, f) {
                 self.handlers.previewDropdown.append(
                     $('<option></option>').val(i).html(f.file_name)
                 );
             });
         },
-        objectHasOneItem: function(o) {
-            return 1 === $.map(o, function(n, i) { return i; }).length;
+        objectHasOneItem: function (o) {
+            return 1 === $.map(o, function (n, i) {
+                return i;
+            }).length;
         },
-        renderModelFiles: function(m) {
+        renderModelFiles: function (m) {
             this.handlers.filesListContent.html('');
 
             //Just ignore if only one file there
@@ -383,7 +384,7 @@
                     a = $(
                         '<a href="javascript:void(0)" class="d3files-preview-widget-load" title="' + f.file_name + '">' +
                         '<img src="' + D3FilesPreviewJsVars.assetUrl + '/img/' + icon + '-icon.png"  style="width:40px;height:40px"><br>' +
-                '</a>'
+                        '</a>'
                     );
                 self.setLoadButtonAttrs(a, m);
                 a.on('click', function () {
@@ -394,23 +395,23 @@
             });
             this.handlers.filesListContent.html(ul);
         },
-        getNextData: function(modelId, arr) {
+        getNextData: function (modelId, arr) {
             let nextModelId = this.getArrNextValue(arr, modelId);
-            if (! nextModelId) {
+            if (!nextModelId) {
                 return null;
             }
             let data = $("a[data-model-id=" + nextModelId + "]").data(this.previewButtonDataName);
             return data;
         },
-        getPrevData: function(modelId, arr) {
+        getPrevData: function (modelId, arr) {
             let prevModelId = this.getArrPrevValue(arr, modelId);
-            if (! prevModelId) {
+            if (!prevModelId) {
                 return null;
             }
             let data = $("a[data-model-id=" + prevModelId + "]").data(this.previewButtonDataName);
             return data;
         },
-        initPrevNextButtons: function(m, rows) {
+        initPrevNextButtons: function (m, rows) {
             try {
                 this.handlers.nextButton.hide();
                 this.handlers.prevButton.hide();
@@ -426,21 +427,21 @@
                     this.handlers.prevButton.show();
                 }
             } catch (e) {
-                throw new Error( "initPrevNextButtons Catch got: " + e);
+                throw new Error("initPrevNextButtons Catch got: " + e);
             }
         },
-        setLoadButtonAttrs: function(b, f) {
+        setLoadButtonAttrs: function (b, f) {
             b.data(this.previewButtonDataName, f);
             //b.attr('data-' + this.previewButtonDataName, f);
         },
-        getFirstPreviewItem: function(ext) {
+        getFirstPreviewItem: function (ext) {
             let firstItem;
             let self = this;
-            
+
             if (!ext) {
                 ext = 'pdf';
             }
-            
+
             $.each(this.getFilesList(), function (i, item) {
                 var file = self.getFileByExtension(item.files, ext);
                 if (file) {
@@ -450,7 +451,7 @@
             });
             return firstItem;
         },
-        clickFirstPreviewItem: function(ext) {
+        clickFirstPreviewItem: function (ext) {
             let fpi = this.getFirstPreviewItem(ext);
             if (!fpi) {
                 return false;
@@ -458,7 +459,7 @@
             fpi.click();
         }
     };
-    $(document).on('pjax:success', function() {
+    $(document).on('pjax:success', function () {
         if ("undefined" !== typeof document.D3FP) {
             document.D3FP.reflow();
         }

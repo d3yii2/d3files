@@ -48,8 +48,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
 
     public $icon = self::DEFAULT_ICON;
-    public $previewExtensions = '/(gif|pdf|jpe?g|png)$/i';
-    public $viewExtension = ['pdf', 'jpg'];
+    public $previewExtensions = '/(gif|pdf|jpe?g|png|txt)$/i';
+    public $viewExtension = ['pdf', 'jpg', 'txt'];
     public $currentFile;
     public $showPrevNext = false;
     public $prevFile;
@@ -189,7 +189,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
     public function initFilesList(): array
     {
         parent::initFilesList();
-    
+
         if (!$this->nameModel) {
             $this->nameModel = D3filesModelName::findOne(['name' => $this->model_name]);
         }
@@ -280,7 +280,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
         if (self::VIEW_MODAL_BUTTON === $this->view || self::VIEW_INLINE_BUTTON === $this->view) {
             foreach ($this->viewExtension as $extension) {
-                if($params['file'] = D3Files::getFirstFileHavingExt($this->fileList, $extension)) {
+                if ($params['file'] = D3Files::getFirstFileHavingExt($this->fileList, $extension)) {
                     break;
                 }
             }
@@ -306,7 +306,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
             'data-model-id' => $file['model_id'],
         ];
     }
-    
+
     /**
      * @param array $file
      * @param array $files
@@ -317,7 +317,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
         $attrs = self::getPreviewButtonDataAttributes($file, $files);
         $attrs['title'] = Yii::t('d3files', 'Preview atachment');
         $attrs['class'] = 'd3files-preview-widget-load ';
-        
+
         return $attrs;
     }
 

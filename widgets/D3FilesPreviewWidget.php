@@ -49,7 +49,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     public $icon = self::DEFAULT_ICON;
     public $previewExtensions = '/(gif|pdf|jpe?g|png|txt)$/i';
-    public $viewExtension = ['pdf', 'jpg'];
+    public $viewExtension = ['pdf', 'jpg', 'txt'];
     public $currentFile;
     public $showPrevNext = false;
     public $prevFile;

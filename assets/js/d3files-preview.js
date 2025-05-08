@@ -209,6 +209,11 @@
                 this.activeFile = f;
                 return true;
             }
+            if ("txt" === ext) {
+                this.loadText(f);
+                this.activeFile = f;
+                return true;
+            }
             throw new Error('Unsupported file type for load: ' + ext);
         },
         loadPDF: function (f) {
@@ -222,6 +227,11 @@
             }]);
             this.handlers.imageContent.show();
 
+        },
+        loadText: function (f) {
+            $('.th-modal-content').empty();
+            $('.modal-dialog .modal-content').css('height', 'unset');
+            $('.modal-dialog .th-modal-content').load(f.src);
         },
         getModelIndex: function (modelId) {
             let index = null;

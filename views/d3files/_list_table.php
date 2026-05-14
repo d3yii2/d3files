@@ -1,16 +1,13 @@
 <?php
 /**
- * @var bool $viewType
  * @var string $viewByExtensions
  * @var array $fileList
  * @var $actionColumn
- * @var string $icon
  * @var string $urlPrefix
  * @var bool $readOnly
- * @var int $modelId
  * @var string $previewButton
- * @var array $previewButtonAttrs
  * @var string $model_name
+ * @var bool $enableNotes
  */
 
 use d3yii2\d3files\components\D3Files;

@@ -1,10 +1,10 @@
 <?php
 
+use d3yii2\d3files\D3FilesAsset;
 use d3yii2\d3files\widgets\D3FilesWidget;
 use eaBlankonThema\widget\ThModal;
-use yii\helpers\Html;
 
-\d3yii2\d3files\D3FilesAsset::register($this);
+D3FilesAsset::register($this);
 /**
  * @var string $urlPrefix
  * @var string $viewType

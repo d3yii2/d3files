@@ -19,6 +19,8 @@ use yii\helpers\Url;
  * @var array $_params_
  * @var string $uploadButtonPlacement
  * @var bool $allowUpload
+ * @var bool $enableNotes
+ * @var string $previewButton
  */
 
 D3FilesAsset::register($this);
@@ -91,6 +93,20 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
         <?php endif; ?>
     </div>
     <div class="panel-body no-padding">
-        <?= $this->render('_list_table', $_params_) ?>
+        <?= $this->render(
+                '_list_table',
+                [
+                    'viewByExtensions' => $viewByExtensions,
+                    'fileList' => $fileList,
+                    'actionColumn' => $actionColumn,
+                    'urlPrefix' => $urlPrefix,
+                    'readOnly' => $readOnly,
+                    'previewExtensions' => $previewExtensions ?? null,
+                    'previewFileList' => $previewFileList ?? null,
+                    'previewButton' => $previewButton ?? false,
+                    'model_name' => $model_name,
+                    'enableNotes' => $enableNotes,
+                ]
+        ) ?>
     </div>
 </div>

@@ -26,11 +26,11 @@ class D3FilesFileDownloadWidget extends Widget
         
     }
     
-    public function run()
+    public function run(): ?string
     {
         try {
-            return $this->render(
-                'file_download',
+            return $this->renderFile(
+                $this->getViewPath() . 'file_download',
                 [
                     'fileModelId' => $this->fileModelId,
                     'downloadUrl'   => $this->downloadUrl,

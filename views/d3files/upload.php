@@ -6,11 +6,10 @@ use yii\helpers\Html;
  * @var yii\web\View $this
  * @var string $file_name
  * @var int $file_model_id
- * @var string $icon
  * @var string $model_name
  * @var string $previewButtonContent
  * @var array $file
- * @var array $fileList
+ * @var int $id
  */
 
 ?>

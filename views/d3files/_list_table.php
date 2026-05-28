@@ -54,7 +54,7 @@ use yii\helpers\Url;
             <?php endif; ?>
             <td class="col-xs-1"><?php
                 if (isset($previewExtensions, $previewFileList) && D3Files::fileHasExtension($file, $previewExtensions)) {
-                    echo $this->render($previewButton, compact('icon', 'file', 'previewFileList'));
+                    echo $this->renderFile($previewButton, compact('icon', 'file', 'previewFileList'));
                 }
                 if ($actionColumn && is_callable($actionColumn)) {
                     echo $actionColumn($file);

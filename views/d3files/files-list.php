@@ -6,7 +6,6 @@ use yii\bootstrap\Html;
 use yii\helpers\Url;
 
 /**
- * @var bool $viewType
  * @var array $viewByExtensions
  * @var array $fileList
  * @var  $actionColumn
@@ -16,11 +15,11 @@ use yii\helpers\Url;
  * @var int $model_name
  * @var bool $readOnly
  * @var bool $hideTitle
- * @var array $_params_
- * @var string $uploadButtonPlacement
+  * @var string $uploadButtonPlacement
  * @var bool $allowUpload
  * @var bool $enableNotes
  * @var string $previewButton
+ * @var string $title
  */
 
 D3FilesAsset::register($this);
@@ -93,8 +92,8 @@ $data = isset($hasPreview) ? 'data-type="preview"' : '';
         <?php endif; ?>
     </div>
     <div class="panel-body no-padding">
-        <?= $this->render(
-                '_list_table',
+        <?= $this->renderFile(
+                '@vendor/d3yii2/d3files/views/d3files/_list_table.php',
                 [
                     'viewByExtensions' => $viewByExtensions,
                     'fileList' => $fileList,

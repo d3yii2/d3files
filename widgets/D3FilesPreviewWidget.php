@@ -8,6 +8,7 @@ use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaBlankonThema\assetbundles\AjaxAsset;
 use Exception;
+use yii\base\InvalidConfigException;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -209,6 +210,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     /**
      * @return string
+     * @throws InvalidConfigException
      */
     public function getAssetsUrl(): string
     {
@@ -265,7 +267,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
         $params = [
             'showPrevNext' => $this->showPrevNext,
             'viewType' => $this->viewType,
-            'previewButton' => $this->buttonView,
+            'previewButton' => $this->getViewPath() . $this->buttonView,
             'hasPreview' => true,
             'previewExtensions' => $this->previewExtensions,
             'previewFileList' => D3Files::getPreviewFilesList(

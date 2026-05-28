@@ -26,6 +26,8 @@ class D3Files extends Module
     public $models = [];
     public $enableNotes;
 
+    //public ?string $viewPathAlias = null;
+
     public function init()
     {
         parent::init();

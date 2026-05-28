@@ -152,10 +152,10 @@ class D3FilesWidget extends D3Widget
         if (!$this->view) {
             return '';
         }
-
+        $viewPathAlias = $this->getViewPath() . $this->view . '.php';
         try {
             $viewParams = $this->getViewParams();
-            return $this->render($this->view, $viewParams);
+            return $this->renderFile($viewPathAlias, $viewParams);
         } catch (\Exception $exception) {
             Yii::error('D3FilesWidget:run Exception message: ' . PHP_EOL . $exception->getMessage());
             Yii::error('D3FilesWidget:run Exception trace: ' . PHP_EOL . $exception->getTraceAsString());

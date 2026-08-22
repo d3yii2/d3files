@@ -25,7 +25,7 @@ class CleanFilesController extends D3CommandController
      * @return int
      * @throws \Exception
      */
-    public function actionRemoveOlderThan(string $modelName, int $months, string $sqlLikeFileName = null): int
+    public function actionRemoveOlderThan(string $modelName, int $months, ?string $sqlLikeFileName = null): int
     {
         $date = new DateTime();
         $date->sub(new DateInterval('P' . $months . 'M'));

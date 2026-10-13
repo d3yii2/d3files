@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use yii\db\Migration;
 
@@ -9,7 +10,7 @@ class m190308_105814_d3files_model_optimise_index extends Migration
     /**
     * {@inheritdoc}
     */
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->execute('
             ALTER TABLE `d3files_model`   
@@ -21,7 +22,10 @@ class m190308_105814_d3files_model_optimise_index extends Migration
         ');
     }
 
-    public function safeDown()
+    /**
+     * @return false
+     */
+    public function safeDown(): bool
     {
         echo "m190308_105814_d3files_model_optimise_index cannot be reverted.\n";
         return false;

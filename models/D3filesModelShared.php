@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -12,7 +14,7 @@ use yii\db\ActiveRecord;
  * @property string $d3files_model_id
  * @property string $hash
  * @property string $expire_date
- * @property integer $left_loadings
+ * @property int $left_loadings
  *
  * @property D3filesModel $d3filesModel
  */
@@ -21,7 +23,7 @@ class D3filesModelShared extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'd3files_model_shared';
     }
@@ -29,21 +31,27 @@ class D3filesModelShared extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['d3files_model_id', 'hash', 'expire_date'], 'required'],
             [['d3files_model_id', 'left_loadings'], 'integer'],
             [['expire_date'], 'safe'],
             [['hash'], 'string', 'max' => 32],
-            [['d3files_model_id'], 'exist', 'skipOnError' => true, 'targetClass' => D3filesModel::className(), 'targetAttribute' => ['d3files_model_id' => 'id']],
+            [
+                ['d3files_model_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => D3filesModel::class,
+                'targetAttribute' => ['d3files_model_id' => 'id']
+            ],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => Yii::t('d3files', 'ID'),
@@ -55,10 +63,10 @@ class D3filesModelShared extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getD3filesModel()
+    public function getD3filesModel(): ActiveQuery
     {
-        return $this->hasOne(D3filesModel::className(), ['id' => 'd3files_model_id']);
+        return $this->hasOne(D3filesModel::class, ['id' => 'd3files_model_id']);
     }
 }

@@ -1,11 +1,19 @@
 <?php
+declare(strict_types=1);
+
 use yii\helpers\Html;
 use yii\bootstrap\Modal;
 
-$imageExtensions = Yii::$app->getModule('d3files')->imageExtensions;
+/**
+ * @var string $fileName
+ * @var string $downloadUrl
+ * @var int $fileModelId
+ */
+
+$imageExtensions = Yii::$app->getModule('d3files')->imageExtensions ?? [];
 $fileExtension   = pathinfo($fileName, PATHINFO_EXTENSION);
 
-if (in_array($fileExtension, $imageExtensions)) {
+if (in_array($fileExtension, $imageExtensions, true)) {
     Modal::begin(['id' => 'modal-image', 'size' => 'modal-lg']);
     echo Html::img(
         [$downloadUrl, 'id' => $fileModelId],

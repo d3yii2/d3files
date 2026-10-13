@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use d3yii2\d3files\D3FilesAsset;
 use d3yii2\d3files\widgets\D3FilesPreviewWidget;

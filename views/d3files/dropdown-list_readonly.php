@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use d3yii2\d3files\D3FilesAsset;
 use d3yii2\d3files\widgets\D3FilesWidget;
@@ -15,30 +16,34 @@ D3FilesAsset::register($this);
 if (empty($fileList)) {
     return;
 } ?>
-<select class="form-control d3files-list th-dropdown-load">
-    <option value="default" selected="selected"><?= Yii::t('d3files', 'Select attachment') ?></option>
-    <?php
+<label>
+    <select class="form-control d3files-list th-dropdown-load">
+        <option value="default" selected="selected"><?= Yii::t('d3files', 'Select attachment') ?></option>
+        <?php
 
-    foreach ($fileList as $row) {
-        $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
-        if ($viewType && in_array($ext, $viewByExtensions, true)) {
-            $fileUrl =         $fileUrl = [
-                $urlPrefix . 'd3filesopen',
-                'id' => $row['file_model_id']
-            ];
+        foreach ($fileList as $row) {
+            $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
+            if ($viewType && in_array($ext, $viewByExtensions, true)) {
+                $fileUrl = [
+                        $urlPrefix . 'd3filesopen',
+                        'id' => $row['file_model_id']
+                ];
 
-            $dataAttributes = D3FilesWidget::getPreviewButtonDataAttributes(
-                $fileUrl, '#' . ThModal::MODAL_ID, '.' . ThModal::MODAL_CONTENT_CLASS
-            );
+                $dataAttributes = [
+                    $fileUrl,
+                    '#' . ThModal::MODAL_ID,
+                    '.' . ThModal::MODAL_CONTENT_CLASS
+                ];
 
-            $dataAttributesStr = '';
+                $dataAttributesStr = '';
 
-            foreach ($dataAttributes as $key => $val) {
-                $dataAttributesStr .= ' ' . $key . '="' . $val . '"';
-            } ?>
-            <option value="<?= $row['file_name'] ?>"<?= $dataAttributesStr ?>><?= $row['file_name'] ?></option>
-            <?php
+                foreach ($dataAttributes as $key => $val) {
+                    $dataAttributesStr .= ' ' . $key . '="' . $val . '"';
+                } ?>
+                <option value="<?= $row['file_name'] ?>"<?= $dataAttributesStr ?>><?= $row['file_name'] ?></option>
+                <?php
+            }
         }
-    }
-    ?>
-</select>
+        ?>
+    </select>
+</label>

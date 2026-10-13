@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\components;
 
@@ -9,7 +10,6 @@ use Exception;
 use Yii;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-
 
 /**
  * Class EditNotesAction
@@ -41,10 +41,6 @@ class EditNotesAction extends D3FilesAction
                 self::STATUS => self::STATUS_SUCCESS,
                 self::MESSAGE => Yii::t('d3files', 'File Notes updated'),
             ];
-        } catch (HttpException | NotFoundHttpException $e) {
-            Yii::error($e->getMessage());
-            Yii::$app->response->statusCode = 406;
-            return [self::STATUS => self::STATUS_ERROR, self::MESSAGE => $e->getMessage()];
         } catch (Exception $e) {
             Yii::error($e->getMessage());
             Yii::$app->response->statusCode = 502;

@@ -1,13 +1,20 @@
 <?php
+declare(strict_types=1);
+
 namespace d3yii2\d3files\components;
 
+use d3system\exceptions\D3ActiveRecordException;
+use d3system\exceptions\D3Exception;
 use ReflectionClass;
+use ReflectionException;
 use Yii;
 use yii\base\Component;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
 use yii\helpers\Url;
 use d3yii2\d3files\models\D3files as ModelD3Files;
 use yii\web\UploadedFile;
+use function get_class;
 
 /**
  * Class D3Files
@@ -44,7 +51,7 @@ class D3Files extends Component
 
     /**
      * @param array $files
-     * @param string $viewExtensions
+     * @param string $extensions
      * @return bool
      */
     public static function hasFileWithExtension(array $files, string $extensions): bool
@@ -52,7 +59,6 @@ class D3Files extends Component
         foreach ($files as $f) {
             if (self::fileHasExtension($f, $extensions)) {
                 return true;
-                break;
             }
         }
         return false;
@@ -67,7 +73,7 @@ class D3Files extends Component
     public static function fileHasExtension(array $file, string $extensions): bool
     {
         $ext = self::getFileExtension($file);
-        return preg_match($extensions, $ext);
+        return preg_match($extensions, $ext) === 1;
     }
 
     /**
@@ -97,7 +103,7 @@ class D3Files extends Component
     public static function getPreviewFilesList(array $fileList, string $viewExtensions, array $urlParams): array
     {
         $fl = [];
-        foreach ($fileList as $i => $file) {
+        foreach ($fileList as $file) {
             if (self::hasFileWithExtension([$file], $viewExtensions)) {
                 $urlParams['id'] = $file['file_model_id'];
                 $file['src'] = Url::to($urlParams, true);
@@ -109,16 +115,16 @@ class D3Files extends Component
 
     /**
      * @param string $modelName
-     * @param string $modelId
+     * @param int $modelId
      * @param bool $forPath get data for building file path
      * @return array
+     * @throws Exception
      */
     public static function getModelFilesList(
         string $modelName,
-        string $modelId,
+        int $modelId,
         bool $forPath = false
-    ): array
-    {
+    ): array {
         $files = ModelD3Files::fileListForWidget($modelName, $modelId, $forPath);
 
         foreach ($files as $i => $f) {
@@ -131,7 +137,7 @@ class D3Files extends Component
      * @param int $modelNameId
      * @param int $modelId
      * @return array
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     public static function getModelFilesListByNameId(int $modelNameId, int $modelId): array
     {
@@ -145,10 +151,10 @@ class D3Files extends Component
 
     /**
      * @param array $list
-     * @param int $id
+     * @param string $id
      * @return array|null
      */
-    public static function getFileFromListById(array $list, string $id): ?array
+    public static function getFileFromListById(array $list, int $id): ?array
     {
         foreach ($list as $file) {
             if ($id === $file['id']) {
@@ -161,7 +167,7 @@ class D3Files extends Component
     /**
      * @param null $modelName
      * @return string
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public static function getAllowedFileTypes($modelName = null): string
     {
@@ -176,14 +182,14 @@ class D3Files extends Component
 
         return Yii::$app->getModule('d3files')->fileTypes ?? FileHandler::FILE_TYPES;
     }
-    
+
     /**
-     * @param $model
-     * @param $className
+     * @param ActiveRecord $model
+     * @param string $className
      * @param string $field
      * @throws \Exception
      */
-    public static function uploadModelFile(ActiveRecord  $model, string $className, string $field = 'upload_file')
+    public static function uploadModelFile(ActiveRecord  $model, string $className, string $field = 'upload_file'): void
     {
         if ($model->primaryKey) {
             $uploadedFile = UploadedFile::getInstance($model, $field);
@@ -193,22 +199,30 @@ class D3Files extends Component
             }
         }
     }
-    
+
     /**
      * @param ActiveRecord $modelFrom
      * @param ActiveRecord $modelTo
+     * @param string|null $modelFromClass
      * @return bool
-     * @throws \yii\db\Exception
+     * @throws Exception
+     * @throws ReflectionException
+     * @throws D3ActiveRecordException
+     * @throws D3Exception
+     * @throws \yii\base\Exception
      */
-    public static function copyFilesBetweenModels(ActiveRecord $modelFrom, ActiveRecord $modelTo, ?string $modelFromClass = null)
-    {
+    public static function copyFilesBetweenModels(
+        ActiveRecord $modelFrom,
+        ActiveRecord $modelTo,
+        ?string $modelFromClass = null
+    ): bool {
         $modelFromName = $modelFromClass ?? get_class($modelFrom);
         $modelToName = get_class($modelTo);
-        
-        $modelFiles = ModelD3Files::getRecordFilesList($modelFromName, $modelFrom->id);
+
+        $modelFromId = $modelFrom->id ?? null;
+        $modelFiles = ModelD3Files::getRecordFilesList($modelFromName, $modelFromId);
     
         foreach ($modelFiles as $file) {
-
             // Just ignore non-existent files silently
             if (!file_exists($file['file_path'])) {
                 continue;
@@ -226,7 +240,7 @@ class D3Files extends Component
             ModelD3Files::saveContent(
                 $file['file_name'],
                 $modelToName,
-                $modelTo->id,
+                $modelTo->id ?? null,
                 $fileContent,
                 $fileTypes
             );
@@ -234,12 +248,12 @@ class D3Files extends Component
         
         return true;
     }
-    
+
     /**
-     * @return mixed|object|null
+     * @return bool
      */
-    public static function isNotesEnabled()
+    public static function isNotesEnabled(): bool
     {
-        return Yii::$app->getModule('d3files')->enableNotes;
+        return Yii::$app->getModule('d3files')->enableNotes ?? false;
     }
 }

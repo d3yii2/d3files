@@ -1,12 +1,17 @@
 <?php
+declare(strict_types=1);
+
 namespace d3yii2\d3files\components;
 
-use Yii;
-use yii\base\Action;
+use d3yii2\d3files\exceptions\D3FilesUserException;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModel;
 use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\d3files\models\D3filesModelShared;
+use ReflectionException;
+use Yii;
+use yii\base\Action;
+use yii\db\Exception;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -18,11 +23,14 @@ use yii\web\NotFoundHttpException;
 class DownloadShareAction extends Action
 {
     /**
-     * @throws \ReflectionException
-     * @throws \d3yii2\d3files\exceptions\D3FilesUserException
-     * @throws \yii\web\NotFoundHttpException
+     * @param $id
+     * @param $hash
+     * @throws D3FilesUserException
+     * @throws NotFoundHttpException
+     * @throws ReflectionException
+     * @throws Exception
      */
-    public function run($id, $hash)
+    public function run($id, $hash): void
     {
 
         // Pause every request
@@ -49,7 +57,9 @@ class DownloadShareAction extends Action
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
-        if (!$fileModel = D3filesModel::findOne(['id' => $fileModelShared->d3files_model_id, 'deleted' => 0, 'is_file' => 1])) {
+        if (!$fileModel = D3filesModel::findOne(
+            ['id' => $fileModelShared->d3files_model_id, 'deleted' => 0, 'is_file' => 1]
+        )) {
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
 
@@ -67,8 +77,8 @@ class DownloadShareAction extends Action
         $fileHandler = new FileHandler(
             [
                 'model_name' => $fileModelName->name,
-                'model_id'   => $file->id,
-                'file_name'  => $file->file_name,
+                'model_id' => $file->id,
+                'file_name' => $file->file_name,
             ]
         );
 

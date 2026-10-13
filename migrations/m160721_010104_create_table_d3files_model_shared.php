@@ -1,13 +1,18 @@
 <?php
+declare(strict_types=1);
+
 use yii\db\Migration;
 
+/**
+ *
+ */
 class m160721_010104_create_table_d3files_model_shared extends Migration
 {
 
     /**
      * Create table
      */
-    public function up()
+    public function up(): void
     {
 
         $this->execute("
@@ -31,7 +36,7 @@ class m160721_010104_create_table_d3files_model_shared extends Migration
     /**
      * Drop table
      */
-    public function down()
+    public function down(): void
     {
         $this->dropTable('d3files_model_shared');
     }
@@ -40,7 +45,7 @@ class m160721_010104_create_table_d3files_model_shared extends Migration
      * Create table in a transaction-safe way.
      * Uses $this->up to not duplicate code.
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->up();
     }
@@ -49,7 +54,7 @@ class m160721_010104_create_table_d3files_model_shared extends Migration
      * Drop table in a transaction-safe way.
      * Uses $this->down to not duplicate code.
      */
-    public function safeDown()
+    public function safeDown(): void
     {
         $this->down();
     }

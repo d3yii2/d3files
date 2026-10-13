@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\components;
 
@@ -10,6 +11,7 @@ use Yii;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use function in_array;
+use function is_array;
 
 /**
  * Class DeleteAction
@@ -27,11 +29,9 @@ class DeleteAction extends D3FilesAction
     public function run(int $id, string $model_name = ''): array
     {
         try {
-            if (!$model_name) {
-                $model_name = $this->modelName;
-            }
+            $disableController = Yii::$app->getModule('d3files')->disableController ?? null;
 
-            if (!Yii::$app->getModule('d3files')->disableController) {
+            if (!$disableController) {
                 if (is_array($this->modelName) && !in_array($model_name, $this->modelName, true)) {
                     throw new HttpException(422, 'Can not delete file for requested model');
                 }
@@ -45,15 +45,19 @@ class DeleteAction extends D3FilesAction
 
 
             if (!$fileModel = D3filesModel::findOne(['id' => $id, 'deleted' => 0])) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+                throw new NotFoundHttpException(
+                    Yii::t('d3files', 'The requested file does not exist.')
+                );
             }
 
             if (!$fileModelName = D3filesModelName::findOne($fileModel->model_name_id)) {
-                throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
+                throw new NotFoundHttpException(
+                    Yii::t('d3files', 'The requested file does not exist.')
+                );
             }
 
             // Check access rights to the record the file is attached to
-            D3files::performReadValidation($fileModelName->name, $fileModel->model_id);
+            D3files::performReadValidation($fileModelName->name, (int)$fileModel->model_id);
 
             $fileModel->deleted = 1;
             $fileModel->save();
@@ -62,14 +66,17 @@ class DeleteAction extends D3FilesAction
                 self::STATUS => self::STATUS_SUCCESS,
                 self::MESSAGE => Yii::t('d3files', 'File deleted'),
             ];
-        } catch (HttpException | NotFoundHttpException $e) {
+        } catch (HttpException $e) {
             Yii::error($e->getMessage());
             Yii::$app->response->statusCode = 406;
             return [self::STATUS => self::STATUS_ERROR, self::MESSAGE => $e->getMessage()];
         } catch (Exception $e) {
             Yii::error($e->getMessage());
             Yii::$app->response->statusCode = 502;
-            return [self::STATUS => self::STATUS_ERROR, self::MESSAGE => Yii::t('d3system', 'Unexpected Server Error')];
+            return [
+                self::STATUS => self::STATUS_ERROR,
+                self::MESSAGE => Yii::t('d3system', 'Unexpected Server Error')
+            ];
         }
     }
 }

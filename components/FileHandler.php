@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\components;
 
@@ -16,6 +17,9 @@ use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 use function dirname;
+use function in_array;
+use function is_array;
+use function is_callable;
 
 /**
  * Class FileHandler
@@ -26,9 +30,9 @@ class FileHandler
 
     public const FILE_TYPES = '/(gif|pdf|dat|jpe?g|png|doc|docx|xls|xlsx|htm|txt|zip|csv)$/i';
 
-    protected $options;
+    protected array $options = [];
 
-    private $uploadedFilePath;
+    private string $uploadedFilePath = '·';
 
     /**
      * FileHandler constructor.
@@ -72,7 +76,7 @@ class FileHandler
         $fileTypes = self::getAllowedFileTypes($this->options);
 
         $fileExtension = pathinfo($this->options['file_name'])['extension'];
-        if ('*' !== $fileTypes
+        if ($fileTypes !== '*'
             && !preg_match($fileTypes, $fileExtension)) {
             throw new ForbiddenHttpException(Yii::t('d3files', 'Forbidden file type: {0}', [$fileExtension]));
         }
@@ -87,10 +91,10 @@ class FileHandler
     public static function getUploadDirPath($model_name): string
     {
         $pos = strrpos($model_name, '\\');
-        $modelShortName = false === $pos ? $model_name : substr($model_name, $pos + 1);
+        $modelShortName = $pos === false ? $model_name : substr($model_name, $pos + 1);
 
-        $uploadDir = Yii::$app->getModule('d3files')->uploadDir;
-        if (is_callable($uploadDir)){
+        $uploadDir = Yii::$app->getModule('d3files')->uploadDir ?? '.';
+        if (is_callable($uploadDir)) {
             return $uploadDir($modelShortName, Yii::$app);
         }
         return $uploadDir
@@ -98,7 +102,6 @@ class FileHandler
     }
 
     /**
-     * @param array $options
      * @param array $options
      * @return string
      * @throws ReflectionException
@@ -119,7 +122,7 @@ class FileHandler
      * copy posted file to upload directory
      * @return bool
      * @throws NotFoundHttpException
-     * @throws Exception|\ReflectionException
+     * @throws Exception|ReflectionException
      */
     public function upload(): bool
     {
@@ -138,7 +141,7 @@ class FileHandler
             : $_FILES['upload_file']['error'];
 
         if ($errorMsg = $this->getUploadError((int) $errorCode)) {
-            $userMsg = in_array($errorCode, ['1', '3', '4'])
+            $userMsg = in_array($errorCode, ['1', '3', '4'], true)
                 ? Yii::t('d3files', $errorMsg)
                 : Yii::t('d3files', 'Unexpected upload error! Code: $1', [$errorCode]);
             throw new HttpException(406, $userMsg);
@@ -163,7 +166,7 @@ class FileHandler
      */
     public function getUploadError(int $state): ?string
     {
-        if (UPLOAD_ERR_OK === $state) {
+        if ($state === UPLOAD_ERR_OK) {
             return null;
         }
 
@@ -241,7 +244,7 @@ class FileHandler
      * @return bool
      * @throws Exception
      */
-    public function save(&$fileContent): bool
+    public function save($fileContent): bool
     {
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
@@ -266,7 +269,7 @@ class FileHandler
                 $this->options['file_name']
             );
         $oldName = $this->getFilePath();
-        if (false === rename($oldName, $newName)) {
+        if (rename($oldName, $newName) === false) {
             throw new D3Exception('Cannot rename file from: ' . $oldName . ' to: ' . $newName);
         }
         $this->uploadedFilePath = $newName;
@@ -287,7 +290,7 @@ class FileHandler
     }
 
     /**
-     * @throws \d3yii2\d3files\exceptions\D3FilesUserException
+     * @throws D3FilesUserException
      */
     public function download(): void
     {
@@ -318,7 +321,7 @@ class FileHandler
             Yii::error(
                 'Neatrad ' . $file_path . PHP_EOL
                 . '$this->options: ' . VarDumper::dumpAsString($this->options)
-            );            
+            );
             throw new NotFoundHttpException(Yii::t('d3files', 'The requested file does not exist.'));
         }
         $mimeType = FileHelper::getMimeTypeByExtension($this->options['file_name']);
@@ -341,9 +344,9 @@ class FileHandler
     }
 
     /**
-     * @return false|int
+     * @return int|null
      */
-    public function getFileSize()
+    public function getFileSize(): ?int
     {
         $file_path = $this->getFilePath();
         return filesize($file_path);

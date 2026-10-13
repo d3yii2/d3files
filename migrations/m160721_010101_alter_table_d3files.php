@@ -1,25 +1,29 @@
 <?php
+declare(strict_types=1);
+
 use yii\db\Migration;
 
+/**
+ *
+ */
 class m160721_010101_alter_table_d3files extends Migration
 {
 
     /**
      * Alter table
      */
-    public function up()
+    public function up(): void
     {
 
-        $this->execute("
+        $this->execute('
             ALTER TABLE `d3files` DROP `deleted`;
-        ");
-
+        ');
     }
 
     /**
      * Drop changes
      */
-    public function down()
+    public function down(): void
     {
         $this->execute("
             ALTER TABLE `d3files` ADD `deleted` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'
@@ -30,7 +34,7 @@ class m160721_010101_alter_table_d3files extends Migration
      * Creates initial version of the table in a transaction-safe way.
      * Uses $this->up to not duplicate code.
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->up();
     }
@@ -39,7 +43,7 @@ class m160721_010101_alter_table_d3files extends Migration
      * Drops the table in a transaction-safe way.
      * Uses $this->down to not duplicate code.
      */
-    public function safeDown()
+    public function safeDown(): void
     {
         $this->down();
     }

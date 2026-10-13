@@ -1,16 +1,21 @@
 <?php
+declare(strict_types=1);
+
 use yii\db\Migration;
 
+/**
+ *
+ */
 class m160714_080102_create_table_d3files_model extends Migration
 {
 
-	/**
-	 * Create table
-	 */
-	public function up()
-	{
+    /**
+     * Create table
+     */
+    public function up(): void
+    {
 
-		$this->execute("
+        $this->execute('
             CREATE TABLE `d3files_model`(  
              `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
              `d3files_id` INT UNSIGNED NOT NULL,
@@ -30,33 +35,32 @@ class m160714_080102_create_table_d3files_model extends Migration
               ADD COLUMN `is_file` TINYINT(1) UNSIGNED DEFAULT 1  NOT NULL AFTER `d3files_id`,
               ADD INDEX (`model_id`,`model_name`(4) );
 
-        ");
-        
-	}
+        ');
+    }
 
-	/**
-	 * Drop table
-	 */
-	public function down()
-	{
-		$this->dropTable('d3files_model');
-	}
+    /**
+     * Drop table
+     */
+    public function down(): void
+    {
+        $this->dropTable('d3files_model');
+    }
 
-	/**
-	 * Create table in a transaction-safe way.
-	 * Uses $this->up to not duplicate code.
-	 */
-	public function safeUp()
-	{
-		$this->up();
-	}
+    /**
+     * Create table in a transaction-safe way.
+     * Uses $this->up to not duplicate code.
+     */
+    public function safeUp(): void
+    {
+        $this->up();
+    }
 
-	/**
-	 * Drop table in a transaction-safe way.
-	 * Uses $this->down to not duplicate code.
-	 */
-	public function safeDown()
-	{
-		$this->down();
-	}
+    /**
+     * Drop table in a transaction-safe way.
+     * Uses $this->down to not duplicate code.
+     */
+    public function safeDown(): void
+    {
+        $this->down();
+    }
 }

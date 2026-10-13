@@ -1,16 +1,21 @@
 <?php
+declare(strict_types=1);
+
 use yii\db\Migration;
 
+/**
+ *
+ */
 class m160517_010101_create_tables_d3files extends Migration
 {
 
-	/**
-	 * Creates initial version of the table
-	 */
-	public function up()
-	{
+    /**
+     * Creates initial version of the table
+     */
+    public function up(): void
+    {
 
-		$this->execute("
+        $this->execute("
             CREATE TABLE `d3files` (
               `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `type_id` smallint(5) unsigned DEFAULT NULL,
@@ -26,32 +31,31 @@ class m160517_010101_create_tables_d3files extends Migration
               KEY `type_id` (`type_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
         ");
-        
-	}
+    }
 
-	/**
-	 * Drops the table
-	 */
-	public function down()
-	{
+    /**
+     * Drops the table
+     */
+    public function down(): void
+    {
         $this->dropTable('d3files');
-	}
+    }
 
-	/**
-	 * Creates initial version of the table in a transaction-safe way.
-	 * Uses $this->up to not duplicate code.
-	 */
-	public function safeUp()
-	{
-		$this->up();
-	}
+    /**
+     * Creates initial version of the table in a transaction-safe way.
+     * Uses $this->up to not duplicate code.
+     */
+    public function safeUp(): void
+    {
+        $this->up();
+    }
 
-	/**
-	 * Drops the table in a transaction-safe way.
-	 * Uses $this->down to not duplicate code.
-	 */
-	public function safeDown()
-	{
-		$this->down();
-	}
+    /**
+     * Drops the table in a transaction-safe way.
+     * Uses $this->down to not duplicate code.
+     */
+    public function safeDown(): void
+    {
+        $this->down();
+    }
 }

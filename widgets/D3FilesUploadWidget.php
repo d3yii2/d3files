@@ -1,13 +1,18 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\widgets;
 
 use d3system\widgets\D3Widget;
-use d3yii2\d3files\components\D3Files;
 use Exception;
 use kartik\widgets\FileInput;
+use Throwable;
+use yii\db\ActiveRecord;
 use yii\helpers\Url;
 use Yii;
+use yii\widgets\ActiveField;
+use yii\widgets\ActiveForm;
+use function get_class;
 
 /**
  * Class D3FilesUploadWidget
@@ -16,24 +21,41 @@ use Yii;
  */
 class D3FilesUploadWidget extends D3Widget
 {
-    public $model;
-    public $form;
-    public $name = 'upload_file';
-    public $modelName;
-    public $modelId;
-    public $ajaxUpload = null;
-    public $uploadExtraData = [];
-    public $maxFileCount = 3;
-    public $options;
-    public $pluginOptions;
-    public $showUpload = null;
-    public $urlPrefix = '/d3files/d3files/';
-    public $controllerRoute = '';
-    public $showPreview = true;
-    public $showCaption = true;
-    public $showRemove = true;
-    public $addModelId = true;
-    public $autostart = true;
+    public ?ActiveRecord $model = null;
+
+    public ?ActiveForm $form = null;
+
+    public string $name = 'upload_file';
+
+    public ?string $modelName = null;
+
+    public ?int $modelId = null;
+
+    public ?bool $ajaxUpload = null;
+
+    public array $uploadExtraData = [];
+
+    public int $maxFileCount = 3;
+
+    public array $options = [];
+
+    public array $pluginOptions = [];
+
+    public ?bool $showUpload = null;
+
+    public string $urlPrefix = '/d3files/d3files/';
+
+    public string $controllerRoute = '';
+
+    public bool $showPreview = true;
+
+    public bool $showCaption = true;
+
+    public bool $showRemove = true;
+
+    public bool $addModelId = true;
+
+    public bool $autostart = true;
     
     /**
      * @throws Exception
@@ -49,7 +71,8 @@ class D3FilesUploadWidget extends D3Widget
         }
     
         // Disabled controller actions, remove url prefix
-        if (Yii::$app->getModule('d3files')->disableController) {
+        $disableController = Yii::$app->getModule('d3files')->disableController ?? false;
+        if ($disableController) {
             $this->urlPrefix = $this->controllerRoute;
         }
     
@@ -64,7 +87,7 @@ class D3FilesUploadWidget extends D3Widget
         }
     
         // Automatically enable ajax upload for existing record if not set
-        if ($this->modelId && null === $this->ajaxUpload) {
+        if ($this->modelId && $this->ajaxUpload === null) {
             $this->ajaxUpload = true;
         }
     
@@ -90,12 +113,12 @@ class D3FilesUploadWidget extends D3Widget
                 //'maxImageHeight' => '20',
             ];
             
-            if (true === $this->ajaxUpload) {
+            if ($this->ajaxUpload === true) {
                 $this->pluginOptions['uploadUrl'] = Url::to($url);
                 $this->pluginOptions['uploadAsync'] = true;
                 $this->pluginOptions['uploadExtraData'] = $this->uploadExtraData;
     
-                if (null === $this->showUpload && ! $this->autostart) {
+                if ($this->showUpload === null && ! $this->autostart) {
                     $this->showUpload = true;
                     $this->pluginOptions['showUpload'] = true;
                 }
@@ -110,10 +133,10 @@ class D3FilesUploadWidget extends D3Widget
             }
         }
     }
-    
+
     /**
-     * @return string|void
-     * @throws Exception
+     * @return FileInput|ActiveField
+     * @throws Throwable
      */
     public function run()
     {
@@ -133,8 +156,14 @@ class D3FilesUploadWidget extends D3Widget
                 ]
             );
     }
-    
-    public function initAssets()
+
+    /**
+     * @return void
+     */
+    /**
+     * @return void
+     */
+    public function initAssets(): void
     {
         $js = '
         var d3UploadField = $("[data-krajee-fileinput]");
@@ -144,6 +173,6 @@ class D3FilesUploadWidget extends D3Widget
             });
         }';
         
-        Yii::$app->view->registerJs($js, Yii::$app->view::POS_READY);
+        Yii::$app->view->registerJs($js);
     }
 }

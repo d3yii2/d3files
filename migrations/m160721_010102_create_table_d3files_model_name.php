@@ -1,29 +1,33 @@
 <?php
+declare(strict_types=1);
+
 use yii\db\Migration;
 
+/**
+ *
+ */
 class m160721_010102_create_table_d3files_model_name extends Migration
 {
 
     /**
      * Create table
      */
-    public function up()
+    public function up(): void
     {
 
-        $this->execute("
+        $this->execute('
             CREATE TABLE `d3files_model_name` (
              `id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `name` VARCHAR(200) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL
             ) ENGINE = InnoDB;
             ALTER TABLE `d3files_model_name` ADD UNIQUE (`name`);
-        ");
-
+        ');
     }
 
     /**
      * Drop table
      */
-    public function down()
+    public function down(): void
     {
         $this->dropTable('d3files_model_name');
     }
@@ -32,7 +36,7 @@ class m160721_010102_create_table_d3files_model_name extends Migration
      * Create table in a transaction-safe way.
      * Uses $this->up to not duplicate code.
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->up();
     }
@@ -41,7 +45,7 @@ class m160721_010102_create_table_d3files_model_name extends Migration
      * Drop table in a transaction-safe way.
      * Uses $this->down to not duplicate code.
      */
-    public function safeDown()
+    public function safeDown(): void
     {
         $this->down();
     }

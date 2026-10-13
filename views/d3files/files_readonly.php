@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use eaBlankonThema\widget\ThFancyBoxLink;
 use yii\helpers\Html;
@@ -8,9 +9,14 @@ use yii\helpers\Html;
  * @var array $viewByExtensions
  * @var array $fileList
  * @var  $actionColumn
+ * @var bool $hideTitle
+ * @var string  $icon
+ * @var string  $title
+ * @var string  $urlPrefix
  */
 
-if($viewType) {
+/*if ($viewType) {
+    //Deprecated
     echo newerton\fancybox3\FancyBox::widget([
         'target' => '[data-fancybox]',
         'config' => [
@@ -20,7 +26,7 @@ if($viewType) {
             ]
         ],
     ]);
-}
+}*/
 
 ?>
 <div class="d3files-widget">
@@ -30,11 +36,11 @@ if($viewType) {
         ?>
         <tr style="border-bottom: 0;">
             <th style="border-bottom: 0;">
-                <span class="<?php echo $icon; ?>"></span>
-                <?php echo $title; ?>
+                <span class="<?= $icon ?>"></span>
+                <?= $title ?>
             </th>
         </tr>
-    <?php
+        <?php
     }
     ?>    
 </table>
@@ -52,22 +58,21 @@ foreach ($fileList as $row) {
             ) ?>
         </td>
         <?php
-        if($actionColumn) {
+        if ($actionColumn) {
             ?>
             <td class="col-xs-1">
-                <?php
-                echo call_user_func($actionColumn,$row);
-                ?>
+                <?= $actionColumn($row) ?>
             </td>
             <?php
         }
-        if($viewType) {
+        if ($viewType) {
             $ext = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
             ?>
             <td class="col-xs-1">
                 <?php
-                if(in_array($ext,$viewByExtensions, true)){
-                    echo ThFancyBoxLink::widget([
+                if (in_array($ext, $viewByExtensions, true)) {
+                    try {
+                        echo ThFancyBoxLink::widget([
                         'text' => Yii::t('d3files', 'View'),
                         'options' => [
                             //'class' => 'unpaid-invoice-table-actions-col'
@@ -76,7 +81,11 @@ foreach ($fileList as $row) {
                             $urlPrefix . 'd3filesopen',
                             'id' => $row['file_model_id']
                         ]
-                    ]);
+                        ]);
+                    } catch (Exception $e) {
+                        Yii::error($e->getMessage());
+                        echo 'Cannot load widget';
+                    }
                 }
                 ?>
             </td>

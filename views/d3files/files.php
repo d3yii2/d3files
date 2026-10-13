@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 use yii\helpers\Html;
 use yii\web\View;
 use yii\helpers\Url;
@@ -8,6 +10,12 @@ use yii\helpers\Url;
  * @var array $viewByExtensions
  * @var array $fileList
  * @var  $actionColumn
+ * @var string  $urlPrefix
+ * @var int  $model_id
+ * @var string $hideTitle
+ * @var string $icon
+ * @var string $title
+ * @var string $model_name
  */
 
 
@@ -144,7 +152,8 @@ JS;
 
 $this->registerJs($script, View::POS_END, 'd3files');
 
-if($viewType) {
+/* if ($viewType) {
+    //Deprecated
     echo newerton\fancybox3\FancyBox::widget([
         'target' => '[data-fancybox]',
         'config' => [
@@ -154,7 +163,7 @@ if($viewType) {
             ]
         ],
     ]);
-}
+}*/
 
 ?>
 <div id="d3files-widget-<?= $model_id ?>" class="d3files-widget">
@@ -164,22 +173,22 @@ if($viewType) {
         ?>
         <tr style="border-bottom: 0;">
             <th style="border-bottom: 0;">
-                <span class="<?php echo $icon; ?>"></span>
-                <?php echo $title; ?>
-                <label style="margin: 0; margin-left: 5px;" title="<?php echo Yii::t('d3files', 'Add'); ?>">
-                    <input type="file" class="d3file-input" style="display: none;" data-url="<?php echo $uploadUrl; ?>" name="<?php echo $model_name; ?>" />
+                <span class="<?= $icon ?>"></span>
+                <?= $title ?>
+                <label style="margin: 0; margin-left: 5px;" title="<?= Yii::t('d3files', 'Add') ?>">
+                    <input type="file" class="d3file-input" style="display: none;" data-url="<?= $uploadUrl ?>" name="<?= $model_name ?>" />
                     <span class="glyphicon glyphicon-plus text-primary" style="cursor: pointer;"></span>
                 </label>
             </th>
         </tr>
-    <?php
+        <?php
     }
     ?>
     <tr style="border-bottom: 0;">
         <td style="padding: 0; border-bottom: 0;">
-            <div id="d3files-drop-zone-<?= $model_id ?>" class="d3files-drop-zone" title="<?php echo Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically'); ?>" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
+            <div id="d3files-drop-zone-<?= $model_id ?>" class="d3files-drop-zone" title="<?= Yii::t('d3files', 'Drag&Drop a file here, upload will start automatically') ?>" style="border: 2px dashed #bbb; color: #bbb; text-align: center; padding: 8px;">
                 <span class="glyphicon glyphicon-cloud-upload"></span>
-                <?php echo Yii::t('d3files', 'Drag&Drop file here'); ?>
+                <?= Yii::t('d3files', 'Drag&Drop file here') ?>
             </div>
         </td>
     </tr>
@@ -199,11 +208,11 @@ foreach ($fileList as $row) {
             ) ?>
         </td>
         <?php
-        if($viewType) {
+        if ($viewType) {
             ?>
             <td class="col-xs-1">
                 <?php
-                if(in_array($ext,$viewByExtensions, true)){
+                if (in_array($ext, $viewByExtensions, true)) {
                     $fbUrl = [
                         $urlPrefix . 'd3filesopen',
                         'id' => $row['file_model_id']
@@ -215,19 +224,20 @@ foreach ($fileList as $row) {
                         'data-src' => Url::to($fbUrl)
                     ];
 
-                    echo Html::a('<i class="fa fa-external-link"></i>',
-                        'javascript:;', $fbOptions);
+                    echo Html::a(
+                        '<i class="fa fa-external-link"></i>',
+                        'javascript:;',
+                        $fbOptions
+                    );
                 }
                 ?>
             </td>
             <?php
         }
-        if($actionColumn) {
+        if ($actionColumn) {
             ?>
             <td class="col-xs-1">
-                <?php
-                echo call_user_func($actionColumn,$row);
-                ?>
+                <?= $actionColumn($row) ?>
             </td>
             <?php
         }
@@ -237,7 +247,7 @@ foreach ($fileList as $row) {
                 '<span class="glyphicon glyphicon-trash"></span>',
                 [$urlPrefix . 'd3filesdelete', 'id' => $row['file_model_id']],
                 ['class' => 'd3files-delete', 'title' => Yii::t('d3files', 'Delete')]
-            ); ?>
+            ) ?>
         </td>
     </tr>
     <?php

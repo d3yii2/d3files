@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 
 namespace d3yii2\d3files\controllers;
@@ -10,8 +11,16 @@ use d3system\commands\D3CommandController;
 use d3yii2\d3files\models\D3filesModelName;
 use DateInterval;
 use DateTime;
+use Exception;
+use ReflectionException;
+use Throwable;
 use yii\console\ExitCode;
+use yii\db\StaleObjectException;
+use function count;
 
+/**
+ *
+ */
 class CleanFilesController extends D3CommandController
 {
 
@@ -23,7 +32,7 @@ class CleanFilesController extends D3CommandController
      * @param int $months
      * @param string|null $sqlLikeFileName
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public function actionRemoveOlderThan(string $modelName, int $months, ?string $sqlLikeFileName = null): int
     {
@@ -76,8 +85,9 @@ class CleanFilesController extends D3CommandController
      *
      * @param string $modelName
      * @return int
-     * @throws \ReflectionException
-     * @throws \yii\db\StaleObjectException
+     * @throws ReflectionException
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function actionRemoveFiles(string $modelName): int
     {
@@ -111,14 +121,14 @@ class CleanFilesController extends D3CommandController
             $filePath = $fileHandler->getFilePath();
             $fileModel->delete();
 
-            if (!$usedModel = D3filesModel::findOne(['d3files_id' => $file->id])) {
+            if ($usedModel = D3filesModel::findOne(['d3files_id' => $file->id])) {
+                $this->out('Can\'t delete file ' . $file->file_name . ', in use with model: '. $usedModel->id);
+            } else {
                 $this->out('Delete file ' . $fileModel->d3files_id . ' - ' .  $file->file_name);
                 $file->delete();
                 if (file_exists($filePath)) {
                     unlink($filePath);
                 }
-            } else {
-                $this->out('Can\'t delete file ' . $file->file_name . ', in use with model: '. $usedModel->id);
             }
         }
         return ExitCode::OK;
@@ -128,6 +138,7 @@ class CleanFilesController extends D3CommandController
      * check all model files in upload directory and check it in db. if not used, delete
      * @param string $modelName
      * @return int
+     * @throws \yii\db\Exception
      */
     public function actionUnusedFiles(string $modelName): int
     {

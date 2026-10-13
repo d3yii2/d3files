@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\components;
 
@@ -24,16 +25,16 @@ use yii\helpers\Html;
  */
 class D3FilesColumn extends DataColumn
 {
-    public $model;
-    public $modelClass;
-    public $nameModel;
-    public $filterListBoxOptions = [];
-    public $showFilter = false;
-    public $previewOptions = [];
-    private $dataProviderIds = [];
-    private $recordsWithFiles = [];
-    public $nextButtonLabel;
-    public $prevButtonLabel;
+    public ?ActiveRecord $model = null;
+    public ?string $modelClass = null;
+    public ?ActiveRecord $nameModel = null;
+    public array $filterListBoxOptions = [];
+    public bool $showFilter = false;
+    public array $previewOptions = [];
+    private array $dataProviderIds = [];
+    private array $recordsWithFiles = [];
+    public ?string $nextButtonLabel = null;
+    public ?string $prevButtonLabel = null;
     /**
      * Set the initial properties on class init
      */
@@ -90,7 +91,7 @@ class D3FilesColumn extends DataColumn
      * @return string
      * @throws \Exception
      */
-    public function renderDataCellContent($model, $key, $index): string
+    protected function renderDataCellContent($model, $key, $index): string
     {
         try {
             if (empty($this->recordsWithFiles[$model->id])) {
@@ -120,7 +121,7 @@ class D3FilesColumn extends DataColumn
             }
 
             return D3FilesPreviewWidget::widget($options);
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             Yii::error('D3FilesColumn::renderDataCellContent exception: ' . $exception->getMessage());
         }
         return '';

@@ -1,16 +1,18 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\widgets;
 
 use d3system\widgets\D3Widget;
 use d3yii2\d3files\components\D3Files;
 use d3yii2\d3files\D3Files as D3FilesModule;
-use d3yii2\d3files\models\D3filesModelName;
 use ReflectionException;
 use yii\base\Exception;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\grid\ActionColumn;
 use yii\helpers\Json;
+use function get_class;
 
 /**
  * Class`D3FilesWidget`
@@ -36,18 +38,30 @@ use yii\helpers\Json;
  */
 class D3FilesWidget extends D3Widget
 {
-    public $model;
-    public $model_name;
-    public $nameModel;
-    public $model_id;
-    public $title;
-    public $icon = 'glyphicon glyphicon-paperclip';
-    public $allowUpload = true;
-    public $hideTitle = false;
-    public $readOnly = false;
+    public ?ActiveRecord $model = null;
+
+    public ?string $model_name = null;
+
+    public ?ActiveRecord $nameModel = null;
+
+    public ?int $model_id = null;
+
+    public ?string $title = null;
+
+    public string $icon = 'glyphicon glyphicon-paperclip';
+
+    public bool $allowUpload = true;
+
+    public bool $hideTitle = false;
+
+    public bool $readOnly = false;
+
     // File handling controller route. If empty, then use actual controller
-    public $controllerRoute = '';
-    public $enableNotes;
+    public string $controllerRoute = '';
+
+    public bool $enableNotes = false;
+
+    public string $viewFile = self::VIEW_FILES_LIST;
 
     /**
      * @deprecated $viewByFancyBox
@@ -55,8 +69,7 @@ class D3FilesWidget extends D3Widget
      * Fancybox window has been replaced with modal dialog
      * Use D3FilesPreviewWidget with $viewType instead
      */
-    public $viewByFancyBox = false;
-    public $view = self::VIEW_FILES_LIST;
+    public bool $viewByFancyBox = false;
 
     /**
      * @var array
@@ -64,18 +77,21 @@ class D3FilesWidget extends D3Widget
      * Has been renamed since 0.9.18
      * Use $viewByExtensions instead
      */
-    public $viewByFancyBoxExtensions;
-    //File extensions to show
-    public $viewByExtensions;
-    public $fileList = [];
-    // Implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php
-    public $actionColumn;
-    public $urlPrefix = '/d3files/d3files/';
+    public array $viewByFancyBoxExtensions;
 
-    public $uploadButtonPlacement = self::BUTTON_PLACEMENT_RIGHT;
+    //File extensions to show
+    public string $viewByExtensions = '';
+
+    public array $fileList = [];
+
+    // Implented only in ea\eablankonthema\d3files_views\d3files\files_readonly.php
+    public ?ActionColumn $actionColumn = null;
+
+    public string $urlPrefix = '/d3files/d3files/';
+
+    public string $uploadButtonPlacement = self::BUTTON_PLACEMENT_RIGHT;
 
     public const VIEW_FILES_LIST = 'files-list';
-
     public const BUTTON_PLACEMENT_LEFT = 'left';
     public const BUTTON_PLACEMENT_RIGHT = 'right';
     
@@ -102,18 +118,19 @@ class D3FilesWidget extends D3Widget
                 $this->model_name = get_class($this->model);
             }
             
-            if ('' === $this->controllerRoute && property_exists($this->model, 'd3filesControllerRoute')) {
+            if ($this->controllerRoute === '' && property_exists($this->model, 'd3filesControllerRoute')) {
                 $this->controllerRoute = $this->model->d3filesControllerRoute;
             }
         }
         
         // Disabled controller actions, remove url prefix
-        if (Yii::$app->getModule('d3files')->disableController) {
+        $disableController = Yii::$app->getModule('d3files')->disableController ?? false;
+        if ($disableController) {
             $this->urlPrefix = $this->controllerRoute;
         }
 
         // Check default settting from module if not specified
-        if (null === $this->enableNotes) {
+        if (!$this->enableNotes) {
             $this->enableNotes = D3Files::isNotesEnabled();
         }
         
@@ -127,7 +144,7 @@ class D3FilesWidget extends D3Widget
     /**
      * @throws \yii\db\Exception
      */
-    public function initFilesList()
+    public function initFilesList(): void
     {
         // New record?
         if (!$this->model_id) {
@@ -141,21 +158,19 @@ class D3FilesWidget extends D3Widget
     }
 
     /**
-     * @return string|void
+     * @return string
      */
-    public function run()
+    public function run(): string
     {
         if ($this->title === null) {
             $this->title = Yii::t('d3files', 'Attachments');
         }
 
-        if (!$this->view) {
+        if (!$this->viewFile) {
             return '';
         }
-        $viewPathAlias = $this->getViewPath() . $this->view . '.php';
         try {
-            $viewParams = $this->getViewParams();
-            return $this->renderFile($viewPathAlias, $viewParams);
+            return $this->render($this->viewFile, $this->getViewParams());
         } catch (\Exception $exception) {
             Yii::error('D3FilesWidget:run Exception message: ' . PHP_EOL . $exception->getMessage());
             Yii::error('D3FilesWidget:run Exception trace: ' . PHP_EOL . $exception->getTraceAsString());
@@ -166,7 +181,7 @@ class D3FilesWidget extends D3Widget
     /**
      * Get the default params for view file
      * May be owerriden by D3FilesPreviewWidget
-     * @return array
+     * @return array|null
      */
     public function getViewParams(): ?array
     {
@@ -188,17 +203,6 @@ class D3FilesWidget extends D3Widget
     }
 
     /**
-     * @return string
-     */
-    public function getViewPath(): string
-    {
-        if (!$viewPath = Yii::$app->getModule('d3files')->viewPath) {
-            $viewPath = dirname(__DIR__) . '/views';
-        }
-        return $viewPath . '/d3files/';
-    }
-
-    /**
      * Get the list of readed model files
      * @return array
      */
@@ -208,6 +212,9 @@ class D3FilesWidget extends D3Widget
     }
 
 
+    /**
+     * @return void
+     */
     public function registerJsTranslations(): void
     {
         $i18n = Json::encode([

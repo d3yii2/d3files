@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\components;
 
@@ -15,6 +16,7 @@ use yii\helpers\Url;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use function in_array;
+use function is_array;
 
 /**
  * Class DownloadAction
@@ -24,7 +26,7 @@ use function in_array;
  */
 class UploadAction extends D3FilesAction
 {
-    public $fileInputName = 'upload_file';
+    public string $fileInputName = 'upload_file';
     
     /**
      * @param int $id
@@ -41,7 +43,7 @@ class UploadAction extends D3FilesAction
             if (!$d3filesModule->disableController) {
                 if (!$postModelName) {
                     throw new HttpException(422, 'Can not upload file');
-                }                
+                }
                 if (is_array($this->modelName) && !in_array($postModelName, $this->modelName, true)) {
                     throw new HttpException(422, 'Can not upload file for requested model');
                 }
@@ -77,15 +79,18 @@ class UploadAction extends D3FilesAction
             $renderParam = [];
             
             foreach ($fileNames as $fileName) {
-                $tmp_id = uniqid('d3f', false);
+                $tmp_id = uniqid('d3f', true);
                 $versionCounter = 0;
                 $fileData = pathinfo($fileName);
 
-                if(!isset($fileData['extension'])){
-                    throw new D3FilesUserException(Yii::t('d3files','Can not upload the file without extension'));
+                if (!isset($fileData['extension'])) {
+                    throw new D3FilesUserException(
+                        Yii::t('d3files', 'Can not upload the file without extension')
+                    );
                 }
 
-                // If the file with the same name exists, extend the name with the version, e.g. file(1).ext, file(2).ext
+                // If the file with the same name exists, extend the name with the version,
+                // e.g. file(1).ext, file(2).ext
                 do {
                     $versionName = $versionCounter > 0
                         ? $fileData['filename'] . '(' . ($versionCounter + 1) . ').' . $fileData['extension']
@@ -154,7 +159,7 @@ class UploadAction extends D3FilesAction
                             $previewExtensions,
                             $urlParams
                         );
-                        $uploadedFile = D3FilesComponent::getFileFromListById($previewFileList, (string)$model->id);
+                        $uploadedFile = D3FilesComponent::getFileFromListById($previewFileList, $model->id);
                         $file = $uploadedFile ?? [];
                         
                         $renderParam['previewButtonContent'] = $this->controller->renderFile(
@@ -203,7 +208,7 @@ class UploadAction extends D3FilesAction
                 ];
     
                 // Can fix UPLOAD_ERR_PARTIAL problem with non-closing Keep-Alive connection
-                header("Connection: close");
+                header('Connection: close');
             }
             
             return [

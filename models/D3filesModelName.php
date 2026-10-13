@@ -1,14 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace d3yii2\d3files\models;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
 
 /**
  * This is the model class for table "d3files_model_name".
  *
- * @property integer $id
+ * @property int $id
  * @property string $name
  *
  * @property D3filesModel[] $d3filesModels
@@ -18,7 +21,7 @@ class D3filesModelName extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'd3files_model_name';
     }
@@ -26,7 +29,7 @@ class D3filesModelName extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name'], 'required'],
@@ -37,7 +40,7 @@ class D3filesModelName extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => Yii::t('d3files', 'ID'),
@@ -46,9 +49,9 @@ class D3filesModelName extends ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getD3filesModels()
+    public function getD3filesModels(): ActiveQuery
     {
         return $this->hasMany(D3filesModel::class, ['model_name_id' => 'id']);
     }
@@ -57,9 +60,10 @@ class D3filesModelName extends ActiveRecord
      * @param string $name model name
      * @param bool $addIfNotSet add/don't add new, if name not exist
      *
-     * @return integer model name id
+     * @return int|null model name id
+     * @throws Exception
      */
-    public function getByName(string $name, bool $addIfNotSet)
+    public function getByName(string $name, bool $addIfNotSet): ?int
     {
         $model = self::find()
             ->select('id')
@@ -67,7 +71,7 @@ class D3filesModelName extends ActiveRecord
             ->one();
 
         if ($model) {
-            return $model->id;
+            return $model->id ?? null;
         }
 
         if (!$addIfNotSet) {

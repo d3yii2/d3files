@@ -96,19 +96,28 @@ if (!isset($icon)) {
             if (!$readOnly) : ?>
                 <tr class="d3files-row-notes" style="display:none">
                     <td colspan="5">
-                        <?= Html::textarea(
-                            'd3files-notes',
-                            $file['notes'],
-                            ['class' => 'd3files-notes-field', 'rows' => 2, 'cols' => 2]
-                        ) ?>
-                        <?= Html::button(
-                            Yii::t('d3files', 'Save Note'),
-                            [
-                                        'value' => $file['notes'],
-                                        'class' => 'btn btn-sm btn-success d3files-save-notes',
-                                        'data-url' => Url::to([$urlPrefix . 'd3fileseditnotes', 'id' => $file['id']])
-                                ]
-                        ) ?>
+                        <?= Html::tag(
+                                'div',
+                                Html::tag(
+                                        'div',
+                                        Html::tag(
+                                                'div',
+                                                    Html::textarea(
+                                                        'd3files-notes',
+                                                        $file['notes'],
+                                                        ['class' => 'd3files-notes-field form-control mb-1', 'rows' => 2, 'cols' => 2]
+                                                    )
+                                                    . Html::button(
+                                                        Yii::t('d3files', 'Save Note'),
+                                                        [
+                                                                    'value' => $file['notes'],
+                                                                    'class' => 'btn btn-sm btn-success d3files-save-notes form-control',
+                                                                    'data-url' => Url::to([$urlPrefix . 'd3fileseditnotes', 'id' => $file['id']])
+                                                            ]
+                                                    ),
+                                ['class' => 'form-group']),
+                            ['class' => 'col-12 form-body']),
+                    ['class' => 'row']) ?>
                     </td>
                 </tr>
                 <?php

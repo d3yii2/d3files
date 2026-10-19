@@ -6,6 +6,7 @@ namespace d3yii2\d3files\components;
 use d3yii2\d3files\models\D3files;
 use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\d3files\widgets\D3FilesPreviewWidget;
+use Throwable;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Exception;
@@ -108,7 +109,7 @@ class D3FilesColumn extends DataColumn
                     'nameModel' => $this->nameModel,
                     'fileList' => $modelFiles,
                     'showPrevNextButtons' => true,
-                    'view' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,
+                    'viewFile' => D3FilesPreviewWidget::VIEW_MODAL_BUTTON,
                     'nextButtonLabel' => $this->nextButtonLabel,
                     'prevButtonLabel' => $this->prevButtonLabel,
                     'useInColumn' => true,
@@ -117,11 +118,11 @@ class D3FilesColumn extends DataColumn
             );
 
             if (!empty($search['attachment_type'])) {
-                $options['viewByExtensions'] = [$search['attachment_type']];
+                $options['viewByExtensions'] = (string)$search['attachment_type'];
             }
 
             return D3FilesPreviewWidget::widget($options);
-        } catch (\Exception $exception) {
+        } catch (Throwable $exception) {
             Yii::error('D3FilesColumn::renderDataCellContent exception: ' . $exception->getMessage());
         }
         return '';

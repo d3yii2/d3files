@@ -38,3 +38,9 @@
     overflow-wrap: break-word;
     width: 100%;
 }
+
+td.d3files-notes-text {
+    word-wrap: break-word;
+    min-width: 160px;
+    max-width: 500px;
+}

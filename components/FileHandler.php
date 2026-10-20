@@ -249,10 +249,12 @@ class FileHandler
         $filePath = $this->getFilePath();
         FileHelper::createDirectory(dirname($filePath));
 
-        if ($res = file_put_contents($filePath, $fileContent)) {
-            $this->uploadedFilePath = $filePath;
+        if (file_put_contents($filePath, $fileContent) === false) {
+            return false;
         }
-        return $res;
+
+        $this->uploadedFilePath = $filePath;
+        return true;
     }
 
     /**

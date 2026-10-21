@@ -12,7 +12,7 @@ use yii\i18n\PhpMessageSource;
  */
 class D3Files extends Module
 {
-    public string $uploadDir = '.';
+    public string|\Closure $uploadDir = '.';
 
     public string $fileTypes = '';
 

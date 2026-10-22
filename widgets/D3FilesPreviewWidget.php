@@ -8,6 +8,7 @@ use d3yii2\d3files\D3FilesPreviewAsset;
 use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\pdfobject\widgets\PDFObject;
 use eaBlankonThema\assetbundles\AjaxAsset;
+use eaBlankonThema\widget\ThModal;
 use Exception;
 use Throwable;
 use yii\base\InvalidConfigException;
@@ -114,7 +115,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 $this->buttonView = self::VIEW_INLINE_BUTTON;
                 $this->pdfObjectOptions = [
                     'wrapperHtmlOptions' => ['style' => 'height:800px'],
-                    //'targetElementClass' => self::EMBED_CONTENT_CLASS,
+                    'targetElementClass' => self::EMBED_CONTENT_CLASS,
                 ];
             }
 
@@ -150,7 +151,6 @@ class D3FilesPreviewWidget extends D3FilesWidget
                 $pdfObjectOptions = array_merge(
                     [
                         'closeButtonOptions' => ['label' => Yii::t('d3files', 'Close')],
-                        'targetElementClass' => self::EMBED_CONTENT_CLASS,
                     ],
                     $this->pdfObjectOptions
                 );
@@ -161,19 +161,16 @@ class D3FilesPreviewWidget extends D3FilesWidget
             Yii::$app->view->params['PdfObjectRendered'] = true;
         }
 
-        // Ensure modal preview is enabled and the layout rendered once
-        if (self::VIEW_TYPE_MODAL === $this->viewType && !isset(Yii::$app->view->params['D3FilesModalRendered'])) {
-            if (is_callable($this->dialogWidgetClass)) {
-                throw new D3Exception('Invalid Modal Dialog class: ' . $this->dialogWidgetClass);
-            }
+        // Ensure modal preview is enabled
+        if (self::VIEW_TYPE_MODAL === $this->viewType) {
+
+            $this->pdfObjectOptions['targetElementClass'] = ThModal::MODAL_CONTENT_CLASS;
 
             $modalOptions = [];
 
             // Force modal width/height
             $modalOptions['dialogHtmlOptions'] = ['style' => 'width:70%;height:80%'];
             $modalOptions['contentHtmlOptions'] = ['style' => 'height:100%'];
-            $modalOptions['id'] = self::MODAL_ID;
-            $modalOptions['contentClass'] = PDFObject::CONTENT_CLASS;
             $modalOptions['title'] = $this->getModalTitle();
             $modalOptions['toolbarContent'] = $this->getModalToolbarContent();
 
@@ -350,7 +347,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
         $attrs['title'] = Yii::t('d3files', 'Preview atachment');
         $attrs['class'] = 'd3files-preview-widget-load ';
         $attrs['data-toggle'] = 'modal';
-        $attrs['data-target'] = '#' . self::MODAL_ID;
+        $attrs['data-target'] = '#' . ThModal::MODAL_ID;
 
         return $attrs;
     }

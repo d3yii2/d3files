@@ -39,8 +39,8 @@ class D3FilesFileDownloadWidget extends Widget
     public function run(): ?string
     {
         try {
-            return $this->render(
-                $this->getViewPath() . 'file_download',
+            return $this->renderFile(
+                $this->getViewPath() . 'file_download.php',
                 [
                     'fileModelId' => $this->fileModelId,
                     'downloadUrl'   => $this->downloadUrl,

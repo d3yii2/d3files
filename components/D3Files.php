@@ -204,6 +204,7 @@ class D3Files extends Component
      * @param ActiveRecord $modelFrom
      * @param ActiveRecord $modelTo
      * @param string|null $modelFromClass
+     * @param int|null $userId if not set, D3files uses current web user id
      * @return bool
      * @throws Exception
      * @throws ReflectionException
@@ -214,7 +215,8 @@ class D3Files extends Component
     public static function copyFilesBetweenModels(
         ActiveRecord $modelFrom,
         ActiveRecord $modelTo,
-        ?string $modelFromClass = null
+        ?string $modelFromClass = null,
+        ?int $userId = null
     ): bool {
         $modelFromName = $modelFromClass ?? get_class($modelFrom);
         $modelToName = get_class($modelTo);
@@ -242,7 +244,8 @@ class D3Files extends Component
                 $modelToName,
                 $modelTo->id ?? null,
                 $fileContent,
-                $fileTypes
+                $fileTypes,
+                $userId
             );
         }
         

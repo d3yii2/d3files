@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace d3yii2\d3files\widgets;
 
-use d3system\exceptions\D3Exception;
 use d3yii2\d3files\D3FilesPreviewAsset;
 use d3yii2\d3files\models\D3filesModelName;
 use d3yii2\pdfobject\widgets\PDFObject;
@@ -18,7 +17,6 @@ use yii\helpers\Url;
 use Yii;
 use d3yii2\d3files\components\D3Files;
 use yii\web\View;
-use function is_callable;
 
 /**
  * Class D3FilesPreviewWidget
@@ -75,21 +73,19 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     public bool $useInColumn = false;
 
-    public const DEFAULT_ICON = 'glyphicon glyphicon-eye-open';
+    public const string DEFAULT_ICON = 'glyphicon glyphicon-eye-open';
 
-    public const VIEW_DROPDOWN_LIST = 'dropdown-list';
-    public const VIEW_MODAL_BUTTON = '_modal_button';
-    public const VIEW_INLINE_BUTTON = '_inline_button';
-    public const VIEW_IFRAME = '_iframe';
+    public const string VIEW_DROPDOWN_LIST = 'dropdown-list';
+    public const string VIEW_MODAL_BUTTON = '_modal_button';
+    public const string VIEW_INLINE_BUTTON = '_inline_button';
+    public const string VIEW_IFRAME = '_iframe';
 
-    public const VIEW_TYPE_MODAL = 'modal';
-    public const VIEW_TYPE_NONE = 'none';
-    public const VIEW_TYPE_INLINE = 'inline';
+    public const string VIEW_TYPE_MODAL = 'modal';
+    public const string VIEW_TYPE_NONE = 'none';
+    public const string VIEW_TYPE_INLINE = 'inline';
 
-    public const EMBED_CONTENT_CLASS = 'd3files-embed-content';
-    public const PREVIEW_BUTTON_CLASS = 'd3files-preview-button';
-
-    private const MODAL_ID = 'D3FilesPreviewModal';
+    public const string EMBED_CONTENT_CLASS = 'd3files-embed-content';
+    public const string PREVIEW_BUTTON_CLASS = 'd3files-preview-button';
 
     /**
      * @throws Exception

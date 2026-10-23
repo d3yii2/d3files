@@ -57,8 +57,15 @@ class UploadAction extends D3FilesAction
                 throw new NotFoundHttpException(Yii::t('d3files', 'File not uploaded.'));
             }
             
+            // With the controller disabled the client may not send model_name; fall back to the configured one
+            if (!$postModelName && is_string($this->modelName)) {
+                $postModelName = $this->modelName;
+            }
+            if (!is_string($postModelName) || $postModelName === '') {
+                throw new HttpException(422, 'Can not upload file');
+            }
             $this->modelName = $postModelName;
-            
+
             // Check access rights to the record the file is attached to
             D3files::performReadValidation($this->modelName, $id);
             
@@ -162,8 +169,12 @@ class UploadAction extends D3FilesAction
                         $uploadedFile = D3FilesComponent::getFileFromListById($previewFileList, $model->id);
                         $file = $uploadedFile ?? [];
                         
+                        $modalButtonView = $d3filesModule->getView('d3files/' . D3FilesPreviewWidget::VIEW_MODAL_BUTTON);
+                        if (!is_file(Yii::getAlias($modalButtonView))) {
+                            $modalButtonView = dirname(__DIR__) . '/widgets/views/' . D3FilesPreviewWidget::VIEW_MODAL_BUTTON . '.php';
+                        }
                         $renderParam['previewButtonContent'] = $this->controller->renderFile(
-                            $d3filesModule->getView('d3files/' . D3FilesPreviewWidget::VIEW_MODAL_BUTTON),
+                            $modalButtonView,
                             [
                                 'icon' => D3FilesPreviewWidget::DEFAULT_ICON,
                                 'file' => $file,

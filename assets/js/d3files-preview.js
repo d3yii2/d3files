@@ -8,15 +8,18 @@
 (function ($) {
     "use strict";
 
-    $.D3FilesPreview = function () {
+    $.D3FilesPreview = function (options) {
+        options = options || {};
+        this.modalSelector = options.modalSelector || '#th-modal';
         this.gridSelector = '#ThGridViewTable tbody';
         this.handlers = {
             previewButton: $('.d3files-preview-widget-load'),
             previewDropdown: $('.d3files-preview-dropdown'),
             prevButton: $('.d3files-preview-prev-button'),
             nextButton: $('.d3files-preview-next-button'),
-            modalContent: $('#th-modal .th-modal-content'),
-            modalMessages: $('#th-modal .th-modal-messages'),
+            modalDialogContent: $(this.modalSelector + ' .modal-content'),
+            modalContent: $(this.modalSelector + ' .th-modal-content'),
+            modalMessages: $(this.modalSelector + ' .th-modal-messages'),
             imageContent: $('.d3preview-image-content'),
             filesListContent: $('.d3preview-model-files'),
             counterI: $(".d3preview-counter-i"),
@@ -198,7 +201,7 @@
                     this.setPdfObject(this.pdfOptions);
                     this.loadPDF(f);
                     this.activeFile = f;
-                    $('.modal-dialog .modal-content').css('height', '80%');
+                    this.handlers.modalDialogContent.css('height', '80%');
                     return true;
                 } catch (err) {
                     throw new Error('loadFile got catch: ' + err);
@@ -220,8 +223,8 @@
             D3PDF.trigger(f.src);
         },
         loadImage: function (f) {
-            $('.th-modal-content').empty();
-            $('.modal-dialog .modal-content').css('height', 'unset');
+            this.handlers.modalContent.empty();
+            this.handlers.modalDialogContent.css('height', 'unset');
             new PhotoViewer([{
                 src: f.src
             }]);
@@ -229,9 +232,9 @@
 
         },
         loadText: function (f) {
-            $('.th-modal-content').empty();
-            $('.modal-dialog .modal-content').css('height', 'unset');
-            $('.modal-dialog .th-modal-content').load(f.src);
+            this.handlers.modalContent.empty();
+            this.handlers.modalDialogContent.css('height', 'unset');
+            this.handlers.modalContent.load(f.src);
         },
         getModelIndex: function (modelId) {
             let index = null;

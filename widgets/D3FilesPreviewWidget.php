@@ -73,6 +73,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     public bool $useInColumn = false;
 
+    public const string MODAL_ID = 'D3FilesPreviewWidget-modal';
+
     public const string DEFAULT_ICON = 'glyphicon glyphicon-eye-open';
 
     public const string VIEW_DROPDOWN_LIST = 'dropdown-list';
@@ -96,24 +98,22 @@ class D3FilesPreviewWidget extends D3FilesWidget
         parent::init();
 
         $this->icon = self::DEFAULT_ICON;
-
-        // Backward compatibility
-        if ($this->viewByFancyBox) {
-            $this->viewType = self::VIEW_TYPE_MODAL;
-        }
-
         $hasPreviewFiles = false;
         $hasPdf = false;
         $hasAjax = false;
 
-        if (self::VIEW_TYPE_NONE !== $this->viewType) {
-            if (self::VIEW_TYPE_MODAL !== $this->viewType) {
-                $this->buttonView = self::VIEW_INLINE_BUTTON;
+        if ($this->viewType !== self::VIEW_TYPE_NONE) {
+            if (self::VIEW_TYPE_MODAL === $this->viewType) {
                 $this->pdfObjectOptions = [
                     'wrapperHtmlOptions' => ['style' => 'height:800px'],
                     'targetElementClass' => self::EMBED_CONTENT_CLASS,
                 ];
             }
+
+            if ($this->viewType === self::VIEW_TYPE_INLINE) {
+                $this->buttonView = self::VIEW_INLINE_BUTTON;
+            }
+
 
             // Check for PDF and AJAX loaded attachments to  assets and assign preview attributes
             foreach ($this->fileList as $file) {
@@ -167,6 +167,8 @@ class D3FilesPreviewWidget extends D3FilesWidget
             // Force modal width/height
             $modalOptions['dialogHtmlOptions'] = ['style' => 'width:70%;height:80%'];
             $modalOptions['contentHtmlOptions'] = ['style' => 'height:100%'];
+            $modalOptions['id'] = self::MODAL_ID;
+            $modalOptions['contentClass'] = self::EMBED_CONTENT_CLASS;
             $modalOptions['title'] = $this->getModalTitle();
             $modalOptions['toolbarContent'] = $this->getModalToolbarContent();
 
@@ -177,7 +179,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
         }
 
         Yii::$app->getView()->registerJs(
-            'document.D3FP = new $.D3FilesPreview();
+            'document.D3FP = new $.D3FilesPreview(' . Json::encode(['modalSelector' => '#' . self::MODAL_ID]) . ');
                 document.D3FP.setOption("prevNextButtons",  ' . ($this->showPrevNextButtons ? 'true' : 'false') . ');
                 document.D3FP.reflow();',
             View::POS_READY,
@@ -309,6 +311,25 @@ class D3FilesPreviewWidget extends D3FilesWidget
      * @param array $files
      * @return array
      */
+    public static function getPreviewButtonAttributes(array $file, array $files): array
+    {
+        return array_merge(
+            [
+                'data-pjax' => '0',
+                'title' => Yii::t('d3files', 'Preview atachment'),
+                'class' => 'd3files-preview-widget-load',
+
+            ],
+            self::getPreviewButtonDataAttributes($file, $files)
+        );
+    }
+
+    /**
+     * Get element data attributes for modal or inline box scripts
+     * @param array $file
+     * @param array $files
+     * @return array
+     */
     public static function getPreviewButtonDataAttributes(array $file, array $files): array
     {
         return [
@@ -325,11 +346,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public static function getPreviewInlineButtonAttributes(array $file, array $files = []): array
     {
-        $attrs = self::getPreviewButtonDataAttributes($file, $files);
-        $attrs['title'] = Yii::t('d3files', 'Preview atachment');
-        $attrs['class'] = 'd3files-preview-widget-load ';
-
-        return $attrs;
+        return self::getPreviewButtonAttributes($file, $files);
     }
 
     /**
@@ -339,11 +356,11 @@ class D3FilesPreviewWidget extends D3FilesWidget
      */
     public static function getPreviewModalButtonAttributes(array $file, array $files = []): array
     {
-        $attrs = self::getPreviewButtonDataAttributes($file, $files);
-        $attrs['title'] = Yii::t('d3files', 'Preview atachment');
-        $attrs['class'] = 'd3files-preview-widget-load ';
+        $attrs = self::getPreviewButtonAttributes($file, $files);
         $attrs['data-toggle'] = 'modal';
-        $attrs['data-target'] = '#' . ThModal::MODAL_ID;
+        $attrs['data-target'] = '#' . self::MODAL_ID;
+        // Bootstrap 3 loads a href without "#" (javascript:void(0)) into the modal as remote content
+        $attrs['data-remote'] = 'false';
 
         return $attrs;
     }

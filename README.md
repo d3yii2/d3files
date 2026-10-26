@@ -91,6 +91,10 @@ Extends D3FilesWidget with file preview.
 ```
 File types are determined automatically to load PDF or images inside modal dialog window.
 
+The preview opens in its own modal `#D3FilesPreviewWidget-modal` (`D3FilesPreviewWidget::MODAL_ID`), so it can be used on the same page as the generic `#th-modal`.
+Custom preview links should get their attributes from `D3FilesPreviewWidget::getPreviewModalButtonAttributes($file, $files)`. It sets `data-target` and `data-remote="false"`, so Bootstrap 3 does not load the link `href` (e.g. `javascript:void(0)`) as remote modal content.
+The JS preview takes the modal selector as an option: `new $.D3FilesPreview({modalSelector: '#D3FilesPreviewWidget-modal'})` (defaults to `#th-modal`).
+
 ###
 Dependencies:
 

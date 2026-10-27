@@ -74,11 +74,10 @@ class D3files extends ActiveRecord
 
         $model->file_name = $fileName;
         $model->add_datetime = new Expression('NOW()');
-        $model->user_id = $userId ?? (Yii::$app->has('user') ? Yii::$app->user->id : null);
+        $model->user_id = $userId ?? ((Yii::$app->has('user') ? Yii::$app->user->id : null) ?? 0);
 
         if (!$model->save()) {
-            $fileHandler->remove();
-            throw new D3Exception(Yii::t('d3files', 'Insert DB record failed'));
+            throw new D3Exception(Yii::t('d3files', 'Insert DB record failed') . ': ' . json_encode($model->getErrors()));
         }
     
         self::saveModelName($modelName, $modelId, $model->id);
@@ -121,7 +120,7 @@ class D3files extends ActiveRecord
 
         $model->file_name = $fileName;
         $model->add_datetime = new Expression('NOW()');
-        $model->user_id = $userId ?? (Yii::$app->has('user') ? Yii::$app->user->id : null);
+        $model->user_id = $userId ?? ((Yii::$app->has('user') ? Yii::$app->user->id : null) ?? 0);
 
         if ($model->save()) {
             self::saveModelName($modelName, $modelId, $model->id);

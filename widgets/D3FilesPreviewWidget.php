@@ -57,7 +57,11 @@ class D3FilesPreviewWidget extends D3FilesWidget
 
     public string $dialogWidgetClass = 'eaBlankonThema\widget\ThModal';
 
+    public array $dialogWidgetHtmlOptions = ['style' => 'width:70%;height:100%'];
+
     public array $pdfObjectOptions = [];
+
+    public array $pdfObjectWrapperHtmlOptions = ['style' => 'height:700px'];
 
     public bool $showPrevNextButtons = false;
 
@@ -103,9 +107,13 @@ class D3FilesPreviewWidget extends D3FilesWidget
         $hasAjax = false;
 
         if ($this->viewType !== self::VIEW_TYPE_NONE) {
+
+            $this->pdfObjectOptions = [
+                'wrapperHtmlOptions' => $this->pdfObjectWrapperHtmlOptions,
+            ];
+
             if (self::VIEW_TYPE_MODAL === $this->viewType) {
                 $this->pdfObjectOptions = [
-                    'wrapperHtmlOptions' => ['style' => 'height:800px'],
                     'targetElementClass' => self::EMBED_CONTENT_CLASS,
                 ];
             }
@@ -165,8 +173,7 @@ class D3FilesPreviewWidget extends D3FilesWidget
             $modalOptions = [];
 
             // Force modal width/height
-            $modalOptions['dialogHtmlOptions'] = ['style' => 'width:70%;height:80%'];
-            $modalOptions['contentHtmlOptions'] = ['style' => 'height:100%'];
+            $modalOptions['dialogHtmlOptions'] = $this->dialogWidgetHtmlOptions;
             $modalOptions['id'] = self::MODAL_ID;
             $modalOptions['contentClass'] = self::EMBED_CONTENT_CLASS;
             $modalOptions['title'] = $this->getModalTitle();

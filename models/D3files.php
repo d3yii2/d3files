@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace d3yii2\d3files\models;
 
 use d3system\exceptions\D3ActiveRecordException;
+use d3system\exceptions\D3ActiveRecordException2;
 use d3system\exceptions\D3Exception;
 use d3yii2\d3files\components\FileHandler;
 use ReflectionException;
@@ -77,7 +78,7 @@ class D3files extends ActiveRecord
         $model->user_id = $userId ?? ((Yii::$app->has('user') ? Yii::$app->user->id : null) ?? 0);
 
         if (!$model->save()) {
-            throw new D3Exception(Yii::t('d3files', 'Insert DB record failed') . ': ' . json_encode($model->getErrors()));
+            throw new D3ActiveRecordException2($model);
         }
     
         self::saveModelName($modelName, $modelId, $model->id);
@@ -93,6 +94,7 @@ class D3files extends ActiveRecord
      * @param string $fileContent
      * @param string $fileTypes
      * @param int|null $userId if not set, current web user id is used
+     * @return int
      * @throws D3ActiveRecordException
      * @throws D3Exception
      * @throws Exception
@@ -106,7 +108,7 @@ class D3files extends ActiveRecord
         string $fileContent,
         string $fileTypes,
         ?int $userId = null
-    ): void {
+    ): int {
         $fileHandler = new FileHandler(
             [
                 'file_name' => $fileName,
@@ -122,16 +124,17 @@ class D3files extends ActiveRecord
         $model->add_datetime = new Expression('NOW()');
         $model->user_id = $userId ?? ((Yii::$app->has('user') ? Yii::$app->user->id : null) ?? 0);
 
-        if ($model->save()) {
-            self::saveModelName($modelName, $modelId, $model->id);
-            $fileHandler->setModelId($model->id);
-            
-            if (!$fileHandler->save($fileContent)) {
-                throw new D3Exception('D3Files: Cannot save the file: ' . $fileName);
-            }
-        } else {
-            throw new Exception(Yii::t('d3files', 'Insert DB record failed') . ': ' . json_encode($model->getErrors()));
+        if (!$model->save()) {
+            throw new D3ActiveRecordException2($model);
         }
+        $modelId = self::saveModelName($modelName, $modelId, $model->id);
+        $fileHandler->setModelId($model->id);
+
+        if (!$fileHandler->save($fileContent)) {
+            throw new D3Exception('D3Files: Cannot save the file: ' . $fileName);
+        }
+
+        return $modelId;
     }
 
     /**
@@ -165,7 +168,7 @@ class D3files extends ActiveRecord
             $fileHandler->rename($model->id);
         } else {
             $fileHandler->remove();
-            throw new D3ActiveRecordException($model, Yii::t('d3files', 'Insert DB record failed'));
+            throw new D3ActiveRecordException2($model, Yii::t('d3files', 'Insert DB record failed'));
         }
     }
 
@@ -173,10 +176,12 @@ class D3files extends ActiveRecord
      * @param string $modelName
      * @param int $modelId
      * @param int $filesModelId
+     * @return int
      * @throws D3ActiveRecordException
      * @throws Exception
+     * @throws D3ActiveRecordException2
      */
-    private static function saveModelName(string $modelName, int $modelId, int $filesModelId): void
+    private static function saveModelName(string $modelName, int $modelId, int $filesModelId): int
     {
         // Get or create model name id
         $nameModel = new D3filesModelName();
@@ -188,8 +193,9 @@ class D3files extends ActiveRecord
         $filesModel->model_name_id = $model_name_id;
         $filesModel->model_id = $modelId;
         if (!$filesModel->save()) {
-            throw new D3ActiveRecordException($filesModel, null);
+            throw new D3ActiveRecordException2($filesModel, null);
         }
+        return $filesModel->id;
     }
 
     /**
@@ -251,7 +257,7 @@ class D3files extends ActiveRecord
               CASE fm.is_file 
                 WHEN 1 THEN fmn.name
                 ELSE fmnBase.name
-              END className              
+              END className
             FROM
               d3files f
               INNER JOIN d3files_model fm

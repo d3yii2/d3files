@@ -13,7 +13,7 @@ use function sprintf;
 /**
  * This is the model class for table "d3files_model".
  *
- * @property string $id
+ * @property int $id
  * @property string $d3files_id
  * @property int $is_file
  * @property int $model_name_id
@@ -26,8 +26,8 @@ use function sprintf;
 class D3filesModel extends ActiveRecord
 {
 
-    public const SHARED_EXPIRE_DAYS = 5;
-    public const SHARED_LEFT_LOADINGS = 5;
+    public const int SHARED_EXPIRE_DAYS = 5;
+    public const int SHARED_LEFT_LOADINGS = 5;
 
     /**
      * @inheritdoc
